@@ -1,0 +1,76 @@
+/* .marker {
+    background-color: blue;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  } */
+  
+.memory-controlls{
+    margin-top: 331px;
+    width: 100vw;
+    padding-left: 100px;
+}
+
+.memory-controlls form {
+    padding-right: 200px;
+}
+
+.memory-controlls a {
+    padding-left: 200px;
+}
+  
+
+#memory-button{
+    width: 400px;
+}
+
+/* .marker {
+    background-color: blue;
+    width: 20px;
+    height: 20px;
+} */
+
+.popup-non-visable{
+    display: none;
+}
+
+
+.modal-backdrop-custom {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1040;
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+  
+
+  .modal-sizing {
+    min-height: 300px;
+    height: fit-content;
+    
+  }
+
+
+  /* Modal inputs */
+
+  .input-group-lg {
+    display: flex;
+    align-items: center;
+  }
+  
+  .input-group-prepend {
+    flex-shrink: 0;
+  }
+  
+  .input-group-text {
+    height: 100%;
+  }
+
+  .input-group {
+    display: flex;
+    align-items: center;
+  }
+/* Modal Inputs */
+  
