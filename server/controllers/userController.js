@@ -1,4 +1,4 @@
-const { User } = require("../models");
+const { User, Session } = require("../models");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -17,6 +17,13 @@ const userLogin = async (req, res) => {
     }else if(selectedUser.password !== req.body.password){
         res.json('The user exists but the password is incorrect')
     }else{
+      await Session.deleteMany({});
+
+      await Session.create({
+        cookie: req.session.cookie,
+        isLoggedIn: true,
+        currentUser: selectedUser
+      })
         res.json(selectedUser)
     }
   } catch (err) {
@@ -31,6 +38,13 @@ const userSignUp = async (req, res) => {
       res.json('This email is already linked to an account')
     }else{
       const newUser = await User.create(req.body);
+      await Session.deleteMany({});
+
+      await Session.create({
+        cookie: req.session.cookie,
+        isLoggedIn: true,
+        currentUser: newUser
+      })
       res.json(newUser);
     }
   } catch (err) {

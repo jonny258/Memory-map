@@ -9,7 +9,14 @@ function Home() {
   const [memoryButtonMode, setMemoryButtonMode] = useState(false);
   const [activeModal, setActiveModal] = useState(-1);
   const [isEdit, setIsEdit] = useState(false);
-  const [colorState, setColorState] = useState('#ff0000')
+  const [userState, setUserState] = useState(null);
+  // const [userState, setUserState] = useState(()=> {
+  //   fetch('http://localhost:5500/api/session')
+  //   .then((response) => response.json())
+  //   .then((data) => {
+  //     return data
+  //   })
+  // })
   const [mapStyles, setMapStyles] = useState(
     "mapbox://styles/jonnman/cljn80p85002l01rgdt63guar"
   );
@@ -85,6 +92,17 @@ function Home() {
   const mapLoadHandler = () => {};
 
   useEffect(() => {
+    fetch("http://localhost:5500/api/session")
+      .then((response) => response.json())
+      .then((data) => {
+        setUserState(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching user session:", error);
+      });
+  }, []);
+
+  useEffect(() => {
     mapboxgl.accessToken =
       "pk.eyJ1Ijoiam9ubm1hbiIsImEiOiJjbGppeTh3cncwNDJyM2VubzBmbWY4dW5iIn0.q1fX0L5lbw6RlMZYhz8lhw";
 
@@ -124,25 +142,23 @@ function Home() {
         popup.addClassName("popup-non-visable");
         if (memoryButtonRef.current.innerText === "Currently VIEW Mode") {
           console.log("pop up was clicked");
-          setIsEdit(false)
+          setIsEdit(false);
           setActiveModal(index);
         }
       });
 
       const marker = new mapboxgl.Marker({
-        color: colorState
+        color: (userState ? userState[0].currentUser.color : '#FFFFFF'),
       })
         .setLngLat([point.lng, point.lat])
         .setPopup(popup)
         .addTo(map);
       markers.push(marker);
-    });
+    });4
     return () => {
       markers.forEach((marker) => marker.remove());
     };
-  }, [markerArr]);
-
-
+  }, [markerArr, userState]);
 
   const mapFly = (camera) => {
     const map = mapRef.current;
@@ -153,17 +169,16 @@ function Home() {
       pitch: camera.pitch,
       bearing: camera.bearing,
       duration: camera.duration,
-      easing: function(t) {
+      easing: function (t) {
         return 1 - Math.pow(1 - t, 3);
         // return t
         //return t * t
-      }
+      },
     });
-  }
+  };
 
   const searchButtonHandler = () => {
     const query = searchButtonRef.current.value;
-    
 
     const accessToken =
       "pk.eyJ1Ijoiam9ubm1hbiIsImEiOiJjbGppeTh3cncwNDJyM2VubzBmbWY4dW5iIn0.q1fX0L5lbw6RlMZYhz8lhw";
@@ -177,52 +192,51 @@ function Home() {
       .then((data) => {
         if (data.features[0]) {
           let zoomAmount;
-          const placeType = data.features[0].place_type[0]
+          const placeType = data.features[0].place_type[0];
           switch (placeType) {
-            case 'country':
+            case "country":
               zoomAmount = 5;
               break;
-            case 'region':
+            case "region":
               zoomAmount = 7;
               break;
-            case 'district':
+            case "district":
               zoomAmount = 10;
               break;
-            case 'place':
+            case "place":
               zoomAmount = 12;
               break;
-            case 'postcode':
+            case "postcode":
               zoomAmount = 14;
               break;
-            case 'locality':
+            case "locality":
               zoomAmount = 12;
               break;
-            case 'neighborhood':
+            case "neighborhood":
               zoomAmount = 14;
               break;
-            case 'address':
+            case "address":
               zoomAmount = 16;
               break;
-            case 'poi':
+            case "poi":
               zoomAmount = 14;
               break;
-            case 'landmark':
+            case "landmark":
               zoomAmount = 14;
               break;
             default:
               zoomAmount = 10;
               break;
-          }         
+          }
 
           const camera = {
-            center: data.features[0].geometry.coordinates, 
+            center: data.features[0].geometry.coordinates,
             zoom: zoomAmount,
             pitch: 0,
             bearing: 0,
-            duration: 5000
+            duration: 5000,
           };
-          mapFly(camera)
-
+          mapFly(camera);
         } else {
           alert("The place you searched for doesn't exist");
         }
@@ -258,46 +272,41 @@ function Home() {
   };
 
   const deleteButtonHandler = (index) => {
-    if(typeof index === 'number'){
+    if (typeof index === "number") {
       const updatedMarkerArr = [...markerArr];
       updatedMarkerArr.splice(index, 1);
       setMarkersArr(updatedMarkerArr);
-      setActiveModal(-1)
-    }else{
+      setActiveModal(-1);
+    } else {
       const updatedMarkerArr = [...markerArr];
       updatedMarkerArr.splice(activeModal, 1);
       setMarkersArr(updatedMarkerArr);
-      setActiveModal(-1)
+      setActiveModal(-1);
     }
-
   };
 
   const editAndViewCardHandler = (lng, lat, index, editStatus) => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: "smooth",
     });
 
     const showModal = () => {
       setIsEdit(editStatus);
       setActiveModal(index);
-    }
+    };
 
-    setTimeout(showModal, 5000)
+    setTimeout(showModal, 5000);
 
     const camera = {
-      center: [lng, lat], 
+      center: [lng, lat],
       zoom: 16,
       pitch: 0,
       bearing: 0,
       duration: 5000,
     };
-    mapFly(camera)
-  }
-
-
-
-
+    mapFly(camera);
+  };
 
   const modalBackgroundHandler = (event) => {
     if (event.target.className === "modal fade show") {
@@ -313,7 +322,7 @@ function Home() {
           <div className="d-flex">
             <button
               type="button"
-              class="btn btn-light"
+              className="btn btn-light"
               onClick={() =>
                 setMapStyles(
                   "mapbox://styles/jonnman/cljn7z6j3001301ocf8xh52il"
@@ -324,7 +333,7 @@ function Home() {
             </button>
             <button
               type="button"
-              class="btn btn-dark"
+              className="btn btn-dark"
               onClick={() =>
                 setMapStyles(
                   "mapbox://styles/jonnman/cljn80p85002l01rgdt63guar"
@@ -335,7 +344,7 @@ function Home() {
             </button>
             <button
               type="button"
-              class="btn btn-success"
+              className="btn btn-success"
               id="right-button"
               onClick={() =>
                 setMapStyles(
@@ -376,7 +385,7 @@ function Home() {
           </div>
         </nav>
         <div className="container">
-          <h1>Jonny's memories</h1>
+          <h1>{userState ? userState[0].currentUser.name : "Defaultname"}'s memories</h1>
           <div className="card">
             <ul className="list-group list-group-flush">
               {markerArr.map((point, index) => {
@@ -402,20 +411,36 @@ function Home() {
                       >
                         <button
                           className="btn btn-outline-info w-100 h-100"
-                          onClick={() => editAndViewCardHandler(point.lng, point.lat, index, false)}
+                          onClick={() =>
+                            editAndViewCardHandler(
+                              point.lng,
+                              point.lat,
+                              index,
+                              false
+                            )
+                          }
                         >
                           View
                         </button>
                         <button
                           className="btn btn-outline-success w-100 h-100"
-                          onClick={() => editAndViewCardHandler(point.lng, point.lat, index, true)}
+                          onClick={() =>
+                            editAndViewCardHandler(
+                              point.lng,
+                              point.lat,
+                              index,
+                              true
+                            )
+                          }
                         >
                           Edit
                         </button>
                         <button
                           className="btn btn-outline-danger w-100 h-100"
                           id="rightmost-card"
-                          onClick={()=> {deleteButtonHandler(index)}}
+                          onClick={() => {
+                            deleteButtonHandler(index);
+                          }}
                         >
                           Delete
                         </button>
@@ -432,7 +457,7 @@ function Home() {
           return (
             index === activeModal && (
               <ParentModal
-              deleteButtonHandler={deleteButtonHandler}
+                deleteButtonHandler={deleteButtonHandler}
                 isEdit={isEdit}
                 setIsEdit={setIsEdit}
                 markerArr={markerArr}

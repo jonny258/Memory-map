@@ -1,11 +1,19 @@
 const express = require('express')
 const app = express()
+
+const session = require('express-session');
 const cors = require('cors')
 
 const db = require('./config/connection')
 const routes = require('./routes')
 
 const PORT = 5500;
+
+app.use(session({
+    secret: 't5H1i7Gc$Gy9^sb@9K0E', 
+    resave: false,
+    saveUninitialized: true
+  }));
 
 app.use(cors())
 app.use(express.urlencoded({ extended: true }));
