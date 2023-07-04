@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
-class Memory { //This is the constucor that makes the memories
+class Memory {
+  //This is the constucor that makes the memories
   constructor(title, description, lngLat) {
     (this.title = title),
       (this.description = description),
@@ -20,44 +21,37 @@ function Modal({
   modalData,
   setModalData,
 }) {
-
   //This is all this does is change the modal to edit
   const editButtonHandler = () => {
     setIsEdit(true);
   };
 
   const saveChangesHandler = (event) => {
-    // const newMemory = new Memory(
+    //Assigns the modal inputs to a value
     const memoryTitle = document.getElementById("memory-title").value;
     const memoryDescription =
       document.getElementById("memory-description").value;
-    //   activeLngLat
-    // );
-    // console.log(newMemory);
-    // setMemoryArr((prevMemoryArr) => [...prevMemoryArr, newMemory]);
-    // console.log(memoryArr);
-    console.log(activeLngLat)
+    //Validates that both the fields are filled out
     if (memoryTitle && memoryDescription) {
-      console.log(activeLngLat)
-      const newMemory = new Memory(
+      const newMemory = new Memory( //Creates the new memory
         memoryTitle,
         memoryDescription,
-        mapObject.lngLat,
+        mapObject.lngLat
       );
-      setModalData(newMemory);
-      // console.log(newMemory);
-      makeMarker(mapObject, newMemory);
-      setIsEdit(false);
+      setModalData(newMemory); //Sets the modalData so that you can view it right after you submit
+      makeMarker(mapObject, newMemory); //Calls the makeMarker function that will be called in the home.jsx file
+      setIsEdit(false); //Changes the page to edit
     } else {
-      alert("please fillout both fields to make a memory");
+      alert("please fillout both fields to make a memory"); //This runs if you don't input both fields
     }
   };
+
   return (
     <>
       <div
         className="modal-backdrop-custom fade show"
+        //   //This code is never hit and that is why I can't close when i click the background
         // onClick={(event) => {
-        //   //This code is never hit and that is why I can't close the background
         //   event.stopPropagation();
         //   console.log("hehe");
         // }}
@@ -67,6 +61,7 @@ function Modal({
         tabIndex="-1"
         role="dialog"
         style={{ display: "block" }}
+        //This code runs every time you click and the modal is open
         // onClick={(event) => {
         //   event.stopPropagation();
         //   console.log("yoyo");
@@ -74,7 +69,7 @@ function Modal({
       >
         <div className="modal-dialog" role="document">
           <div className="modal-content modal-sizing">
-            {!isEdit && (
+            {!isEdit && ( //The Display part of the modal
               <>
                 <div className="modal-header">
                   <h5 className="modal-title" id="modalDataTitle">
@@ -110,7 +105,7 @@ function Modal({
                 </div>
               </>
             )}
-            {isEdit && (
+            {isEdit && ( //The edit part of the modal
               <>
                 <div className="modal-header">
                   <div className="input-group input-group-lg">
@@ -126,19 +121,7 @@ function Modal({
                       type="text"
                       className="form-control"
                       id="memory-title"
-                      // value={modalData.title}
                       defaultValue={modalData.title}
-                      // onChange={(event) => {
-                      //   // Update the value of modalData.title
-                      //   const updatedModalData = {
-                      //     ...modalData,
-                      //     title: event.target.value,
-                      //   };
-                      //   // Handle the onChange event if needed
-                      //   // For example, you can update the state or perform any other operations
-                      //   console.log(updatedModalData.title);
-                      //   // Update the modalData state or perform any other necessary actions
-                      // }}
                     />
                   </div>
 
@@ -161,17 +144,6 @@ function Modal({
                       className="form-control"
                       aria-label="With textarea"
                       defaultValue={modalData.description}
-                      // onChange={(event) => {
-                      //   // Update the value of modalData.description
-                      //   const updatedModalData = {
-                      //     ...modalData,
-                      //     description: event.target.value,
-                      //   };
-                      //   // Handle the onChange event if needed
-                      //   // For example, you can update the state or perform any other operations
-                      //   console.log(updatedModalData.description);
-                      //   // Update the modalData state or perform any other necessary actions
-                      // }}
                     />
                   </div>
                 </div>

@@ -1,237 +1,520 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "../assets/css/home.css";
-import Modal from "../components/modal";
+import ParentModal from "../components/ParentModal";
 
 function Home() {
-  //Unchanging constiant variables
-  const mapStyles = {
-    width: "100vw",
-    height: "500px",
-    position: "absolute",
-    top: "0",
-  };
-
-  //Function wide changing variables
-  let activeLngLat;
-
-  //All of my usestate
-  const [markers, setMarkers] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [memoryArr, setMemoryArr] = useState([]);
+  const [memoryButtonMode, setMemoryButtonMode] = useState(false);
+  const [activeModal, setActiveModal] = useState(-1);
   const [isEdit, setIsEdit] = useState(false);
-  const [markerObject, setMarkerObject] = useState({});
-  const [modalData, setModalData] = useState([]);
+  const [colorState, setColorState] = useState('#ff0000')
+  const [mapStyles, setMapStyles] = useState(
+    "mapbox://styles/jonnman/cljn80p85002l01rgdt63guar"
+  );
+  const [markerArr, setMarkersArr] = useState(() => [
+    //Where I will fetch values
+    {
+      lat: 40.7608,
+      lng: -111.891,
+      title: "Salt Lake City",
+      description: "This is Salt Lake City.",
+      name: "Mary Jane",
+      date: "6/29",
+    },
+    {
+      lat: 40.6461,
+      lng: -111.4979,
+      title: "Park City",
+      description: "This is Park City.",
+      name: "Jack Lou",
+      date: "5/29",
+    },
+    {
+      lat: 40.2338,
+      lng: -111.6585,
+      title: "Provo",
+      description: "This is Provo.",
+      name: "Jonathan Christian",
+      date: "3/8",
+    },
+    {
+      lat: 41.223,
+      lng: -111.9738,
+      title: "Ogden",
+      description: "This is Ogden.",
+      name: "mikey",
+      date: "8/1",
+    },
+  ]);
 
-  const makeMarker = (mapObject, newMemory) => {
-    //This is what make the new marker, it is called in modal.jsx but ran here
-    const { lng, lat } = newMemory.lngLat; //Destrucures the lat and lng that were assigned to it
-    const marker = new mapboxgl.Marker() //This makes the new marker
-      .setLngLat([lng, lat]) //This positions the new marker
-      .setPopup(mapObject.popup) //This gives it the pop up
-      .addTo(mapObject.map); //This adds it to the map
+  const mapRef = useRef(null);
+  const searchButtonRef = useRef();
+  const memoryButtonRef = useRef();
 
-    marker._element.slot = JSON.stringify(newMemory); //The new memory has the data like title and description that I need so I save it to the element on every marker
-    setMarkers((prevMarkers) => [...prevMarkers, marker]); //Adds the new marker to the marker array
-  };
+  const modalMemoryDescriptionRef = useRef("");
+  const modalMemoryTitleRef = useRef("");
+  const coordinatesRef = useRef([]);
 
-  //These are simple functions local to home
-  const openModal = () => {
-    //Opens the modal
-    console.log("open modal");
-    setModalOpen(true);
-  };
+  class MakeMarker {
+    constructor(lat, lng, title, description, date, name) {
+      (this.lat = lat),
+        (this.lng = lng),
+        (this.title = title),
+        (this.description = description),
+        (this.date = date),
+        (this.name = name);
+    }
+  }
 
-  const closeModal = () => {
-    //Closes the modal
-    console.log("close modal");
-    setModalOpen(false);
-  };
-
-  const addMemoriesButtonHandler = (event) => {
-    //switches the text on the modal
-    if (event.target.innerText === "Click to Add Memories") {
-      event.target.innerText = "Click to View Memories";
+  const mapClickHandler = (clickEvent) => {
+    if (memoryButtonRef.current.innerText === "Currently CREATE Mode") {
+      console.log("Map has been clicked on CREATE mode");
+      coordinatesRef.current = [clickEvent.lngLat.lat, clickEvent.lngLat.lng];
+      setModalOpen(true);
+    } else if (memoryButtonRef.current.innerText === "Currently VIEW Mode") {
+      console.log("Map has been clicked on VIEW mode");
     } else {
-      event.target.innerText = "Click to Add Memories";
+      console.log("ERROR something went wrong");
+      console.log(memoryButtonMode);
+      console.log(memoryButtonRef);
     }
   };
 
-  const searchButtonHandler = (event) => {
-    //Will do something with the search in the future
-    event.preventDefault();
-    const searchInput = document.getElementById("searchInput");
-    console.log(searchInput);
-    console.log(searchInput.value);
-  };
-
-  const handleBackgroundClick = (event) => {
-    //This doesn't work right now but this is how to modal background will work
-    console.log("handleBackground clicks");
-    if (event.target.classList.contains("modal-backdrop")) {
-      closeModal();
-    }
-  };
-
-  //This useRef is used to store the handler function that will persist across multiple re renders or react
-  //I am storing this function in a handler so that I can call it outside of the useEffect but I can still get the most recent Markers cards
-  const popUpOpenHandlerRef = useRef(null);
+  const mapLoadHandler = () => {};
 
   useEffect(() => {
-    //This useEffect runs everytime there is an update to the markers useState
-    const handler = (popup) => {
-      //The pop up being passed here is from the popup that was clicked
-      const selectedMarker = markers.filter((mark) => {
-        //This filters through the markers array
-        return Math.abs(popup._lngLat.lat - mark._lngLat.lat) < 0.000001; //Returns an array of all the markers that meet the same latitude to with in 1/100000
-      });
-      const lastMatchedMarker = selectedMarker.pop(); //Because this is an array I get the last element using pop
-      setModalData(JSON.parse(lastMatchedMarker._element.slot)); //Set the model data as the selected items slot value
-      setIsEdit(false); //Sets what page the modal will be on
-      openModal(); //Opens the modal
-    };
-
-    popUpOpenHandlerRef.current = handler; // Assign the handler function to the ref
-  }, [markers]); //This is what makes it run every time the markers state updates
-
-  const handleMapClick = (event) => {
-    //This function runs on every single click to the mouse
-    const map = mapRef.current; //Assigns map to the reference value
-    const popup = new mapboxgl.Popup().setHTML("<h1>Hello World!</h1>"); //makes a new popup the html will never actually be seen
-
-    popup.on("open", () => {
-      popup.addClassName("popup-non-visable"); //assigns the modal a class that makes it not visable
-      //This code updates the marker object, so that if you edit the memory then you will still have the correct values like lngLat
-      activeLngLat = event.lngLat;
-      setMarkerObject({
-        event: event,
-        popup: popup,
-        map: map,
-        lngLat: activeLngLat,
-      });
-      //VIEW MODE
-      if (
-        //This is verification that makes sure you are in the view mode, and makes sure that the pop up function has been assigned to a function
-        document.getElementById("memory-button").innerText ===
-          "Click to Add Memories" &&
-        typeof popUpOpenHandlerRef.current === "function"
-      ) {
-        popUpOpenHandlerRef.current(popup); //runs the popup function that is in the useEffect and it gets the correct marker array
-      }
-    });
-
-    //CREATE MODE
-    if (
-      //checks to see if you are in make a new one mode
-      document.getElementById("memory-button").innerText ===
-      "Click to View Memories"
-    ) {
-      setModalData([""]); //clears the modalData so that there isn't anything in the text boxes when you load in
-      setIsEdit(true); //Sets the page that the modal will be on
-      activeLngLat = event.lngLat; //sets the activeLngLat so that it will be correct
-      openModal(); //opens the modal
-      setMarkerObject({
-        //sets all the right data so that a new marker can be made
-        event: event,
-        popup: popup,
-        map: map,
-        lngLat: activeLngLat,
-      });
-    }
-  };
-
-  const mapRef = useRef(null); //defines the map as a blank use ref
-
-  useEffect(() => {
-    //This useEffect runs once on start
     mapboxgl.accessToken =
-      "pk.eyJ1Ijoiam9ubm1hbiIsImEiOiJjbGppeTh3cncwNDJyM2VubzBmbWY4dW5iIn0.q1fX0L5lbw6RlMZYhz8lhw"; //my map token, kind of like an API key
+      "pk.eyJ1Ijoiam9ubm1hbiIsImEiOiJjbGppeTh3cncwNDJyM2VubzBmbWY4dW5iIn0.q1fX0L5lbw6RlMZYhz8lhw";
 
     const map = new mapboxgl.Map({
-      //This makes the map
       container: "map",
-      style: "mapbox://styles/jonnman/cljiybkez001801r99ioccx42", //Map styles
-      center: [-111.88, 40.67], //Centers at salt lake city
+      style: mapStyles,
+      center: [-111.88, 40.67],
       zoom: 10,
     });
 
-    mapRef.current = map; //Assigns useRef to the map
+    mapRef.current = map;
+
+    map.on("click", (event) => {
+      mapClickHandler(event);
+    });
+
+    map.on("load", () => {
+      mapLoadHandler();
+    });
+
+    setMarkersArr([...markerArr]);
 
     return () => {
-      //I don't really know why I need this
       map.remove();
+      map.off("load");
+      map.off("click");
     };
-  }, []);
+  }, [mapStyles]);
 
   useEffect(() => {
-    //This makes the map event handlers seperate from the creation of the map, this is also so that I can get the most recent data
-    if (mapRef.current) {
-      //this is for error handling
-      const map = mapRef.current; //assigns the map so that it can get event handlers placed on it
-      map.on("click", handleMapClick); //makes the handleMapClick work
-      return () => {
-        map.off("click", handleMapClick); //removes the handle map click so that there isn't duplicate code
-      };
-    }
-  }, [handleMapClick]);
+    const map = mapRef.current;
+    const markers = [];
 
-  //This is the HTML that is returned to the user
+    markerArr.forEach((point, index) => {
+      const popup = new mapboxgl.Popup().setHTML("<h1>Hello World!</h1>");
+      popup.on("open", (event) => {
+        popup.addClassName("popup-non-visable");
+        if (memoryButtonRef.current.innerText === "Currently VIEW Mode") {
+          console.log("pop up was clicked");
+          setIsEdit(false)
+          setActiveModal(index);
+        }
+      });
+
+      const marker = new mapboxgl.Marker({
+        color: colorState
+      })
+        .setLngLat([point.lng, point.lat])
+        .setPopup(popup)
+        .addTo(map);
+      markers.push(marker);
+    });
+    return () => {
+      markers.forEach((marker) => marker.remove());
+    };
+  }, [markerArr]);
+
+
+
+  const mapFly = (camera) => {
+    const map = mapRef.current;
+
+    map.flyTo({
+      center: camera.center,
+      zoom: camera.zoom,
+      pitch: camera.pitch,
+      bearing: camera.bearing,
+      duration: camera.duration,
+      easing: function(t) {
+        return 1 - Math.pow(1 - t, 3);
+        // return t
+        //return t * t
+      }
+    });
+  }
+
+  const searchButtonHandler = () => {
+    const query = searchButtonRef.current.value;
+    
+
+    const accessToken =
+      "pk.eyJ1Ijoiam9ubm1hbiIsImEiOiJjbGppeTh3cncwNDJyM2VubzBmbWY4dW5iIn0.q1fX0L5lbw6RlMZYhz8lhw";
+    const baseEndpoint = "https://api.mapbox.com/geocoding/v5/mapbox.places";
+    const url = `${baseEndpoint}/${encodeURIComponent(
+      query
+    )}.json?access_token=${accessToken}&limit=1`;
+
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.features[0]) {
+          let zoomAmount;
+          const placeType = data.features[0].place_type[0]
+          switch (placeType) {
+            case 'country':
+              zoomAmount = 5;
+              break;
+            case 'region':
+              zoomAmount = 7;
+              break;
+            case 'district':
+              zoomAmount = 10;
+              break;
+            case 'place':
+              zoomAmount = 12;
+              break;
+            case 'postcode':
+              zoomAmount = 14;
+              break;
+            case 'locality':
+              zoomAmount = 12;
+              break;
+            case 'neighborhood':
+              zoomAmount = 14;
+              break;
+            case 'address':
+              zoomAmount = 16;
+              break;
+            case 'poi':
+              zoomAmount = 14;
+              break;
+            case 'landmark':
+              zoomAmount = 14;
+              break;
+            default:
+              zoomAmount = 10;
+              break;
+          }         
+
+          const camera = {
+            center: data.features[0].geometry.coordinates, 
+            zoom: zoomAmount,
+            pitch: 0,
+            bearing: 0,
+            duration: 5000
+          };
+          mapFly(camera)
+
+        } else {
+          alert("The place you searched for doesn't exist");
+        }
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const saveMemoryHandler = () => {
+    if (
+      modalMemoryTitleRef.current.value &&
+      modalMemoryDescriptionRef.current.value
+    ) {
+      //I need to input the name here
+      const currentDate = new Date();
+      const formattedDate = `${
+        currentDate.getMonth() + 1
+      }/${currentDate.getDate()}`;
+
+      console.log(coordinatesRef.current);
+      const newMarker = new MakeMarker(
+        coordinatesRef.current[0],
+        coordinatesRef.current[1],
+        modalMemoryTitleRef.current.value,
+        modalMemoryDescriptionRef.current.value,
+        formattedDate
+      );
+      console.log(newMarker);
+      setMarkersArr((prev) => [...prev, newMarker]);
+      setModalOpen(false);
+    } else {
+      alert("Please fillout both fields");
+    }
+  };
+
+  const deleteButtonHandler = (index) => {
+    if(typeof index === 'number'){
+      const updatedMarkerArr = [...markerArr];
+      updatedMarkerArr.splice(index, 1);
+      setMarkersArr(updatedMarkerArr);
+      setActiveModal(-1)
+    }else{
+      const updatedMarkerArr = [...markerArr];
+      updatedMarkerArr.splice(activeModal, 1);
+      setMarkersArr(updatedMarkerArr);
+      setActiveModal(-1)
+    }
+
+  };
+
+  const editAndViewCardHandler = (lng, lat, index, editStatus) => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+
+    const showModal = () => {
+      setIsEdit(editStatus);
+      setActiveModal(index);
+    }
+
+    setTimeout(showModal, 5000)
+
+    const camera = {
+      center: [lng, lat], 
+      zoom: 16,
+      pitch: 0,
+      bearing: 0,
+      duration: 5000,
+    };
+    mapFly(camera)
+  }
+
+
+
+
+
+  const modalBackgroundHandler = (event) => {
+    if (event.target.className === "modal fade show") {
+      setModalOpen(false);
+    }
+  };
+
   return (
     <>
-    {/* The map */}
-      <div id="map" style={mapStyles}></div> 
-      {/* The container that holds all the markers and renders them with a map*/}
-      {markers.length > 0 && (
-        <div id="marker-container">
-          {markers.map((marker, index) => (
-            <div key={index} className="marker"></div>
-          ))}
+      <div className="map-container">
+        <div className="map-styles-selector">
+          <h3>Map Styles</h3>
+          <div className="d-flex">
+            <button
+              type="button"
+              class="btn btn-light"
+              onClick={() =>
+                setMapStyles(
+                  "mapbox://styles/jonnman/cljn7z6j3001301ocf8xh52il"
+                )
+              }
+            >
+              Light
+            </button>
+            <button
+              type="button"
+              class="btn btn-dark"
+              onClick={() =>
+                setMapStyles(
+                  "mapbox://styles/jonnman/cljn80p85002l01rgdt63guar"
+                )
+              }
+            >
+              Dark
+            </button>
+            <button
+              type="button"
+              class="btn btn-success"
+              id="right-button"
+              onClick={() =>
+                setMapStyles(
+                  "mapbox://styles/jonnman/cljn81k8o002f01r9ecuh6zxf"
+                )
+              }
+            >
+              Satellite
+            </button>
+          </div>
         </div>
-      )}
-
-      {/* This is the nav bar below */}
-      <nav className="navbar navbar-dark bg-dark memory-controlls">
-        <a className="navbar-brand">Navbar</a>
-        <button
-          className="btn btn-outline-success my-2 my-sm-0"
-          id="memory-button"
-          onClick={(event) => addMemoriesButtonHandler(event)}
-        >
-          Click to Add Memories
-        </button>
-        <form className="form-inline d-flex">
-          <input
-            id="searchInput"
-            className="form-control mr-sm-2"
-            type="search"
-            placeholder="Search"
-            aria-label="Search"
-          ></input>
+        <div id="map"></div>
+        {/* Edit and change nav below */}
+        <nav className="navbar navbar-dark bg-dark memory-controlls">
+          <a className="navbar-brand">Memory Map</a>
           <button
+            ref={memoryButtonRef}
             className="btn btn-outline-success my-2 my-sm-0"
-            onClick={(event) => searchButtonHandler(event)}
+            id="memory-button"
+            onClick={() => setMemoryButtonMode(!memoryButtonMode)}
           >
-            Search
+            {memoryButtonMode ? "Currently CREATE Mode" : "Currently VIEW Mode"}
           </button>
-        </form>
-      </nav>
+          <div className="form-inline d-flex search-box">
+            <input
+              ref={searchButtonRef}
+              className="form-control mr-sm-2"
+              type="search"
+              placeholder="Enter a location"
+              aria-label="Search"
+            ></input>
+            <button
+              className="btn btn-outline-success my-2 my-sm-0"
+              onClick={searchButtonHandler}
+            >
+              Search
+            </button>
+          </div>
+        </nav>
+        <div className="container">
+          <h1>Jonny's memories</h1>
+          <div className="card">
+            <ul className="list-group list-group-flush">
+              {markerArr.map((point, index) => {
+                return (
+                  <li className="list-group-item" key={index}>
+                    <div className="d-flex">
+                      <div
+                        className="col border d-flex justify-content-between col-text"
+                        id="leftmost-card"
+                      >
+                        <h3>{point.title}</h3>
+                        <div className="text-end">
+                          <h6>{point.name ? point.name : "Default Name"}</h6>
+                          <p>{point.date}</p>
+                        </div>
+                      </div>
+                      <div className="col border col-text">
+                        <p>{point.description}</p>
+                      </div>
+                      <div
+                        className="col border d-flex flex-row align-items-start col-buttons"
+                        id="rightmost-card"
+                      >
+                        <button
+                          className="btn btn-outline-info w-100 h-100"
+                          onClick={() => editAndViewCardHandler(point.lng, point.lat, index, false)}
+                        >
+                          View
+                        </button>
+                        <button
+                          className="btn btn-outline-success w-100 h-100"
+                          onClick={() => editAndViewCardHandler(point.lng, point.lat, index, true)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-outline-danger w-100 h-100"
+                          id="rightmost-card"
+                          onClick={()=> {deleteButtonHandler(index)}}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
+
+        {markerArr.map((point, index) => {
+          return (
+            index === activeModal && (
+              <ParentModal
+              deleteButtonHandler={deleteButtonHandler}
+                isEdit={isEdit}
+                setIsEdit={setIsEdit}
+                markerArr={markerArr}
+                setMarkersArr={setMarkersArr}
+                key={index}
+                index={index}
+                setActiveModal={setActiveModal}
+                title={point.title}
+                description={point.description}
+                date={point.date}
+                name={point.name}
+              />
+            )
+          );
+        })}
+      </div>
+
       {modalOpen && (
-        // This renders the modal and passes a ton of props that can be used in it
-        <Modal
-          setModalData={setModalData}
-          modalData={modalData}
-          mapObject={markerObject}
-          makeMarker={makeMarker}
-          isEdit={isEdit}
-          setIsEdit={setIsEdit}
-          activeLngLat={activeLngLat}
-          isOpen={modalOpen}
-          handleBackgroundClick={handleBackgroundClick}
-          closeModal={closeModal}
-          memoryArr={memoryArr}
-          setMemoryArr={setMemoryArr}
-        />
+        <>
+          <div className="modal-backdrop-custom fade show"></div>
+          <div
+            className="modal fade show"
+            tabIndex="-1"
+            role="dialog"
+            style={{ display: "block" }}
+            onClick={modalBackgroundHandler}
+          >
+            <div className="modal-dialog" role="document">
+              <div className="modal-content modal-sizing">
+                <>
+                  <div className="modal-header">
+                    <div className="input-group input-group-lg">
+                      <div className="input-group-prepend">
+                        <span
+                          className="input-group-text"
+                          id="inputGroup-sizing-lg"
+                        >
+                          Memory
+                        </span>
+                      </div>
+                      <input
+                        type="text"
+                        className="form-control"
+                        ref={modalMemoryTitleRef}
+                      />
+                    </div>
+                  </div>
+                  <div className="modal-body">
+                    <div className="input-group">
+                      <div className="input-group-prepend">
+                        <span className="input-group-text">Description</span>
+                      </div>
+                      <textarea
+                        id="home-textArea"
+                        className="form-control"
+                        ref={modalMemoryDescriptionRef}
+                      />
+                    </div>
+                  </div>
+                  <div className="custom-modal-footer">
+                    <button
+                      id="left-button"
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setModalOpen(false)}
+                    >
+                      Close
+                    </button>
+                    <button
+                      id="right-button"
+                      type="button"
+                      className="btn btn-success"
+                      onClick={saveMemoryHandler}
+                    >
+                      Save Memory
+                    </button>
+                  </div>
+                </>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </>
   );
