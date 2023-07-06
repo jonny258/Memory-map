@@ -12,15 +12,42 @@ function EditModal({
   handler,
   tempDescription,
   deleteButtonHandler,
+  userState,
 }) {
   const memoryTitleRef = useRef("");
   const memoryDescriptionRef = useRef("");
 
   const saveChangesHandler = () => {
+    console.log("this will be the edit");
     handler(memoryTitleRef.current.value, memoryDescriptionRef.current.value);
     markerArr[index].title = memoryTitleRef.current.value;
     markerArr[index].description = memoryDescriptionRef.current.value;
     setIsEdit(false);
+
+    const url = `http://localhost:5500/api/user/marker/${userState[0].currentUser._id}`;
+    fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        markerIndex: index,
+        updatedMarkerData: markerArr[index]
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Error: " + response.status);
+        }
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   };
 
   return (

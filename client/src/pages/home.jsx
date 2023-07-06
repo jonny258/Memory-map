@@ -5,56 +5,15 @@ import "../assets/css/home.css";
 import ParentModal from "../components/ParentModal";
 
 function Home() {
+  const [userState, setUserState] = useState(null);
+  const [markerArr, setMarkersArr] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [memoryButtonMode, setMemoryButtonMode] = useState(false);
   const [activeModal, setActiveModal] = useState(-1);
   const [isEdit, setIsEdit] = useState(false);
-  const [userState, setUserState] = useState(null);
-  // const [userState, setUserState] = useState(()=> {
-  //   fetch('http://localhost:5500/api/session')
-  //   .then((response) => response.json())
-  //   .then((data) => {
-  //     return data
-  //   })
-  // })
   const [mapStyles, setMapStyles] = useState(
     "mapbox://styles/jonnman/cljn80p85002l01rgdt63guar"
   );
-  const [markerArr, setMarkersArr] = useState(() => [
-    //Where I will fetch values
-    {
-      lat: 40.7608,
-      lng: -111.891,
-      title: "Salt Lake City",
-      description: "This is Salt Lake City.",
-      name: "Mary Jane",
-      date: "6/29",
-    },
-    {
-      lat: 40.6461,
-      lng: -111.4979,
-      title: "Park City",
-      description: "This is Park City.",
-      name: "Jack Lou",
-      date: "5/29",
-    },
-    {
-      lat: 40.2338,
-      lng: -111.6585,
-      title: "Provo",
-      description: "This is Provo.",
-      name: "Jonathan Christian",
-      date: "3/8",
-    },
-    {
-      lat: 41.223,
-      lng: -111.9738,
-      title: "Ogden",
-      description: "This is Ogden.",
-      name: "mikey",
-      date: "8/1",
-    },
-  ]);
 
   const mapRef = useRef(null);
   const searchButtonRef = useRef();
@@ -92,7 +51,8 @@ function Home() {
   const mapLoadHandler = () => {};
 
   useEffect(() => {
-    fetch("http://localhost:5500/api/session")
+    const sessionUrl = "http://localhost:5500/api/session";
+    fetch(sessionUrl)
       .then((response) => response.json())
       .then((data) => {
         setUserState(data);
@@ -101,6 +61,20 @@ function Home() {
         console.error("Error fetching user session:", error);
       });
   }, []);
+
+  useEffect(() => {
+    if (userState) {
+      const markerURL = `http://localhost:5500/api/user/marker/${userState[0].currentUser._id}`;
+      fetch(markerURL)
+        .then((response) => response.json())
+        .then((data) => {
+          setMarkersArr(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching markers:", error);
+        });
+    }
+  }, [userState]);
 
   useEffect(() => {
     mapboxgl.accessToken =
@@ -148,17 +122,19 @@ function Home() {
       });
 
       const marker = new mapboxgl.Marker({
-        color: (userState ? userState[0].currentUser.color : '#FFFFFF'),
+        // color: (userState ? userState[0].currentUser.color : '#FFFFFF'),
+        color: userState[0].currentUser.color,
       })
         .setLngLat([point.lng, point.lat])
         .setPopup(popup)
         .addTo(map);
       markers.push(marker);
-    });4
+    });
+    4;
     return () => {
       markers.forEach((marker) => marker.remove());
     };
-  }, [markerArr, userState]);
+  }, [markerArr]);
 
   const mapFly = (camera) => {
     const map = mapRef.current;
@@ -172,12 +148,20 @@ function Home() {
       easing: function (t) {
         return 1 - Math.pow(1 - t, 3);
         // return t
-        //return t * t
+        // return t * t
       },
     });
   };
 
   const searchButtonHandler = () => {
+    console.log(userState[0].currentUser._id);
+    const testurl = `http://localhost:5500/api/user/marker/${userState[0].currentUser._id}`;
+    fetch(testurl)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+      });
+
     const query = searchButtonRef.current.value;
 
     const accessToken =
@@ -261,9 +245,36 @@ function Home() {
         coordinatesRef.current[1],
         modalMemoryTitleRef.current.value,
         modalMemoryDescriptionRef.current.value,
-        formattedDate
+        formattedDate,
+        userState[0].currentUser.name
       );
       console.log(newMarker);
+
+      const markerURL = `http://localhost:5500/api/user/marker/${userState[0].currentUser._id}`;
+
+      fetch(markerURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newMarker),
+      })
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Error: " + response.status);
+          }
+        })
+        .then((data) => {
+          console.log(data);
+          // Update the marker array state if needed
+          // setMarkersArr(data);
+        })
+        .catch((error) => {
+          console.error("Error creating marker:", error);
+        });
+
       setMarkersArr((prev) => [...prev, newMarker]);
       setModalOpen(false);
     } else {
@@ -271,18 +282,38 @@ function Home() {
     }
   };
 
+
   const deleteButtonHandler = (index) => {
+    let deleteIndex;
+
     if (typeof index === "number") {
-      const updatedMarkerArr = [...markerArr];
-      updatedMarkerArr.splice(index, 1);
-      setMarkersArr(updatedMarkerArr);
-      setActiveModal(-1);
+      deleteIndex = index;
     } else {
-      const updatedMarkerArr = [...markerArr];
-      updatedMarkerArr.splice(activeModal, 1);
-      setMarkersArr(updatedMarkerArr);
-      setActiveModal(-1);
+      deleteIndex = activeModal;
     }
+    const updatedMarkerArr = [...markerArr];
+    updatedMarkerArr.splice(deleteIndex, 1);
+    setMarkersArr(updatedMarkerArr);
+    setActiveModal(-1);
+
+    const url = `http://localhost:5500/api/user/marker/${userState[0].currentUser._id}`;
+    fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({deleteIndex: deleteIndex})
+    })
+      .then((response) => {
+        if (response.ok) {
+          console.log("Resource deleted successfully.");
+        } else {
+          throw new Error("Error: " + response.status);
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   };
 
   const editAndViewCardHandler = (lng, lat, index, editStatus) => {
@@ -385,7 +416,10 @@ function Home() {
           </div>
         </nav>
         <div className="container">
-          <h1>{userState ? userState[0].currentUser.name : "Defaultname"}'s memories</h1>
+          <h1>
+            {userState ? userState[0].currentUser.name : "Defaultname"}'s
+            memories
+          </h1>
           <div className="card">
             <ul className="list-group list-group-flush">
               {markerArr.map((point, index) => {
@@ -457,6 +491,7 @@ function Home() {
           return (
             index === activeModal && (
               <ParentModal
+                userState={userState}
                 deleteButtonHandler={deleteButtonHandler}
                 isEdit={isEdit}
                 setIsEdit={setIsEdit}

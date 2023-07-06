@@ -14,6 +14,7 @@ function ParentModal({
   isEdit,
   setIsEdit,
   deleteButtonHandler,
+  userState,
 }) {
   const [tempDescription, setTempDescription] = useState();
 
@@ -44,6 +45,7 @@ function ParentModal({
           <div className="modal-content modal-sizing">
             {isEdit ? (
               <EditModal
+              userState={userState}
               deleteButtonHandler={deleteButtonHandler}
                 tempDescription={tempDescription}
                 handler={editButtonHandler}
