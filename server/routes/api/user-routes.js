@@ -8,12 +8,16 @@ const {
   createMarkersInUser,
   updateAMarker,
   deleteAMarker,
+  updateUser,
+  getOneUsers,
 } = require("../../controllers/userController");
 
 router.route("/").get(getAllUsers);
 
 router.route("/login").post(userLogin);
 router.route("/signup").post(userSignUp);
+
+router.route('/:userid').get(getOneUsers).put(updateUser)
 
 router
   .route("/marker/:userid")

@@ -24,7 +24,7 @@ function EditModal({
     markerArr[index].description = memoryDescriptionRef.current.value;
     setIsEdit(false);
 
-    const url = `http://localhost:5500/api/user/marker/${userState[0].currentUser._id}`;
+    const url = `http://localhost:5500/api/user/marker/${userState._id}`;
     fetch(url, {
       method: "PUT",
       headers: {

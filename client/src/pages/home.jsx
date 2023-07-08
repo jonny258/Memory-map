@@ -3,11 +3,15 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "../assets/css/home.css";
 import ParentModal from "../components/ParentModal";
+import Loading from "./loading";
+import ProfileModal from "../components/ProfileModal";
 
 function Home() {
+  const [isLoading, setIsLoading] = useState(true);
   const [userState, setUserState] = useState(null);
   const [markerArr, setMarkersArr] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [memoryButtonMode, setMemoryButtonMode] = useState(false);
   const [activeModal, setActiveModal] = useState(-1);
   const [isEdit, setIsEdit] = useState(false);
@@ -51,20 +55,61 @@ function Home() {
   const mapLoadHandler = () => {};
 
   useEffect(() => {
-    const sessionUrl = "http://localhost:5500/api/session";
-    fetch(sessionUrl)
-      .then((response) => response.json())
-      .then((data) => {
-        setUserState(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching user session:", error);
-      });
+    const fetchData = async () => {
+      const sessionUrl = "http://localhost:5500/api/session";
+      let fetchUserId;
+      await fetch(sessionUrl)
+        .then((response) => response.json())
+        .then((data) => {
+          if(!data[0]){
+            window.location.href = "/";
+            return
+          }else{
+            fetchUserId = data[0].currentUser._id;
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching user session:", error);
+        });
+
+      console.log(fetchUserId);
+      const userUrl = `http://localhost:5500/api/user/${fetchUserId}`;
+      await fetch(userUrl)
+        .then((response) => response.json())
+        .then((data) => {
+          setUserState(data);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1000);
+        });
+    };
+    fetchData();
   }, []);
+
+  // useEffect(() => {
+  //   const sessionUrl = "http://localhost:5500/api/session";
+
+  //   const fetchData = async () => {
+  //     try {
+  //       setIsLoading(true); // Display the loading screen
+
+  //       const response = await fetch(sessionUrl);
+  //       const data = await response.json();
+
+  //       setUserState(data);
+  //       setIsLoading(false); // Hide the loading screen once fetch is complete
+  //     } catch (error) {
+  //       console.error("Error fetching user session:", error);
+  //       setIsLoading(false); // Hide the loading screen on error as well
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
 
   useEffect(() => {
     if (userState) {
-      const markerURL = `http://localhost:5500/api/user/marker/${userState[0].currentUser._id}`;
+      const markerURL = `http://localhost:5500/api/user/marker/${userState._id}`;
       fetch(markerURL)
         .then((response) => response.json())
         .then((data) => {
@@ -123,7 +168,7 @@ function Home() {
 
       const marker = new mapboxgl.Marker({
         // color: (userState ? userState[0].currentUser.color : '#FFFFFF'),
-        color: userState[0].currentUser.color,
+        color: userState.color,
       })
         .setLngLat([point.lng, point.lat])
         .setPopup(popup)
@@ -154,13 +199,13 @@ function Home() {
   };
 
   const searchButtonHandler = () => {
-    console.log(userState[0].currentUser._id);
-    const testurl = `http://localhost:5500/api/user/marker/${userState[0].currentUser._id}`;
-    fetch(testurl)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-      });
+    // console.log(userState[0].currentUser._id);
+    // const testurl = `http://localhost:5500/api/user/marker/${userState[0].currentUser._id}`;
+    // fetch(testurl)
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //   });
 
     const query = searchButtonRef.current.value;
 
@@ -246,11 +291,11 @@ function Home() {
         modalMemoryTitleRef.current.value,
         modalMemoryDescriptionRef.current.value,
         formattedDate,
-        userState[0].currentUser.name
+        userState.name
       );
       console.log(newMarker);
 
-      const markerURL = `http://localhost:5500/api/user/marker/${userState[0].currentUser._id}`;
+      const markerURL = `http://localhost:5500/api/user/marker/${userState._id}`;
 
       fetch(markerURL, {
         method: "POST",
@@ -282,7 +327,6 @@ function Home() {
     }
   };
 
-
   const deleteButtonHandler = (index) => {
     let deleteIndex;
 
@@ -296,13 +340,13 @@ function Home() {
     setMarkersArr(updatedMarkerArr);
     setActiveModal(-1);
 
-    const url = `http://localhost:5500/api/user/marker/${userState[0].currentUser._id}`;
+    const url = `http://localhost:5500/api/user/marker/${userState._id}`;
     fetch(url, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({deleteIndex: deleteIndex})
+      body: JSON.stringify({ deleteIndex: deleteIndex }),
     })
       .then((response) => {
         if (response.ok) {
@@ -326,9 +370,7 @@ function Home() {
       setIsEdit(editStatus);
       setActiveModal(index);
     };
-
     setTimeout(showModal, 5000);
-
     const camera = {
       center: [lng, lat],
       zoom: 16,
@@ -345,9 +387,35 @@ function Home() {
     }
   };
 
+  const logoutButtonHandler = () => {
+    window.location.href = "/";
+    const url = `http://localhost:5500/api/session`;
+    fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          console.log("Resource deleted successfully.");
+        } else {
+          throw new Error("Error: " + response.status);
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
+
+  const profileButtonHandler = () => {
+    console.log("this will open the profile");
+    setProfileModalOpen(true);
+  };
+
   return (
     <>
-      <div className="map-container">
+        <div className={'map-container'}>
         <div className="map-styles-selector">
           <h3>Map Styles</h3>
           <div className="d-flex">
@@ -387,6 +455,22 @@ function Home() {
             </button>
           </div>
         </div>
+        <div className="page-nav">
+          <button
+            className="btn btn-outline-warning"
+            id="left-button"
+            onClick={logoutButtonHandler}
+          >
+            Log Out
+          </button>
+          <button className="btn btn-outline-info">Social</button>
+          <button
+            className="btn btn-outline-success"
+            onClick={profileButtonHandler}
+          >
+            Profile
+          </button>
+        </div>
         <div id="map"></div>
         {/* Edit and change nav below */}
         <nav className="navbar navbar-dark bg-dark memory-controlls">
@@ -416,10 +500,7 @@ function Home() {
           </div>
         </nav>
         <div className="container">
-          <h1>
-            {userState ? userState[0].currentUser.name : "Defaultname"}'s
-            memories
-          </h1>
+          <h1>{userState ? userState.name : "Defaultname"}'s memories</h1>
           <div className="card">
             <ul className="list-group list-group-flush">
               {markerArr.map((point, index) => {
@@ -509,7 +590,14 @@ function Home() {
           );
         })}
       </div>
-
+      {profileModalOpen && (
+        <ProfileModal
+          setProfileModalOpen={setProfileModalOpen}
+          user={userState}
+          markerArr={markerArr}
+        />
+      )}
+      {isLoading && <Loading />}
       {modalOpen && (
         <>
           <div className="modal-backdrop-custom fade show"></div>

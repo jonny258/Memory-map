@@ -1,8 +1,8 @@
 const router = require('express').Router()
 
-const { getSessionData } = require('../../controllers/sessionController')
+const { getSessionData, deleteSession } = require('../../controllers/sessionController')
 
-router.route('/').get(getSessionData)
+router.route('/').get(getSessionData).delete(deleteSession)
 
 
 module.exports  = router;

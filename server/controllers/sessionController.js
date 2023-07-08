@@ -8,4 +8,13 @@ const getSessionData = async (req, res) => {
     }
   };
 
-module.exports = { getSessionData }
+  const deleteSession = async (req, res) => {
+    try {
+      await Session.deleteMany({});
+      res.json({ message: 'All sessions have been deleted.' });
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  };
+
+module.exports = { getSessionData, deleteSession }

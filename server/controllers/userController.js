@@ -9,6 +9,18 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+const getOneUsers = async (req, res) => {
+  try {
+    const userId = req.params.userid
+    console.log(userId)
+    const selectedUser = await User.findById(userId);
+    console.log(selectedUser)
+    res.json(selectedUser);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
 const userLogin = async (req, res) => {
   try {
     const selectedUser = await User.findOne({ email: req.body.email });
@@ -135,6 +147,18 @@ const deleteAMarker = async (req, res) => {
   }
 };
 
+const updateUser = async (req, res) => {
+  try {
+    const userId = req.params.userid;
+    const updatedUser = await User.findByIdAndUpdate(userId, req.body, { new: true });
+    console.log(req.body);
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+
 
 module.exports = {
   getAllUsers,
@@ -144,4 +168,6 @@ module.exports = {
   createMarkersInUser,
   updateAMarker,
   deleteAMarker,
+  updateUser,
+  getOneUsers,
 };

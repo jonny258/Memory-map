@@ -9,9 +9,10 @@
   }
 
   .wrapper section{
-    padding: 100px;
-    border-radius: 100px;
+    padding: 20px;
+    border-radius: 20px;
     background-color: rgb(146, 146, 146);
+    max-height: 100vh;
   }
 
   .form-group{
@@ -23,7 +24,7 @@
 
   .form-group button{
     width: 100%;
-    margin-top: 5px;
+    margin: 5px;
   }
 
 
@@ -39,10 +40,25 @@
     justify-content: center;
     align-items: center;
   }
-
-  .email-password .form-group{
-    height: 44%;
+  
+  
+  .about-you {
+    display: flex;
   }
+  
+  .about-you h2 {
+    margin-top: 0;
+    text-align: center;
+  }
+  
+
+  .location-wrapper{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+
   
 
   

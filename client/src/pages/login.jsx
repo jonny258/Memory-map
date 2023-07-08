@@ -7,6 +7,7 @@ function Login() {
   const submitButtonHandler = async (event) => {
     try {
       event.preventDefault(); // Prevent form submission
+      window.location.href = "/home";
 
       const body = {
         email: email,
