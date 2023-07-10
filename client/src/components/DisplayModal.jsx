@@ -9,6 +9,9 @@ function DisplayModal({
   tempDescription,
   name,
   date,
+  pictureState,
+  setPictureState,
+  imageSrc,
 }) {
   return (
     <>
@@ -23,6 +26,11 @@ function DisplayModal({
         </div>
       </div>
       <div className="modal-body" id="modalDataBody">
+
+        <div className="display-picture">
+        <img src={tempDescription ? tempDescription.image : imageSrc} />
+
+        </div>
         <p>{tempDescription ? tempDescription.description : description}</p> 
       </div>
       <div className="custom-modal-footer">

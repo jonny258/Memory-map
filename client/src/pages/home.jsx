@@ -5,9 +5,11 @@ import "../assets/css/home.css";
 import ParentModal from "../components/ParentModal";
 import Loading from "./loading";
 import ProfileModal from "../components/ProfileModal";
+import PictureUploader from "../components/PictureUploader";
 
 function Home() {
   const [isLoading, setIsLoading] = useState(true);
+  const [pictureState, setPictureState] = useState('');
   const [userState, setUserState] = useState(null);
   const [markerArr, setMarkersArr] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -28,13 +30,14 @@ function Home() {
   const coordinatesRef = useRef([]);
 
   class MakeMarker {
-    constructor(lat, lng, title, description, date, name) {
+    constructor(lat, lng, title, description, date, name, image) {
       (this.lat = lat),
         (this.lng = lng),
         (this.title = title),
         (this.description = description),
         (this.date = date),
-        (this.name = name);
+        (this.name = name),
+        (this.image = image);
     }
   }
 
@@ -61,10 +64,10 @@ function Home() {
       await fetch(sessionUrl)
         .then((response) => response.json())
         .then((data) => {
-          if(!data[0]){
+          if (!data[0]) {
             window.location.href = "/";
-            return
-          }else{
+            return;
+          } else {
             fetchUserId = data[0].currentUser._id;
           }
         })
@@ -78,6 +81,7 @@ function Home() {
         .then((response) => response.json())
         .then((data) => {
           setUserState(data);
+          // setIsLoading(false);
           setTimeout(() => {
             setIsLoading(false);
           }, 1000);
@@ -114,6 +118,7 @@ function Home() {
         .then((response) => response.json())
         .then((data) => {
           setMarkersArr(data);
+          console.log(data)
         })
         .catch((error) => {
           console.error("Error fetching markers:", error);
@@ -274,24 +279,24 @@ function Home() {
   };
 
   const saveMemoryHandler = () => {
+    
     if (
       modalMemoryTitleRef.current.value &&
       modalMemoryDescriptionRef.current.value
     ) {
-      //I need to input the name here
       const currentDate = new Date();
       const formattedDate = `${
         currentDate.getMonth() + 1
       }/${currentDate.getDate()}`;
 
-      console.log(coordinatesRef.current);
       const newMarker = new MakeMarker(
         coordinatesRef.current[0],
         coordinatesRef.current[1],
         modalMemoryTitleRef.current.value,
         modalMemoryDescriptionRef.current.value,
         formattedDate,
-        userState.name
+        userState.name,
+        pictureState
       );
       console.log(newMarker);
 
@@ -314,7 +319,7 @@ function Home() {
         .then((data) => {
           console.log(data);
           // Update the marker array state if needed
-          // setMarkersArr(data);
+          //setMarkersArr(data);
         })
         .catch((error) => {
           console.error("Error creating marker:", error);
@@ -409,13 +414,16 @@ function Home() {
   };
 
   const profileButtonHandler = () => {
-    console.log("this will open the profile");
     setProfileModalOpen(true);
   };
 
+  const socialButtonHandler = () => {
+    console.log('This will open the Social page')
+  }
+
   return (
     <>
-        <div className={'map-container'}>
+      <div className={"map-container"}>
         <div className="map-styles-selector">
           <h3>Map Styles</h3>
           <div className="d-flex">
@@ -463,7 +471,7 @@ function Home() {
           >
             Log Out
           </button>
-          <button className="btn btn-outline-info">Social</button>
+          <button className="btn btn-outline-info" onClick={socialButtonHandler}>Social</button>
           <button
             className="btn btn-outline-success"
             onClick={profileButtonHandler}
@@ -572,6 +580,8 @@ function Home() {
           return (
             index === activeModal && (
               <ParentModal
+                pictureState={pictureState}
+                setPictureState={setPictureState}
                 userState={userState}
                 deleteButtonHandler={deleteButtonHandler}
                 isEdit={isEdit}
@@ -585,6 +595,7 @@ function Home() {
                 description={point.description}
                 date={point.date}
                 name={point.name}
+                imageSrc={point.image ? point.image : null}
               />
             )
           );
@@ -629,6 +640,10 @@ function Home() {
                     </div>
                   </div>
                   <div className="modal-body">
+                    <PictureUploader
+                      pictureState={pictureState}
+                      setPictureState={setPictureState}
+                    />
                     <div className="input-group">
                       <div className="input-group-prepend">
                         <span className="input-group-text">Description</span>

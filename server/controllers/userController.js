@@ -9,6 +9,15 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+const deleteAllUsers = async (req, res) => {
+  try {
+    const users = await User.deleteMany({});
+    res.json(users);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
 const getOneUsers = async (req, res) => {
   try {
     const userId = req.params.userid
@@ -79,6 +88,8 @@ const createMarkersInUser = async (req, res) => {
     const userId = req.params.userid;
     const user = await User.findById(userId);
 
+    console.log(req.body.image)
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -95,6 +106,7 @@ const createMarkersInUser = async (req, res) => {
             description: req.body.description,
             date: req.body.date,
             name: user.name,
+            image: req.body.image,
           },
         },
       },
@@ -170,4 +182,5 @@ module.exports = {
   deleteAMarker,
   updateUser,
   getOneUsers,
+  deleteAllUsers,
 };

@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import PictureUploader from "./PictureUploader";
 
 function EditModal({
   isEdit,
@@ -13,15 +14,22 @@ function EditModal({
   tempDescription,
   deleteButtonHandler,
   userState,
+  pictureState,
+  setPictureState,
 }) {
   const memoryTitleRef = useRef("");
   const memoryDescriptionRef = useRef("");
 
   const saveChangesHandler = () => {
     console.log("this will be the edit");
-    handler(memoryTitleRef.current.value, memoryDescriptionRef.current.value);
+    handler(
+      memoryTitleRef.current.value,
+      memoryDescriptionRef.current.value,
+      pictureState
+    );
     markerArr[index].title = memoryTitleRef.current.value;
     markerArr[index].description = memoryDescriptionRef.current.value;
+    markerArr[index].image = pictureState;
     setIsEdit(false);
 
     const url = `http://localhost:5500/api/user/marker/${userState._id}`;
@@ -32,7 +40,7 @@ function EditModal({
       },
       body: JSON.stringify({
         markerIndex: index,
-        updatedMarkerData: markerArr[index]
+        updatedMarkerData: markerArr[index],
       }),
     })
       .then((response) => {
@@ -69,6 +77,10 @@ function EditModal({
         </div>
       </div>
       <div className="modal-body">
+        <PictureUploader
+          pictureState={pictureState}
+          setPictureState={setPictureState}
+        />
         <div className="input-group">
           <div className="input-group-prepend">
             <span className="input-group-text">Description</span>

@@ -10,9 +10,10 @@ const {
   deleteAMarker,
   updateUser,
   getOneUsers,
+  deleteAllUsers,
 } = require("../../controllers/userController");
 
-router.route("/").get(getAllUsers);
+router.route("/").get(getAllUsers).delete(deleteAllUsers);
 
 router.route("/login").post(userLogin);
 router.route("/signup").post(userSignUp);

@@ -15,13 +15,17 @@ function ParentModal({
   setIsEdit,
   deleteButtonHandler,
   userState,
+  pictureState,
+  setPictureState,
+  imageSrc
 }) {
   const [tempDescription, setTempDescription] = useState();
 
-  const editButtonHandler = (title, description) => {
+  const editButtonHandler = (title, description, image) => {
     setTempDescription({
       title: title,
       description: description,
+      image: image,
     });
     console.log(title, description);
   };
@@ -45,8 +49,10 @@ function ParentModal({
           <div className="modal-content modal-sizing">
             {isEdit ? (
               <EditModal
-              userState={userState}
-              deleteButtonHandler={deleteButtonHandler}
+                pictureState={pictureState}
+                setPictureState={setPictureState}
+                userState={userState}
+                deleteButtonHandler={deleteButtonHandler}
                 tempDescription={tempDescription}
                 handler={editButtonHandler}
                 markerArr={markerArr}
@@ -60,6 +66,8 @@ function ParentModal({
               />
             ) : (
               <DisplayModal
+                pictureState={pictureState}
+                setPictureState={setPictureState}
                 name={name}
                 date={date}
                 tempDescription={tempDescription}
@@ -68,6 +76,7 @@ function ParentModal({
                 isEdit={isEdit}
                 setIsEdit={setIsEdit}
                 setActiveModal={setActiveModal}
+                imageSrc={imageSrc}
               />
             )}
           </div>

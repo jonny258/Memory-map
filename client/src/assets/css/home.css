@@ -224,3 +224,19 @@
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+
+/* chrome picker test */
+
+/* Dig in the dom */
+
+.myChromePicker div{
+  width: 400px;
+}
+
+
+
+.display-picture img{
+  width: 100%;
+  margin-bottom: 20px;
+}
