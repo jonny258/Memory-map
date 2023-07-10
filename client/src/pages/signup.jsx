@@ -1,9 +1,12 @@
 import React, { useState, useRef } from "react";
 import "../assets/css/login-signup.css";
 import { ChromePicker } from "react-color";
+import { useNavigate } from 'react-router-dom';
 import LocationInput from "../components/LocationInput";
 
 function Signup() {
+  const navigate = useNavigate();
+
   const [color, setColor] = useState("#000000");
   const [pageState, setPageState] = useState(true);
   const [locationCountState, setLocationCountState] = useState([]);
@@ -49,7 +52,7 @@ function Signup() {
               alert(data);
             } else {
               console.log(data);
-              window.location.href = "/home";
+              navigate('/home');
             }
           });
       }else{

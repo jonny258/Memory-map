@@ -230,10 +230,10 @@
 
 /* Dig in the dom */
 
+/* This is how I would edit it */
 .myChromePicker div{
-  width: 400px;
+  /* width: 400px; */
 }
-
 
 
 .display-picture img{

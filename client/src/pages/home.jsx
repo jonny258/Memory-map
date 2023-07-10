@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "../assets/css/home.css";
@@ -6,11 +7,14 @@ import ParentModal from "../components/ParentModal";
 import Loading from "./loading";
 import ProfileModal from "../components/ProfileModal";
 import PictureUploader from "../components/PictureUploader";
+import Map from "../components/Map";
 
-function Home() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [pictureState, setPictureState] = useState('');
-  const [userState, setUserState] = useState(null);
+function Home({ userState, setUserState, fetchRequest }) {
+  const navigate = useNavigate();
+
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [pictureState, setPictureState] = useState("");
   const [markerArr, setMarkersArr] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
@@ -41,6 +45,8 @@ function Home() {
     }
   }
 
+
+  //Try to remove this 
   const mapClickHandler = (clickEvent) => {
     if (memoryButtonRef.current.innerText === "Currently CREATE Mode") {
       console.log("Map has been clicked on CREATE mode");
@@ -55,136 +61,118 @@ function Home() {
     }
   };
 
-  const mapLoadHandler = () => {};
+  // const getUserData = async (userId) => {
+  //   if (!userState) {
+  //     const userUrl = `http://localhost:5500/api/user/${userId}`;
+  //     await fetch(userUrl)
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         setUserState(data);
+  //         console.log(data.markers);
+  //         setMarkersArr(data.markers);
+  //         //getUserMarkers()
+  //         // setIsLoading(false);
+  //         // setTimeout(() => {
+  //         //   setIsLoading(false);
+  //         // }, 1000);
+  //       });
+  //   } else {
+  //     console.log("Users logged in");
+  //   }
+  // };
+
+  const getSession = async () => {
+    const sessionData = await fetchRequest(
+      "GET",
+      "http://localhost:5500/api/session"
+    );
+    if (sessionData[0]) {
+      console.log("user is logged in");
+      const userUrl = `http://localhost:5500/api/user/${sessionData[0].currentUser._id}`;
+      const userData = await fetchRequest("GET", userUrl);
+      setUserState(userData);
+      setMarkersArr(userData.markers);
+      
+    } else {
+      console.log("user is not logged in");
+      navigate("/");
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const sessionUrl = "http://localhost:5500/api/session";
-      let fetchUserId;
-      await fetch(sessionUrl)
-        .then((response) => response.json())
-        .then((data) => {
-          if (!data[0]) {
-            window.location.href = "/";
-            return;
-          } else {
-            fetchUserId = data[0].currentUser._id;
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching user session:", error);
-        });
-
-      console.log(fetchUserId);
-      const userUrl = `http://localhost:5500/api/user/${fetchUserId}`;
-      await fetch(userUrl)
-        .then((response) => response.json())
-        .then((data) => {
-          setUserState(data);
-          // setIsLoading(false);
-          setTimeout(() => {
-            setIsLoading(false);
-          }, 1000);
-        });
-    };
-    fetchData();
+    console.log("THE APP RE-RENDERED");
+    if (!userState) {
+      getSession();
+    } else {
+      console.log("User is logged in");
+      setMarkersArr(userState.markers);
+    }
   }, []);
 
+
+  //OLD MAP
+
   // useEffect(() => {
-  //   const sessionUrl = "http://localhost:5500/api/session";
+  //   mapboxgl.accessToken =
+  //     "pk.eyJ1Ijoiam9ubm1hbiIsImEiOiJjbGppeTh3cncwNDJyM2VubzBmbWY4dW5iIn0.q1fX0L5lbw6RlMZYhz8lhw";
 
-  //   const fetchData = async () => {
-  //     try {
-  //       setIsLoading(true); // Display the loading screen
+  //   const map = new mapboxgl.Map({
+  //     container: "map",
+  //     style: mapStyles,
+  //     center: [-111.88, 40.67],
+  //     zoom: 10,
+  //   });
 
-  //       const response = await fetch(sessionUrl);
-  //       const data = await response.json();
+  //   mapRef.current = map;
 
-  //       setUserState(data);
-  //       setIsLoading(false); // Hide the loading screen once fetch is complete
-  //     } catch (error) {
-  //       console.error("Error fetching user session:", error);
-  //       setIsLoading(false); // Hide the loading screen on error as well
-  //     }
+  //   map.on("click", (event) => {
+  //     mapClickHandler(event);
+  //   });
+
+  //   // map.on("load", () => {
+  //   //   mapLoadHandler();
+  //   // });
+
+  //   setMarkersArr([...markerArr]);
+
+  //   return () => {
+  //     map.remove();
+  //     map.off("load");
+  //     map.off("click");
   //   };
+  // }, [mapStyles]);
 
-  //   fetchData();
-  // }, []);
 
-  useEffect(() => {
-    if (userState) {
-      const markerURL = `http://localhost:5500/api/user/marker/${userState._id}`;
-      fetch(markerURL)
-        .then((response) => response.json())
-        .then((data) => {
-          setMarkersArr(data);
-          console.log(data)
-        })
-        .catch((error) => {
-          console.error("Error fetching markers:", error);
-        });
-    }
-  }, [userState]);
+  //KEEP KEEP KEEP
 
-  useEffect(() => {
-    mapboxgl.accessToken =
-      "pk.eyJ1Ijoiam9ubm1hbiIsImEiOiJjbGppeTh3cncwNDJyM2VubzBmbWY4dW5iIn0.q1fX0L5lbw6RlMZYhz8lhw";
+  // useEffect(() => {
+  //   const map = mapRef.current;
+  //   const markers = [];
 
-    const map = new mapboxgl.Map({
-      container: "map",
-      style: mapStyles,
-      center: [-111.88, 40.67],
-      zoom: 10,
-    });
+  //   markerArr.forEach((point, index) => {
+  //     const popup = new mapboxgl.Popup().setHTML("<h1>Hello World!</h1>");
+  //     popup.on("open", (event) => {
+  //       popup.addClassName("popup-non-visable");
+  //       if (memoryButtonRef.current.innerText === "Currently VIEW Mode") {
+  //         console.log("pop up was clicked");
+  //         setIsEdit(false);
+  //         setActiveModal(index);
+  //       }
+  //     });
 
-    mapRef.current = map;
-
-    map.on("click", (event) => {
-      mapClickHandler(event);
-    });
-
-    map.on("load", () => {
-      mapLoadHandler();
-    });
-
-    setMarkersArr([...markerArr]);
-
-    return () => {
-      map.remove();
-      map.off("load");
-      map.off("click");
-    };
-  }, [mapStyles]);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    const markers = [];
-
-    markerArr.forEach((point, index) => {
-      const popup = new mapboxgl.Popup().setHTML("<h1>Hello World!</h1>");
-      popup.on("open", (event) => {
-        popup.addClassName("popup-non-visable");
-        if (memoryButtonRef.current.innerText === "Currently VIEW Mode") {
-          console.log("pop up was clicked");
-          setIsEdit(false);
-          setActiveModal(index);
-        }
-      });
-
-      const marker = new mapboxgl.Marker({
-        // color: (userState ? userState[0].currentUser.color : '#FFFFFF'),
-        color: userState.color,
-      })
-        .setLngLat([point.lng, point.lat])
-        .setPopup(popup)
-        .addTo(map);
-      markers.push(marker);
-    });
-    4;
-    return () => {
-      markers.forEach((marker) => marker.remove());
-    };
-  }, [markerArr]);
+  //     const marker = new mapboxgl.Marker({
+  //       color: userState.color,
+  //     })
+  //       .setLngLat([point.lng, point.lat])
+  //       .setPopup(popup)
+  //       .addTo(map);
+  //     markers.push(marker);
+  //   });
+  //   4;
+  //   return () => {
+  //     markers.forEach((marker) => marker.remove());
+  //   };
+  // }, [markerArr]);
 
   const mapFly = (camera) => {
     const map = mapRef.current;
@@ -203,83 +191,69 @@ function Home() {
     });
   };
 
-  const searchButtonHandler = () => {
-    // console.log(userState[0].currentUser._id);
-    // const testurl = `http://localhost:5500/api/user/marker/${userState[0].currentUser._id}`;
-    // fetch(testurl)
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //   });
-
+  const searchButtonHandler = async () => {
     const query = searchButtonRef.current.value;
 
     const accessToken =
       "pk.eyJ1Ijoiam9ubm1hbiIsImEiOiJjbGppeTh3cncwNDJyM2VubzBmbWY4dW5iIn0.q1fX0L5lbw6RlMZYhz8lhw";
     const baseEndpoint = "https://api.mapbox.com/geocoding/v5/mapbox.places";
-    const url = `${baseEndpoint}/${encodeURIComponent(
+    const searchUrl = `${baseEndpoint}/${encodeURIComponent(
       query
     )}.json?access_token=${accessToken}&limit=1`;
+    const searchData = await fetchRequest("Get", searchUrl);
+    if (searchData.features[0]) {
+      let zoomAmount;
+      const placeType = searchData.features[0].place_type[0];
+      switch (placeType) {
+        case "country":
+          zoomAmount = 5;
+          break;
+        case "region":
+          zoomAmount = 7;
+          break;
+        case "district":
+          zoomAmount = 10;
+          break;
+        case "place":
+          zoomAmount = 12;
+          break;
+        case "postcode":
+          zoomAmount = 14;
+          break;
+        case "locality":
+          zoomAmount = 12;
+          break;
+        case "neighborhood":
+          zoomAmount = 14;
+          break;
+        case "address":
+          zoomAmount = 16;
+          break;
+        case "poi":
+          zoomAmount = 14;
+          break;
+        case "landmark":
+          zoomAmount = 14;
+          break;
+        default:
+          zoomAmount = 10;
+          break;
+      }
 
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.features[0]) {
-          let zoomAmount;
-          const placeType = data.features[0].place_type[0];
-          switch (placeType) {
-            case "country":
-              zoomAmount = 5;
-              break;
-            case "region":
-              zoomAmount = 7;
-              break;
-            case "district":
-              zoomAmount = 10;
-              break;
-            case "place":
-              zoomAmount = 12;
-              break;
-            case "postcode":
-              zoomAmount = 14;
-              break;
-            case "locality":
-              zoomAmount = 12;
-              break;
-            case "neighborhood":
-              zoomAmount = 14;
-              break;
-            case "address":
-              zoomAmount = 16;
-              break;
-            case "poi":
-              zoomAmount = 14;
-              break;
-            case "landmark":
-              zoomAmount = 14;
-              break;
-            default:
-              zoomAmount = 10;
-              break;
-          }
-
-          const camera = {
-            center: data.features[0].geometry.coordinates,
-            zoom: zoomAmount,
-            pitch: 0,
-            bearing: 0,
-            duration: 5000,
-          };
-          mapFly(camera);
-        } else {
-          alert("The place you searched for doesn't exist");
-        }
-      })
-      .catch((err) => console.error(err));
+      const camera = {
+        center: searchData.features[0].geometry.coordinates,
+        zoom: zoomAmount,
+        pitch: 0,
+        bearing: 0,
+        duration: 5000,
+      };
+      mapFly(camera);
+    } else {
+      alert("The place you searched for doesn't exist");
+    }
   };
 
-  const saveMemoryHandler = () => {
-    
+  const saveMemoryHandler = async () => {
     if (
       modalMemoryTitleRef.current.value &&
       modalMemoryDescriptionRef.current.value
@@ -298,32 +272,10 @@ function Home() {
         userState.name,
         pictureState
       );
-      console.log(newMarker);
 
       const markerURL = `http://localhost:5500/api/user/marker/${userState._id}`;
-
-      fetch(markerURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newMarker),
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error("Error: " + response.status);
-          }
-        })
-        .then((data) => {
-          console.log(data);
-          // Update the marker array state if needed
-          //setMarkersArr(data);
-        })
-        .catch((error) => {
-          console.error("Error creating marker:", error);
-        });
+      const postedNewMarker = await fetchRequest("POST", markerURL, newMarker);
+      console.log(postedNewMarker);
 
       setMarkersArr((prev) => [...prev, newMarker]);
       setModalOpen(false);
@@ -332,7 +284,7 @@ function Home() {
     }
   };
 
-  const deleteButtonHandler = (index) => {
+  const deleteButtonHandler = async (index) => {
     let deleteIndex;
 
     if (typeof index === "number") {
@@ -345,24 +297,11 @@ function Home() {
     setMarkersArr(updatedMarkerArr);
     setActiveModal(-1);
 
-    const url = `http://localhost:5500/api/user/marker/${userState._id}`;
-    fetch(url, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ deleteIndex: deleteIndex }),
-    })
-      .then((response) => {
-        if (response.ok) {
-          console.log("Resource deleted successfully.");
-        } else {
-          throw new Error("Error: " + response.status);
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    const deleteUrl = `http://localhost:5500/api/user/marker/${userState._id}`;
+    const deletedMarker = await fetchRequest("DELETE", deleteUrl, {
+      deleteIndex: deleteIndex,
+    });
+    console.log(deletedMarker);
   };
 
   const editAndViewCardHandler = (lng, lat, index, editStatus) => {
@@ -386,44 +325,34 @@ function Home() {
     mapFly(camera);
   };
 
+  //I could move this in the jsx
   const modalBackgroundHandler = (event) => {
     if (event.target.className === "modal fade show") {
       setModalOpen(false);
     }
   };
 
-  const logoutButtonHandler = () => {
-    window.location.href = "/";
-    const url = `http://localhost:5500/api/session`;
-    fetch(url, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          console.log("Resource deleted successfully.");
-        } else {
-          throw new Error("Error: " + response.status);
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+  const logoutButtonHandler = async () => {
+    navigate("/");
+    const sessionUrl = `http://localhost:5500/api/session`;
+    const deleteSession = await fetchRequest("DELETE", sessionUrl);
+    console.log(deleteSession);
   };
 
+  //I could move this in the jsx
   const profileButtonHandler = () => {
     setProfileModalOpen(true);
   };
 
+  //I could move this in the jsx
   const socialButtonHandler = () => {
-    console.log('This will open the Social page')
-  }
+    console.log("This will open the Social page");
+    window.location.href = "/social";
+  };
 
   return (
     <>
-      <div className={"map-container"}>
+      <div className="map-container">
         <div className="map-styles-selector">
           <h3>Map Styles</h3>
           <div className="d-flex">
@@ -471,7 +400,12 @@ function Home() {
           >
             Log Out
           </button>
-          <button className="btn btn-outline-info" onClick={socialButtonHandler}>Social</button>
+          <button
+            className="btn btn-outline-info"
+            onClick={socialButtonHandler}
+          >
+            Social
+          </button>
           <button
             className="btn btn-outline-success"
             onClick={profileButtonHandler}
