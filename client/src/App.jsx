@@ -36,12 +36,45 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route index element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route
+            index
+            element={
+              <Signup
+                userState={userState}
+                setUserState={setUserState}
+                fetchRequest={fetchRequest}
+              />
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <Login
+                userState={userState}
+                setUserState={setUserState}
+                fetchRequest={fetchRequest}
+              />
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <Signup
+                userState={userState}
+                setUserState={setUserState}
+                fetchRequest={fetchRequest}
+              />
+            }
+          />
           <Route
             path="/home"
-            element={<Home userState={userState} setUserState={setUserState} fetchRequest={fetchRequest}/>}
+            element={
+              <Home
+                userState={userState}
+                setUserState={setUserState}
+                fetchRequest={fetchRequest}
+              />
+            }
           />
           <Route path="/social" element={<Social />} />
           <Route path="/oldhome" element={<OldHome />} />

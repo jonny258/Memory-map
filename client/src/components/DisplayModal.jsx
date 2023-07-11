@@ -1,44 +1,29 @@
 import React from "react";
 
-function DisplayModal({
-  isEdit,
-  setIsEdit,
-  setActiveModal,
-  title,
-  description,
-  tempDescription,
-  name,
-  date,
-  pictureState,
-  setPictureState,
-  imageSrc,
-}) {
+function DisplayModal(props) {
   return (
     <>
       <div className="modal-header d-flex justify-content-between">
         <h2 className="modal-title" id="modalDataTitle">
-          {tempDescription ? tempDescription.title : title}
+          {props.tempDescription ? props.tempDescription.title : props.title}
         </h2>
         <div className="text-end">
-          {/* I will remove the turninary opperator here once I pull the name from the data base */}
-          <h6>{name ? name : 'Default Name'}</h6>
-          <p>{date}</p>
+          <h6>{props.name ? props.name : 'Default Name'}</h6>
+          <p>{props.date}</p>
         </div>
       </div>
       <div className="modal-body" id="modalDataBody">
-
         <div className="display-picture">
-        <img src={tempDescription ? tempDescription.image : imageSrc} />
-
+          <img src={props.tempDescription ? props.tempDescription.image : props.imageSrc} />
         </div>
-        <p>{tempDescription ? tempDescription.description : description}</p> 
+        <p>{props.tempDescription ? props.tempDescription.description : props.description}</p> 
       </div>
       <div className="custom-modal-footer">
         <button
           id="left-button"
           type="button"
           className="btn btn-secondary"
-          onClick={() => setActiveModal(-1)}
+          onClick={() => props.setActiveModal(-1)}
         >
           Close
         </button>
@@ -46,7 +31,7 @@ function DisplayModal({
           id="right-button"
           type="button"
           className="btn btn-success"
-          onClick={() => setIsEdit(true)}
+          onClick={() => props.setIsEdit(true)}
         >
           Edit
         </button>

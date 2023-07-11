@@ -1,54 +1,48 @@
 import React, { useState, useRef } from "react";
 import { ChromePicker } from "react-color";
 
-function ProfileModal({ setProfileModalOpen, user, markerArr }) {
-  //make this work for this modal
+function ProfileModal({
+  setProfileModalOpen,
+  user,
+  markerArr,
+  fetchRequest,
+  getSession,
+}) {
   const [color, setColor] = useState(user.color);
   const [showPassword, setShowPassword] = useState(false);
 
-  const emailRef = useRef("");
-  const nameRef = useRef("");
-  const passwordRef = useRef("");
+  const editProfileButtonHandler = async (event) => {
+    try {
+      event.preventDefault();
+      const email = event.target.form[0].value;
+      const password = event.target.form[1].value;
+      const name = event.target.form[3].value;
+      if (email && password && name) {
+        const updatedNameMarkers = markerArr.map((marker) => {
+          marker.name = name;
+          return marker;
+        });
 
-  const modalBackgroundHandler = (event) => {
-    if (event.target.className === "modal fade show") {
-      setProfileModalOpen(false);
+        const body = {
+          email: email,
+          password: password,
+          name: name,
+          color: color,
+          markers: updatedNameMarkers,
+        };
+
+        const updateUserUrl = `http://localhost:5500/api/user/${user._id}`;
+
+        const updatedUserData = await fetchRequest("PUT", updateUserUrl, body);
+        console.log(updatedUserData);
+        setProfileModalOpen(false);
+        getSession();
+      } else {
+        alert("Please fill out all fields");
+      }
+    } catch (err) {
+      console.error(err);
     }
-  };
-
-  const handleColorChange = (newColor) => {
-    setColor(newColor.hex);
-  };
-
-  const editProfileButtonHandler = async () => {
-    const updatedNameMarkers = markerArr.map((marker) => {
-      marker.name = nameRef.current.value;
-      return marker;
-    });
-
-    console.log(updatedNameMarkers);
-
-    const body = {
-      email: emailRef.current.value,
-      password: passwordRef.current.value,
-      name: nameRef.current.value,
-      color: color,
-      markers: updatedNameMarkers,
-    };
-
-    await fetch(`http://localhost:5500/api/user/${user._id}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "PUT",
-      body: JSON.stringify(body),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-      });
-    setProfileModalOpen(false);
-    window.location.reload();
   };
   return (
     <>
@@ -58,14 +52,17 @@ function ProfileModal({ setProfileModalOpen, user, markerArr }) {
         tabIndex="-1"
         role="dialog"
         style={{ display: "block" }}
-        onClick={modalBackgroundHandler}
+        onClick={(event) =>
+          event.target.className === "modal fade show" &&
+          setProfileModalOpen(false)
+        }
       >
         <div
           className="modal-dialog"
           role="document"
           style={{ minWidth: "fit-content" }}
         >
-          <div className="modal-content modal-sizing">
+          <form className="modal-content modal-sizing">
             <h2 className="edit-profile-title">Edit your profile</h2>
             <div className="d-flex edit-body">
               <div className="edit-profile-inputs">
@@ -79,7 +76,6 @@ function ProfileModal({ setProfileModalOpen, user, markerArr }) {
                   <input
                     type="text"
                     className="form-control"
-                    ref={emailRef}
                     defaultValue={user.email}
                   />
                 </div>
@@ -93,14 +89,15 @@ function ProfileModal({ setProfileModalOpen, user, markerArr }) {
                   <input
                     type={showPassword ? "text" : "password"}
                     className="form-control"
-                    ref={passwordRef}
                     defaultValue={user.password}
                   />
                   <button
                     type="button"
                     className="btn btn-outline-secondary"
-                    style={{ width: '70px' }}
-                    onClick={()=> {setShowPassword(!showPassword)}}
+                    style={{ width: "70px" }}
+                    onClick={() => {
+                      setShowPassword(!showPassword);
+                    }}
                   >
                     {showPassword ? "Hide" : "Show"}
                   </button>
@@ -115,7 +112,6 @@ function ProfileModal({ setProfileModalOpen, user, markerArr }) {
                   <input
                     type="text"
                     className="form-control"
-                    ref={nameRef}
                     defaultValue={user.name}
                   />
                 </div>
@@ -123,7 +119,7 @@ function ProfileModal({ setProfileModalOpen, user, markerArr }) {
               <div>
                 <ChromePicker
                   color={color}
-                  onChange={handleColorChange}
+                  onChange={(event)=> setColor(event.hex)}
                   className="myChromePicker"
                 />
               </div>
@@ -131,11 +127,12 @@ function ProfileModal({ setProfileModalOpen, user, markerArr }) {
             <button
               className="btn btn-primary"
               id="edit-profile-button"
-              onClick={editProfileButtonHandler}
+              type="submit"
+              onClick={(event) => editProfileButtonHandler(event)}
             >
               Submit
             </button>
-          </div>
+          </form>
         </div>
       </div>
     </>

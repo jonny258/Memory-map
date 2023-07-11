@@ -1,35 +1,24 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+function Login({ fetchRequest, setUserState }) {
+  const navigate = useNavigate();
 
   const submitButtonHandler = async (event) => {
     try {
-      event.preventDefault(); // Prevent form submission
-      window.location.href = "/home";
-
+      event.preventDefault();
+      const email = event.target.form[0].value;
+      const password = event.target.form[1].value;
       const body = {
         email: email,
         password: password,
       };
 
-      await fetch("http://localhost:5500/api/user/login", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        body: JSON.stringify(body),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (!data._id) {
-            alert(data);
-          } else {
-            console.log(data);
-            window.location.href = "/home";
-          }
-        });
+      const loginUrl = `http://localhost:5500/api/user/login`;
+      const userData = await fetchRequest("POST", loginUrl, body);
+      console.log(userData);
+      setUserState(userData);
+      navigate("/home");
     } catch (err) {
       console.error(err);
     }
@@ -43,12 +32,9 @@ function Login() {
             <div className="form-group">
               <label htmlFor="userEmail">Email address</label>
               <input
-                //   type="email"
                 className="form-control"
                 id="userEmail"
                 placeholder="Enter email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
               />
               <small id="emailHelp" className="form-text text-muted">
                 We'll never share your email with anyone else.
@@ -61,8 +47,6 @@ function Login() {
                 className="form-control"
                 id="userPassword"
                 placeholder="Password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
               />
               <button
                 type="submit"
@@ -75,9 +59,12 @@ function Login() {
           </form>
           <div className="other-option">
             <h6>Don't have an account yet? Sign up here</h6>
-            <a className="btn btn-primary" href="/signup">
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate("/signup")}
+            >
               Go To Sign up
-            </a>
+            </button>
           </div>
         </section>
       </div>

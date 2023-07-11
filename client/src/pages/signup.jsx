@@ -1,20 +1,17 @@
 import React, { useState, useRef } from "react";
 import "../assets/css/login-signup.css";
 import { ChromePicker } from "react-color";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import LocationInput from "../components/LocationInput";
 
-function Signup() {
+function Signup({fetchRequest, setUserState}) {
+  const MAX_LOCATIONS = 5;
   const navigate = useNavigate();
 
   const [color, setColor] = useState("#000000");
   const [pageState, setPageState] = useState(true);
-  const [locationCountState, setLocationCountState] = useState([]);
+  const [locationCount, setLocationCount] = useState(0);
   const [inputLocations, setInputLocations] = useState([]);
-
-  const handleColorChange = (newColor) => {
-    setColor(newColor.hex);
-  };
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,13 +20,14 @@ function Signup() {
   const submitButtonHandler = async (event) => {
     try {
       event.preventDefault();
+      console.log([event.target.form]);
       if (email && password && name) {
         const namedMarkers = inputLocations
-        .filter((marker) => marker.name && marker.name.trim() !== '')
-        .map((marker) => {
-          marker.name = name;
-          return marker;
-        });
+          .filter((marker) => marker.name && marker.name.trim() !== "")
+          .map((marker) => {
+            marker.name = name;
+            return marker;
+          });
 
         const body = {
           email: email,
@@ -38,25 +36,14 @@ function Signup() {
           color: color,
           markers: namedMarkers,
         };
+        const signUpUrl = `http://localhost:5500/api/user/signup`
 
-        await fetch("http://localhost:5500/api/user/signup", {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-          body: JSON.stringify(body),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (!data._id) {
-              alert(data);
-            } else {
-              console.log(data);
-              navigate('/home');
-            }
-          });
-      }else{
-        alert("Please fill out all required fields")
+        const userData = await fetchRequest('POST', signUpUrl, body)
+        console.log(userData)
+        setUserState(userData)
+        navigate('/home')
+      } else {
+        alert("Please fill out all required fields");
       }
     } catch (err) {
       console.error(err);
@@ -78,7 +65,9 @@ function Signup() {
 
   const addALocationHandler = (event) => {
     event.preventDefault();
-    setLocationCountState((prev) => [...prev, ""]);
+    if (locationCount < MAX_LOCATIONS) {
+      setLocationCount((prevCount) => prevCount + 1);
+    }
   };
 
   return (
@@ -113,7 +102,6 @@ function Signup() {
                     onChange={(event) => setPassword(event.target.value)}
                   />
                   <button
-                    type="submit"
                     className="btn btn-primary"
                     onClick={emailPasswordHandler}
                   >
@@ -144,7 +132,7 @@ function Signup() {
                   <div className="form-group color-picker">
                     <ChromePicker
                       color={color}
-                      onChange={handleColorChange}
+                      onChange={(event) => setColor(event.hex)}
                       className="myChromePicker"
                     />
                   </div>
@@ -156,6 +144,7 @@ function Signup() {
                       Back to email and password
                     </button>
                     <button
+                      type="submit"
                       className="btn btn-success"
                       onClick={submitButtonHandler}
                     >
@@ -166,19 +155,17 @@ function Signup() {
                 <div>
                   <h2>Add some locations</h2>
                   <div className="location-wrapper">
-                    {/* The name ref kind of passes weird */}
-                    {locationCountState.map((inputText, index) => {
-                      return (
-                        <LocationInput
-                          key={index}
-                          getLocationMarkers={getLocationMarkers}
-                          inputLocations={inputLocations}
-                          index={index}
-                          name={name}
-                        />
-                      );
-                    })}
-                    {locationCountState.length < 5 && (
+                    {Array.from({ length: locationCount }).map((_, index) => (
+                      <LocationInput
+                        key={index}
+                        fetchRequest={fetchRequest}
+                        getLocationMarkers={getLocationMarkers}
+                        inputLocations={inputLocations}
+                        index={index}
+                        name={name}
+                      />
+                    ))}
+                    {locationCount < MAX_LOCATIONS && (
                       <button
                         className="btn btn-primary"
                         onClick={addALocationHandler}

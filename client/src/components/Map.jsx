@@ -8,7 +8,7 @@ function Map({ center, mapClickHandler, mapLoadHandler }) {
     "mapbox://styles/jonnman/cljn80p85002l01rgdt63guar"
   );
 
-  const mapRef = useRef(null); // initialize the ref with null
+  const mapRef = useRef(null);
 
   useEffect(() => {
     mapboxgl.accessToken =
@@ -29,7 +29,6 @@ function Map({ center, mapClickHandler, mapLoadHandler }) {
 
     map.on("load", (event) => {
       mapLoadHandler(event);
-      console.log(map)
     });
 
     return () => {
@@ -46,7 +45,6 @@ function Map({ center, mapClickHandler, mapLoadHandler }) {
 
   return (
     <>
-      <div className="map-container">
         <div className="map-styles-selector">
           <h3>Map Styles</h3>
           <div className="d-flex">
@@ -87,7 +85,6 @@ function Map({ center, mapClickHandler, mapLoadHandler }) {
           </div>
         </div>
         <div id="map"></div>
-      </div>
     </>
   );
 }

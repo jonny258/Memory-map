@@ -1,15 +1,15 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 
-function LocationInput({ getLocationMarkers, index, name, inputLocations }) {
-  const [locationStatus, setLocationStatus] = useState(()=> {
-    if(inputLocations[index]){
-        return 1
-    }else{
-        return -1
-    }
+function LocationInput({
+  getLocationMarkers,
+  index,
+  name,
+  inputLocations,
+  fetchRequest,
+}) {
+  const [locationStatus, setLocationStatus] = useState(() => {
+    return inputLocations[index] ? 1 : -1;
   });
-  const locationInputRef = useRef("");
-  let timeoutId = null;
 
   class MakeMarker {
     constructor(lat, lng, title, description, date, name) {
@@ -22,57 +22,52 @@ function LocationInput({ getLocationMarkers, index, name, inputLocations }) {
     }
   }
 
-  const inputHandler = () => {
-    const query = locationInputRef.current.value;
-
+  const inputHandler = async (event) => {
+    try{
+      const query = event.target.value;
     const accessToken =
       "pk.eyJ1Ijoiam9ubm1hbiIsImEiOiJjbGppeTh3cncwNDJyM2VubzBmbWY4dW5iIn0.q1fX0L5lbw6RlMZYhz8lhw";
     const baseEndpoint = "https://api.mapbox.com/geocoding/v5/mapbox.places";
-    const url = `${baseEndpoint}/${encodeURIComponent(
+    const searchUrl = `${baseEndpoint}/${encodeURIComponent(
       query
     )}.json?access_token=${accessToken}&limit=1`;
 
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.features[0]) {
+    const searchData = await fetchRequest("GET", searchUrl);
+    if (searchData.features[0]) {
+      const currentDate = new Date();
+      const formattedDate = `${
+        currentDate.getMonth() + 1
+      }/${currentDate.getDate()}`;
 
-            const currentDate = new Date();
-            const formattedDate = `${
-              currentDate.getMonth() + 1
-            }/${currentDate.getDate()}`;
-
-            const newMarker = new MakeMarker(
-                data.features[0].center[1],
-                data.features[0].center[0],
-                data.features[0].text,
-                data.features[0].place_name,
-                formattedDate,
-                name
-            )
-
-            // console.log(newMarker)
-            getLocationMarkers(newMarker, index);
-          setLocationStatus(1);
-        } else {
-          getLocationMarkers('', index);
-          setLocationStatus(0);
-        }
-      })
-      .catch((err) => console.error(err));
+      const newMarker = new MakeMarker(
+        searchData.features[0].center[1],
+        searchData.features[0].center[0],
+        searchData.features[0].text,
+        searchData.features[0].place_name,
+        formattedDate,
+        name
+      );
+      getLocationMarkers(newMarker, index);
+      setLocationStatus(1);
+    } else {
+      getLocationMarkers("", index);
+      setLocationStatus(0);
+    }
+    }catch(err){
+      console.error(err)
+    }
   };
-
+  let timeoutId = null;
   return (
     <div className="input-group mb-3">
       <input
-        ref={locationInputRef}
         type="text"
         className="form-control"
         placeholder="Enter a location"
-        defaultValue={inputLocations[index] ? inputLocations[index].title : ''}
-        onChange={() => {
+        defaultValue={inputLocations[index] ? inputLocations[index].title : ""}
+        onChange={(event) => {
           clearTimeout(timeoutId);
-          timeoutId = setTimeout(inputHandler, 1000);
+          timeoutId = setTimeout(() => inputHandler(event), 1000);
         }}
       />
       {locationStatus === -1 && (

@@ -14,7 +14,10 @@ function Social() {
     }
 
     return (
+        <div className="map-container">
         <Map center={[-111.88, 40.67]} mapClickHandler={mapClickHandler} mapLoadHandler={mapLoadHandler}/>
+
+        </div>
       );
 }
 

@@ -1,65 +1,36 @@
-import React, { useRef } from "react";
+import React from "react";
 import PictureUploader from "./PictureUploader";
 
-function EditModal({
-  isEdit,
-  setIsEdit,
-  setActiveModal,
-  title,
-  description,
-  index,
-  markerArr,
-  setMarkersArr,
-  handler,
-  tempDescription,
-  deleteButtonHandler,
-  userState,
-  pictureState,
-  setPictureState,
-}) {
-  const memoryTitleRef = useRef("");
-  const memoryDescriptionRef = useRef("");
+function EditModal(props) {
+  const saveChangesHandler = async (event) => {
+    try {
+      event.preventDefault();
+      event.target.form[0].value;
+      event.target.form[2].value;
+      props.handler(
+        event.target.form[0].value,
+        event.target.form[2].value,
+        props.pictureState
+      );
+      props.markerArr[props.index].title = event.target.form[0].value;
+      props.markerArr[props.index].description = event.target.form[2].value;
+      props.markerArr[props.index].image = props.pictureState;
+      props.setIsEdit(false);
 
-  const saveChangesHandler = () => {
-    console.log("this will be the edit");
-    handler(
-      memoryTitleRef.current.value,
-      memoryDescriptionRef.current.value,
-      pictureState
-    );
-    markerArr[index].title = memoryTitleRef.current.value;
-    markerArr[index].description = memoryDescriptionRef.current.value;
-    markerArr[index].image = pictureState;
-    setIsEdit(false);
-
-    const url = `http://localhost:5500/api/user/marker/${userState._id}`;
-    fetch(url, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        markerIndex: index,
-        updatedMarkerData: markerArr[index],
-      }),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Error: " + response.status);
-        }
-      })
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+      const body = {
+        markerIndex: props.index,
+        updatedMarkerData: props.markerArr[props.index],
+      };
+      const updateUrl = `http://localhost:5500/api/user/marker/${props.userState._id}`;
+      const updatedMarker = await props.fetchRequest("PUT", updateUrl, body);
+      console.log(updatedMarker);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
-    <>
+    <form>
       <div className="modal-header">
         <div className="input-group input-group-lg">
           <div className="input-group-prepend">
@@ -68,29 +39,31 @@ function EditModal({
             </span>
           </div>
           <input
-            ref={memoryTitleRef}
             type="text"
             className="form-control"
             id="memory-title"
-            defaultValue={tempDescription ? tempDescription.title : title}
+            defaultValue={
+              props.tempDescription ? props.tempDescription.title : props.title
+            }
           />
         </div>
       </div>
       <div className="modal-body">
         <PictureUploader
-          pictureState={pictureState}
-          setPictureState={setPictureState}
+          pictureState={props.pictureState}
+          setPictureState={props.setPictureState}
         />
         <div className="input-group">
           <div className="input-group-prepend">
             <span className="input-group-text">Description</span>
           </div>
           <textarea
-            ref={memoryDescriptionRef}
             id="home-textArea"
             className="form-control"
             defaultValue={
-              tempDescription ? tempDescription.description : description
+              props.tempDescription
+                ? props.tempDescription.description
+                : props.description
             }
           />
         </div>
@@ -100,27 +73,27 @@ function EditModal({
           id="left-button"
           type="button"
           className="btn btn-danger"
-          onClick={deleteButtonHandler}
+          onClick={props.deleteButtonHandler}
         >
           Delete
         </button>
         <button
           type="button"
           className="btn btn-secondary"
-          onClick={() => setActiveModal(-1)}
+          onClick={() => props.setActiveModal(-1)}
         >
           Close
         </button>
         <button
           id="right-button"
-          type="button"
+          type="submit"
           className="btn btn-success"
-          onClick={saveChangesHandler}
+          onClick={(event) => saveChangesHandler(event)}
         >
           Save changes
         </button>
       </div>
-    </>
+    </form>
   );
 }
 

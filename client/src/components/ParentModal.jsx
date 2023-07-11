@@ -2,23 +2,7 @@ import React, { useState } from "react";
 import EditModal from "./EditModal";
 import DisplayModal from "./DisplayModal";
 
-function ParentModal({
-  setActiveModal,
-  title,
-  description,
-  index,
-  markerArr,
-  setMarkersArr,
-  name,
-  date,
-  isEdit,
-  setIsEdit,
-  deleteButtonHandler,
-  userState,
-  pictureState,
-  setPictureState,
-  imageSrc
-}) {
+function ParentModal(props) {
   const [tempDescription, setTempDescription] = useState();
 
   const editButtonHandler = (title, description, image) => {
@@ -27,14 +11,8 @@ function ParentModal({
       description: description,
       image: image,
     });
-    console.log(title, description);
   };
 
-  const modalBackgroundHandler = (event) => {
-    if (event.target.className === "modal fade show") {
-      setActiveModal(-1);
-    }
-  };
   return (
     <>
       <div className="modal-backdrop-custom fade show"></div>
@@ -43,41 +21,18 @@ function ParentModal({
         tabIndex="-1"
         role="dialog"
         style={{ display: "block" }}
-        onClick={modalBackgroundHandler}
+        onClick={(event) => event.target.className === "modal fade show" && props.setActiveModal(-1)}
       >
         <div className="modal-dialog" role="document">
           <div className="modal-content modal-sizing">
-            {isEdit ? (
+            {props.isEdit ? (
               <EditModal
-                pictureState={pictureState}
-                setPictureState={setPictureState}
-                userState={userState}
-                deleteButtonHandler={deleteButtonHandler}
+                {...props}
                 tempDescription={tempDescription}
                 handler={editButtonHandler}
-                markerArr={markerArr}
-                setMarkersArr={setMarkersArr}
-                index={index}
-                title={title}
-                description={description}
-                isEdit={isEdit}
-                setIsEdit={setIsEdit}
-                setActiveModal={setActiveModal}
               />
             ) : (
-              <DisplayModal
-                pictureState={pictureState}
-                setPictureState={setPictureState}
-                name={name}
-                date={date}
-                tempDescription={tempDescription}
-                title={title}
-                description={description}
-                isEdit={isEdit}
-                setIsEdit={setIsEdit}
-                setActiveModal={setActiveModal}
-                imageSrc={imageSrc}
-              />
+              <DisplayModal {...props} tempDescription={tempDescription} />
             )}
           </div>
         </div>
