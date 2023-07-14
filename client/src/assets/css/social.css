@@ -1,0 +1,182 @@
+#map-container-custom {
+  width: 80vw;
+  box-sizing: border-box;
+}
+
+.sidebar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20vw;
+  height: 70vh;
+  background: lightgray;
+  box-sizing: border-box;
+  overflow: scroll;
+}
+
+/* .below-map {
+  width: 100vw;
+} */
+
+.display-none {
+  display: none;
+}
+
+#custom-btn {
+  height: 100%;
+  width: 50px;
+  background-color: rgb(187, 187, 187);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0px;
+  z-index: 100;
+}
+
+#custom-btn p {
+  font-size: 40px;
+  transform: rotate(90deg);
+}
+
+/* change this */
+.profile-card {
+  width: 20vw;
+  height: 400px;
+  box-sizing: border-box;
+}
+
+/* change these */
+/* .splide-card {
+  max-height: 400px;
+
+  box-sizing: border-box;
+} */
+
+/* .card img{
+  width: 50px;
+} */
+
+/* PROFILE SPLIDE */
+
+.splide-wrapper-profile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Align items at the start of the flex container */
+  width: calc(100vw); /* Adjust the width to account for the sidebar width */
+  height: 400px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.splide-wrapper-profile .splide {
+  height: 100%;
+}
+
+.splide-wrapper-profile .splide__track {
+  height: 100%;
+}
+
+.splide-wrapper-profile .splide__list {
+  width: calc(100vw - 120px);
+  height: 100%;
+  align-items: center;
+  display: flex;
+}
+
+.splide__slide {
+  width: calc(50% - 10px);
+  height: 90%;
+  margin: 10px;
+  /* width: 50px; */
+}
+
+.splide__slide .users-card {
+  height: 100%;
+}
+
+.splide-wrapper-profile .card-img-top {
+  width: 100%;
+  height: 60%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* PROFILE SPLIDE */
+
+/* MEMORY SPLIDE */
+
+.splide-wrapper-mem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Align items at the start of the flex container */
+  width: calc(60vw); /* Adjust the width to account for the sidebar width */
+  height: 400px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.splide-wrapper-mem .splide {
+  height: 100%;
+}
+
+.splide-wrapper-mem .splide__track {
+  height: 100%;
+}
+
+.splide-wrapper-mem .splide__list {
+  width: calc(60vw - 120px);
+  height: 100%;
+  align-items: center;
+  display: flex;
+}
+
+.splide__slide {
+  width: calc(50% - 10px);
+  height: 90%;
+  margin: 10px;
+  /* width: 50px; */
+}
+
+.splide-wrapper-mem .card-img-top {
+  width: 100%;
+  height: 60%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.view-mem-button {
+  width: 100%;
+  height: 60px;
+}
+.view-mem-button button {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+/* MEMORY SPLIDE */
+
+.view-all-btn {
+  width: 20vw;
+  box-sizing: border-box;
+}
+
+.view-all-btn button {
+  width: 100%;
+  height: 100%;
+}
+
+.big-font {
+  font-size: 50px; /* Adjust the font size as needed */
+}
+
+.medium-font {
+  font-size: 30px; /* Adjust the font size as needed */
+}
+
+.white-text {
+  color: white !important;
+}
+
+.light-border {
+  border-color: #eeeeee; /* Or whatever light color you prefer */
+}

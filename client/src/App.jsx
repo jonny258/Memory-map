@@ -76,7 +76,16 @@ function App() {
               />
             }
           />
-          <Route path="/social" element={<Social />} />
+          <Route
+            path="/social"
+            element={
+              <Social
+                userState={userState}
+                setUserState={setUserState}
+                fetchRequest={fetchRequest}
+              />
+            }
+          />
           <Route path="/oldhome" element={<OldHome />} />
         </Routes>
       </Router>

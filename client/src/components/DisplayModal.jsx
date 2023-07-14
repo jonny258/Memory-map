@@ -8,15 +8,27 @@ function DisplayModal(props) {
           {props.tempDescription ? props.tempDescription.title : props.title}
         </h2>
         <div className="text-end">
-          <h6>{props.name ? props.name : 'Default Name'}</h6>
+          <h6>{props.name ? props.name : "Default Name"}</h6>
           <p>{props.date}</p>
         </div>
       </div>
       <div className="modal-body" id="modalDataBody">
-        <div className="display-picture">
-          <img src={props.tempDescription ? props.tempDescription.image : props.imageSrc} />
-        </div>
-        <p>{props.tempDescription ? props.tempDescription.description : props.description}</p> 
+        {props.tempDescription || props.imageSrc ? (
+          <div className="display-picture">
+            <img
+              src={
+                props.tempDescription
+                  ? props.tempDescription.image
+                  : props.imageSrc
+              }
+            />
+          </div>
+        ) : null}
+        <p>
+          {props.tempDescription
+            ? props.tempDescription.description
+            : props.description}
+        </p>
       </div>
       <div className="custom-modal-footer">
         <button

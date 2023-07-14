@@ -107,13 +107,13 @@ function Signup({fetchRequest, setUserState}) {
                   >
                     Continue
                   </button>
-                  <div className="other-option">
-                    <h6>Already have an account? Login here</h6>
-                    <a className="btn btn-primary" href="/login">
-                      Go To Login
-                    </a>
-                  </div>
                 </div>
+                <div className="other-option">
+                    <h6>Already have an account? Login here</h6>
+                    <button className="btn btn-primary" onClick={()=> navigate('/login')}>
+                      Go To Login
+                    </button>
+                  </div>
               </div>
             ) : (
               <div className="about-you">

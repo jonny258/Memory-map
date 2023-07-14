@@ -15,7 +15,7 @@ function Home({ userState, setUserState, fetchRequest }) {
   //This will be my is loading
   const [isLoading, setIsLoading] = useState(false);
   const [pictureState, setPictureState] = useState("");
-  const [markerArr, setMarkersArr] = useState([]);
+  const [markerArr, setMarkersArr] = useState(userState ? userState.markers : []);
   const [modalOpen, setModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [activeModal, setActiveModal] = useState(-1);
@@ -72,29 +72,49 @@ function Home({ userState, setUserState, fetchRequest }) {
     }
   };
 
+
   const addMarkersToMap = (map) => {
     const markers = [];
+    console.log(markerArr)
     markerArr.forEach((point, index) => {
-      const popup = new mapboxgl.Popup().setHTML("<h1>Hello World!</h1>");
+      const popup = new mapboxgl.Popup({ closeButton: false });
+  
       popup.on("open", (event) => {
-        popup.addClassName("popup-non-visable");
+        if(point.image){
+          popup.setHTML(`<img src='${point.image}' style="width:200px;height:auto;"/>`) // adjust style as needed
+        } else {  
+          popup.setHTML(`<h1 style="color:black;">${point.title}</h1>`) // adjust style as needed
+        }
+      });
+      
+      const markerClickHandler = () => {
         if (memoryButtonRef.current.innerText === "Currently VIEW Mode") {
           setIsEdit(false);
           setActiveModal(index);
         }
-      });
+      }
+  
       const marker = new mapboxgl.Marker({
         color: userState.color,
       })
         .setLngLat([point.lng, point.lat])
         .setPopup(popup)
-        .addTo(map);
+        .addTo(map)
+      // Add the hover functionality here:
+      marker.getElement().addEventListener('mouseenter', () => popup.addTo(map));
+      marker.getElement().addEventListener('mouseleave', () => popup.remove());
+      marker.getElement().addEventListener('click', () => markerClickHandler());
+  
       markers.push(marker);
     });
+  
     return () => {
       markers.forEach((marker) => marker.remove());
     };
   };
+  
+  
+  
 
   //USEEFFECT
   useEffect(() => {
@@ -103,12 +123,19 @@ function Home({ userState, setUserState, fetchRequest }) {
       getSession();
     } else {
       console.log("User is logged in");
-      setMarkersArr(userState.markers);
+      // console.log(markerArr)
+      // console.log(userState.markers)
+      if(!markerArr){
+        setMarkersArr(userState.markers);
+      }else{
+        setMarkersArr([...markerArr])
+      }
     }
   }, []);
 
   useEffect(() => {
     if (map) {
+      console.log('adding markers to map')
       const removeMarkers = addMarkersToMap(map);
       return removeMarkers;
     } else {

@@ -9,16 +9,24 @@ function Login({ fetchRequest, setUserState }) {
       event.preventDefault();
       const email = event.target.form[0].value;
       const password = event.target.form[1].value;
-      const body = {
-        email: email,
-        password: password,
-      };
-
-      const loginUrl = `http://localhost:5500/api/user/login`;
-      const userData = await fetchRequest("POST", loginUrl, body);
-      console.log(userData);
-      setUserState(userData);
-      navigate("/home");
+      if(email && password){
+        const body = {
+          email: email,
+          password: password,
+        };
+  
+        const loginUrl = `http://localhost:5500/api/user/login`;
+        const userData = await fetchRequest("POST", loginUrl, body);
+        console.log(userData);
+        if(userData._id){
+          setUserState(userData);
+          navigate("/home");
+        }else{
+          alert(userData)
+        }
+      }else{
+        alert('Please fillout both feilds')
+      }
     } catch (err) {
       console.error(err);
     }
