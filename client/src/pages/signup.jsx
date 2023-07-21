@@ -3,8 +3,9 @@ import "../assets/css/login-signup.css";
 import { ChromePicker } from "react-color";
 import { useNavigate } from "react-router-dom";
 import LocationInput from "../components/LocationInput";
+import PictureUploader from "../components/PictureUploader";
 
-function Signup({fetchRequest, setUserState}) {
+function Signup({ fetchRequest, setUserState }) {
   const MAX_LOCATIONS = 5;
   const navigate = useNavigate();
 
@@ -12,6 +13,7 @@ function Signup({fetchRequest, setUserState}) {
   const [pageState, setPageState] = useState(true);
   const [locationCount, setLocationCount] = useState(0);
   const [inputLocations, setInputLocations] = useState([]);
+  const [pictureState, setPictureState] = useState("");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,7 +22,6 @@ function Signup({fetchRequest, setUserState}) {
   const submitButtonHandler = async (event) => {
     try {
       event.preventDefault();
-      console.log([event.target.form]);
       if (email && password && name) {
         const namedMarkers = inputLocations
           .filter((marker) => marker.name && marker.name.trim() !== "")
@@ -28,20 +29,21 @@ function Signup({fetchRequest, setUserState}) {
             marker.name = name;
             return marker;
           });
-
+        console.log(pictureState);
         const body = {
           email: email,
           password: password,
           name: name,
           color: color,
+          pfp: pictureState,
           markers: namedMarkers,
         };
-        const signUpUrl = `http://localhost:5500/api/user/signup`
+        const signUpUrl = `http://localhost:5500/api/user/signup`;
 
-        const userData = await fetchRequest('POST', signUpUrl, body)
-        console.log(userData)
-        setUserState(userData)
-        navigate('/home')
+        const userData = await fetchRequest("POST", signUpUrl, body);
+        console.log(userData);
+        setUserState(userData);
+        navigate("/home");
       } else {
         alert("Please fill out all required fields");
       }
@@ -78,6 +80,18 @@ function Signup({fetchRequest, setUserState}) {
             {pageState ? (
               <div className="email-password">
                 <div className="form-group">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => navigate("/social")}
+                  >
+                    <h2 htmlFor="userEmail">Social</h2>
+                  </button>
+
+                  <small id="emailHelp" className="form-text text-muted">
+                    Skip the sign up and check out the social page
+                  </small>
+                </div>
+                <div className="form-group">
                   <label htmlFor="userEmail">Email address</label>
                   <input
                     //   type="email"
@@ -109,11 +123,14 @@ function Signup({fetchRequest, setUserState}) {
                   </button>
                 </div>
                 <div className="other-option">
-                    <h6>Already have an account? Login here</h6>
-                    <button className="btn btn-primary" onClick={()=> navigate('/login')}>
-                      Go To Login
-                    </button>
-                  </div>
+                  <h6>Already have an account? Login here</h6>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => navigate("/login")}
+                  >
+                    Go To Login
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="about-you">
@@ -127,6 +144,13 @@ function Signup({fetchRequest, setUserState}) {
                       placeholder="Enter your name"
                       defaultValue={name && name}
                       onChange={(event) => setName(event.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <PictureUploader
+                      uploadText={"Pick a profile picture"}
+                      pictureState={pictureState}
+                      setPictureState={setPictureState}
                     />
                   </div>
                   <div className="form-group color-picker">

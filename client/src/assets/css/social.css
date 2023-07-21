@@ -9,9 +9,10 @@
   right: 0;
   width: 20vw;
   height: 70vh;
-  background: lightgray;
   box-sizing: border-box;
   overflow: scroll;
+  /* Use a linear gradient for the background */
+  background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.5));
 }
 
 /* .below-map {
@@ -179,4 +180,34 @@
 
 .light-border {
   border-color: #eeeeee; /* Or whatever light color you prefer */
+}
+
+.markers-in-map h6 {
+  width: fit-content;
+  padding: 1px;
+  padding-right: 4px;
+  margin-left: 10px;
+  padding-left: 4px;
+  border-bottom: 2px gray solid;
+}
+
+.markers-in-map li {
+  box-sizing: border-box;
+  margin-top: 5px;
+  padding: 0;
+  height: 50px;
+  border-radius:0;
+}
+
+.markers-in-map button {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+border-radius: 0;
+}
+
+.btn-div {
+  width: 30%;
+  height: 100%;
 }

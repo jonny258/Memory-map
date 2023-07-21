@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Splide, SplideTrack, SplideSlide } from "@splidejs/react-splide";
+import { useNavigate } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Map from "../components/Map";
@@ -7,14 +8,18 @@ import "../assets/css/social.css";
 //I can change the styles
 import "@splidejs/react-splide/css";
 import SocialDiaplayModal from "../components/SocialDiaplayModal";
+import Loading from "./loading";
 
 function Social({ userState, setUserState, fetchRequest }) {
+  const navigate = useNavigate();
   const [activeMarker, setActiveMarker] = useState(null);
   const [showUsers, setShowUsers] = useState(false);
   const [markers, setMarkers] = useState([]);
   const [displayUser, setDisplayUser] = useState("");
   const [markersInViewUsers, setMarkersInViewUsers] = useState(null);
   const [markersInView, setMarkersInView] = useState(null);
+  const [isloggedIn, setIsloggedIn] = useState();
+  const [isLoading, setIsLoading] = useState(true);
 
   const splideMemoryRef = useRef();
   const splideUsersRef = useRef();
@@ -31,9 +36,18 @@ function Social({ userState, setUserState, fetchRequest }) {
     setActiveMarker(allUserDataRef.current[parIndex].markers[index]);
   };
 
+  //This could be used to shuffle the arrays, but I cant dig down
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+
   const mapMoveHandler = () => {
-    if (parIndexRef.current) {
-      console.log("Map move action has ended");
+    if (parIndexRef.current || parIndexRef.current === 0) {
+      console.log("Map move action has ended -- SINGLE");
       console.log(parIndexRef.current);
 
       const bounds = mapRef.current.getBounds();
@@ -46,7 +60,8 @@ function Social({ userState, setUserState, fetchRequest }) {
       setMarkersInView(markersInViewCurrent);
       setMarkersInViewUsers(null);
     } else {
-      console.log("Map move action has ended");
+      console.log("Map move action has ended -- MANY");
+      console.log(allUserDataRef.current);
       console.log(parIndexRef.current);
       const arrOfArrMarkers = [];
 
@@ -61,8 +76,9 @@ function Social({ userState, setUserState, fetchRequest }) {
         // console.log(markersInViewCurrent.length)
         // setMarkersInView(markersInViewCurrent);
       });
-      console.log(arrOfArrMarkers);
-      console.log(arrOfArrMarkers.length);
+      // console.log(arrOfArrMarkers);
+      // console.log(arrOfArrMarkers.length);
+
       setMarkersInViewUsers(arrOfArrMarkers);
       setMarkersInView(null);
     }
@@ -131,6 +147,7 @@ function Social({ userState, setUserState, fetchRequest }) {
       allUserDataRef.current = allUserData;
       addMarkersToMap(allUserData);
       setShowUsers(true);
+      setIsLoading(false);
 
       // Now, add the event listeners here.
       // mapRef.current.on("move", (event) => {
@@ -157,10 +174,34 @@ function Social({ userState, setUserState, fetchRequest }) {
       mapRef.current.on("moveend", (event) => {
         mapMoveHandler();
       });
+      mapMoveHandler();
     } catch (err) {
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    const getSession = async () => {
+      try {
+        const sessionData = await fetchRequest(
+          "GET",
+          "http://localhost:5500/api/session"
+        );
+        if (sessionData[0]) {
+          console.log("user is logged in");
+          setIsloggedIn(true);
+          //This gets the logged in user
+          // const userUrl = `http://localhost:5500/api/user/${sessionData[0].currentUser._id}`;
+          // const userData = await fetchRequest("GET", userUrl);
+        } else {
+          setIsloggedIn(false);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    getSession();
+  });
 
   const mapFly = (camera) => {
     const map = mapRef.current;
@@ -206,6 +247,23 @@ function Social({ userState, setUserState, fetchRequest }) {
     }
   };
 
+  const viewPointInMapHandler = (point) => {
+    console.log(point);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
+    setTimeout(() => {
+      setActiveMarker(point);
+    }, 5000);
+    const camera = {
+      center: [point.lng, point.lat],
+      zoom: 16,
+    };
+    mapFly(camera);
+  };
+
   const viewAllButtonHandler = () => {
     console.log("view button handler");
     parIndexRef.current = null;
@@ -220,6 +278,7 @@ function Social({ userState, setUserState, fetchRequest }) {
   };
 
   const viewMemoryButtonHandler = (user) => {
+    console.log(user);
     window.scrollTo({
       top: 0,
       behavior: "smooth",
@@ -263,15 +322,54 @@ function Social({ userState, setUserState, fetchRequest }) {
     return adjustedSize;
   };
 
+  const logoutButtonHandler = async () => {
+    try {
+      navigate("/");
+      const sessionUrl = `http://localhost:5500/api/session`;
+      const deleteSession = await fetchRequest("DELETE", sessionUrl);
+      console.log(deleteSession);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <>
-      <div className="map-container" id="map-container-custom">
+      {isLoading && <Loading />}
+      <div
+        className="map-container"
+        id="map-container-custom"
+        style={{
+          width: 'calc(80vw - 17px)',
+          height: "70vh",
+          boxSizing: "border-box",
+        }}
+      >
+        <div className="page-nav">
+          <button
+            className="btn btn-outline-warning"
+            id="left-button"
+            onClick={logoutButtonHandler}
+          >
+            {isloggedIn ? "Log Out" : "Sign up"}
+          </button>
+          {isloggedIn && (
+            <button
+              className="btn btn-outline-info"
+              onClick={() => navigate("/home")}
+            >
+              Home
+            </button>
+          )}
+
+          {/* <button
+            className="btn btn-outline-success"
+            onClick={() => setProfileModalOpen(true)}
+          >
+            Profile
+          </button> */}
+        </div>
         <Map
-          style={{
-            width: "80vw",
-            height: "70vh",
-            boxSizing: "border-box",
-          }}
           center={[-111.88, 40.67]}
           mapClickHandler={mapClickHandler}
           mapLoadHandler={mapLoadHandler}
@@ -317,10 +415,7 @@ function Social({ userState, setUserState, fetchRequest }) {
                       return (
                         <SplideSlide key={index}>
                           <div className="card users-card">
-                            <img
-                              src="https://upcdn.io/FW25bUs/image/uploads/2023/07/10/529233723_05b1348453_b-5NE5.jpg.crop?w=600&h=600&fit=max&q=70"
-                              className="card-img-top"
-                            />
+                            <img src={user.pfp} className="card-img-top" />
                             <div className="card-body d-flex">
                               <div className="col-6 d-flex justify-content-center align-items-center border-right border-bottom light-border">
                                 <h1
@@ -393,10 +488,7 @@ function Social({ userState, setUserState, fetchRequest }) {
                     className="card profile-card"
                     style={{ border: `5px solid ${displayUser.color}` }}
                   >
-                    <img
-                      src="https://upcdn.io/FW25bUs/image/uploads/2023/07/10/529233723_05b1348453_b-5NE5.jpg.crop?w=600&h=600&fit=max&q=70"
-                      className="card-img-top"
-                    />
+                    <img src={displayUser.pfp} className="card-img-top" />
                     <div className="card-body">
                       <h1
                         className="card-title"
@@ -560,23 +652,62 @@ function Social({ userState, setUserState, fetchRequest }) {
       <div className="sidebar">
         {markersInView && (
           <>
-            {markersInView.map((point, index) => {
-              return <li>{point.title}</li>;
-            })}
+            <ul className="list-group markers-in-map">
+              {markersInView.map((point, index) => {
+                return (
+                  <li
+                    key={index}
+                    className="list-group-item d-flex justify-content-between align-items-center"
+                    style={{
+                      border: `3px solid ${displayUser.color}`,
+                    }}
+                  >
+                    <h6>{point.title}</h6>
+                    <div className="btn-div">
+                      <button
+                        className="btn btn-info"
+                        onClick={() => viewPointInMapHandler(point)}
+                      >
+                        View
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
           </>
         )}
         {markersInViewUsers && (
           <>
-            {markersInViewUsers.map((userMarkers, parIndex) => {
-              return(
-                <>
-{              userMarkers.map((point, index) => {
-                return <li>{point.title}</li>;
+            <ul className="list-group markers-in-map">
+              {markersInViewUsers.map((userMarkers, parIndex) => {
+                return (
+                  <div key={parIndex}>
+                    {userMarkers.map((point, index) => {
+                      return (
+                        <li
+                          key={`${parIndex}-${index}`}
+                          className="list-group-item d-flex justify-content-between align-items-center"
+                          style={{
+                            border: `3px solid ${allUserDataRef.current[parIndex].color}`,
+                          }}
+                        >
+                          <h6>{point.title}</h6>
+                          <div className="btn-div">
+                            <button
+                              className="btn btn-info"
+                              onClick={() => viewPointInMapHandler(point)}
+                            >
+                              View
+                            </button>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </div>
+                );
               })}
-                </>
-              )
-
-            })}
+            </ul>
           </>
         )}
       </div>
@@ -652,4 +783,7 @@ function Social({ userState, setUserState, fetchRequest }) {
 
 export default Social;
 
-//Addin laoding
+//Add in loading
+//The background in the sidebar is weird
+//It would be cool to randomize the sidebar cards
+//Get the map to be true 80vw

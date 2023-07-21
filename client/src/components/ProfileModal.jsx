@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { ChromePicker } from "react-color";
+import PictureUploader from "./PictureUploader";
 
 function ProfileModal({
   setProfileModalOpen,
@@ -10,6 +11,7 @@ function ProfileModal({
 }) {
   const [color, setColor] = useState(user.color);
   const [showPassword, setShowPassword] = useState(false);
+  const [pictureState, setPictureState] = useState("");
 
   const editProfileButtonHandler = async (event) => {
     try {
@@ -28,6 +30,7 @@ function ProfileModal({
           password: password,
           name: name,
           color: color,
+          pfp: pictureState,
           markers: updatedNameMarkers,
         };
 
@@ -115,11 +118,16 @@ function ProfileModal({
                     defaultValue={user.name}
                   />
                 </div>
+                <PictureUploader
+                  uploadText={"Change your profile picture"}
+                  pictureState={pictureState}
+                  setPictureState={setPictureState}
+                />
               </div>
               <div>
                 <ChromePicker
                   color={color}
-                  onChange={(event)=> setColor(event.hex)}
+                  onChange={(event) => setColor(event.hex)}
                   className="myChromePicker"
                 />
               </div>

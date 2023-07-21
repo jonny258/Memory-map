@@ -3,7 +3,7 @@ import { UploadButton } from "react-uploader";
 import "../assets/css/fileUploader.css";
 import { useState } from "react";
 
-function PictureUploader({ pictureState, setPictureState }) {
+function PictureUploader({ pictureState, setPictureState, uploadText }) {
   const uploader = Uploader({ apiKey: "public_FW25bUsEgLaLmifCsyAEZMAxaX9j" });
 
   const [isUploaded, setIsUploaded] = useState(false);
@@ -36,7 +36,7 @@ function PictureUploader({ pictureState, setPictureState }) {
           }
           onClick={onClick}
         >
-          {isUploaded ? "Image uploaded" : "Upload an Image..."}
+          {isUploaded ? "Image uploaded" : uploadText}
         </button>
       )}
     </UploadButton>
