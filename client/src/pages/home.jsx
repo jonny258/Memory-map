@@ -10,8 +10,9 @@ import PictureUploader from "../components/PictureUploader";
 import Map from "../components/Map";
 
 function Home({ userState, setUserState, fetchRequest }) {
-  const navigate = useNavigate();
+  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500aaa';
 
+  const navigate = useNavigate();
   //This will be my is loading
   const [isLoading, setIsLoading] = useState(false);
   const [pictureState, setPictureState] = useState("");
@@ -57,11 +58,11 @@ function Home({ userState, setUserState, fetchRequest }) {
     try {
       const sessionData = await fetchRequest(
         "GET",
-        "http://localhost:5500/api/session"
+        `${API_BASE_URL}/api/session`
       );
       if (sessionData[0]) {
         console.log("user is logged in");
-        const userUrl = `http://localhost:5500/api/user/${sessionData[0].currentUser._id}`;
+        const userUrl = `${API_BASE_URL}/api/user/${sessionData[0].currentUser._id}`;
         const userData = await fetchRequest("GET", userUrl);
         setUserState(userData);
         setMarkersArr(userData.markers);
@@ -241,7 +242,7 @@ function Home({ userState, setUserState, fetchRequest }) {
           pictureState
         );
 
-        const markerURL = `http://localhost:5500/api/user/marker/${userState._id}`;
+        const markerURL = `${API_BASE_URL}/api/user/marker/${userState._id}`;
         const postedNewMarker = await fetchRequest(
           "POST",
           markerURL,
@@ -268,7 +269,7 @@ function Home({ userState, setUserState, fetchRequest }) {
       setMarkersArr(updatedMarkerArr);
       setActiveModal(-1);
 
-      const deleteUrl = `http://localhost:5500/api/user/marker/${userState._id}`;
+      const deleteUrl = `${API_BASE_URL}/api/user/marker/${userState._id}`;
       const deletedMarker = await fetchRequest("DELETE", deleteUrl, {
         deleteIndex: deleteIndex,
       });
@@ -299,7 +300,7 @@ function Home({ userState, setUserState, fetchRequest }) {
   const logoutButtonHandler = async () => {
     try {
       navigate("/");
-      const sessionUrl = `http://localhost:5500/api/session`;
+      const sessionUrl = `${API_BASE_URL}/api/session`;
       const deleteSession = await fetchRequest("DELETE", sessionUrl);
       console.log(deleteSession);
     } catch (err) {

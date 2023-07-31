@@ -12,6 +12,8 @@ import Loading from "./loading";
 
 function Social({ userState, setUserState, fetchRequest }) {
   const navigate = useNavigate();
+  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500aaa';
+
   const [activeMarker, setActiveMarker] = useState(null);
   const [showUsers, setShowUsers] = useState(false);
   const [markers, setMarkers] = useState([]);
@@ -142,7 +144,7 @@ function Social({ userState, setUserState, fetchRequest }) {
     try {
       console.log(userState);
       mapRef.current = event.target;
-      const allUsersUrl = `http://localhost:5500/api/user/`;
+      const allUsersUrl = `${API_BASE_URL}/api/user/`;
       const allUserData = await fetchRequest("GET", allUsersUrl);
       allUserDataRef.current = allUserData;
       addMarkersToMap(allUserData);
@@ -185,7 +187,7 @@ function Social({ userState, setUserState, fetchRequest }) {
       try {
         const sessionData = await fetchRequest(
           "GET",
-          "http://localhost:5500/api/session"
+          `${API_BASE_URL}/api/session`
         );
         if (sessionData[0]) {
           console.log("user is logged in");
@@ -325,7 +327,7 @@ function Social({ userState, setUserState, fetchRequest }) {
   const logoutButtonHandler = async () => {
     try {
       navigate("/");
-      const sessionUrl = `http://localhost:5500/api/session`;
+      const sessionUrl = `${API_BASE_URL}/api/session`;
       const deleteSession = await fetchRequest("DELETE", sessionUrl);
       console.log(deleteSession);
     } catch (err) {

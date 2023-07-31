@@ -2,6 +2,8 @@ import React from "react";
 import PictureUploader from "./PictureUploader";
 
 function EditModal(props) {
+  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500aaa';
+
   const saveChangesHandler = async (event) => {
     try {
       event.preventDefault();
@@ -21,7 +23,7 @@ function EditModal(props) {
         markerIndex: props.index,
         updatedMarkerData: props.markerArr[props.index],
       };
-      const updateUrl = `http://localhost:5500/api/user/marker/${props.userState._id}`;
+      const updateUrl = `${API_BASE_URL}/api/user/marker/${props.userState._id}`;
       const updatedMarker = await props.fetchRequest("PUT", updateUrl, body);
       console.log(updatedMarker);
     } catch (err) {

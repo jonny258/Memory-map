@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login({ fetchRequest, setUserState }) {
+  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500aaa';
   const navigate = useNavigate();
 
   const submitButtonHandler = async (event) => {
@@ -15,7 +16,7 @@ function Login({ fetchRequest, setUserState }) {
           password: password,
         };
   
-        const loginUrl = `http://localhost:5500/api/user/login`;
+        const loginUrl = `${API_BASE_URL}/api/user/login`;
         const userData = await fetchRequest("POST", loginUrl, body);
         console.log(userData);
         if(userData._id){

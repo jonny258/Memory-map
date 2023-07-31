@@ -6,6 +6,8 @@ import LocationInput from "../components/LocationInput";
 import PictureUploader from "../components/PictureUploader";
 
 function Signup({ fetchRequest, setUserState }) {
+  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500aaa';
+
   const MAX_LOCATIONS = 5;
   const navigate = useNavigate();
 
@@ -38,7 +40,7 @@ function Signup({ fetchRequest, setUserState }) {
           pfp: pictureState,
           markers: namedMarkers,
         };
-        const signUpUrl = `http://localhost:5500/api/user/signup`;
+        const signUpUrl = `${API_BASE_URL}/api/user/signup`;
 
         const userData = await fetchRequest("POST", signUpUrl, body);
         console.log(userData);
@@ -59,6 +61,7 @@ function Signup({ fetchRequest, setUserState }) {
   const emailPasswordHandler = (event) => {
     event.preventDefault();
     if (email && password) {
+      console.log(API_BASE_URL);
       setPageState(false);
     } else {
       alert("Please fill out both fields");

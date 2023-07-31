@@ -7,7 +7,9 @@ const cors = require('cors')
 const db = require('./config/connection')
 const routes = require('./routes')
 
-const PORT = 5500;
+const PORT = process.env.PORT || 5500;
+
+//Add in a deploy from build here
 
 app.use(session({
     secret: 't5H1i7Gc$Gy9^sb@9K0E', 
