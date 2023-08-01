@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const path = require("path");
 
 const session = require('express-session');
 const cors = require('cors')
@@ -20,6 +21,17 @@ app.use(session({
 app.use(cors())
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+if (process.env.NODE_ENV === "production") {
+    // Serve any static files
+    app.use(express.static(path.join(__dirname, "../client/dist")));
+  
+    // Handle React routing, return all requests to React app
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
+    });
+  }
+
 app.use(routes);
 
 db.once('open', () => {
