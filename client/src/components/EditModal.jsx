@@ -2,7 +2,7 @@ import React from "react";
 import PictureUploader from "./PictureUploader";
 
 function EditModal(props) {
-  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500aaa';
+  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500';
 
   const saveChangesHandler = async (event) => {
     try {

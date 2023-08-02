@@ -6,7 +6,7 @@ import LocationInput from "../components/LocationInput";
 import PictureUploader from "../components/PictureUploader";
 
 function Signup({ fetchRequest, setUserState }) {
-  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500aaa';
+  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500';
 
   const MAX_LOCATIONS = 5;
   const navigate = useNavigate();

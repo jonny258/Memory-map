@@ -9,7 +9,7 @@ function ProfileModal({
   fetchRequest,
   getSession,
 }) {
-  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500aaa';
+  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500';
 
   const [color, setColor] = useState(user.color);
   const [showPassword, setShowPassword] = useState(false);

@@ -10,7 +10,7 @@ import PictureUploader from "../components/PictureUploader";
 import Map from "../components/Map";
 
 function Home({ userState, setUserState, fetchRequest }) {
-  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500aaa';
+  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500';
 
   const navigate = useNavigate();
   //This will be my is loading

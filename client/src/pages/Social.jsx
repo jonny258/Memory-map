@@ -12,7 +12,7 @@ import Loading from "./loading";
 
 function Social({ userState, setUserState, fetchRequest }) {
   const navigate = useNavigate();
-  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500aaa';
+  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500';
 
   const [activeMarker, setActiveMarker] = useState(null);
   const [showUsers, setShowUsers] = useState(false);
