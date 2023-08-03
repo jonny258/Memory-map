@@ -53,25 +53,25 @@ const userLogin = async (req, res) => {
 };
 
 const userSignUp = async (req, res) => {
+  let debugInfo = {}; // Object to store debug information
   try {
+    debugInfo.requestBody = req.body;
     const doesUserExist = await User.findOne({ email: req.body.email });
+    debugInfo.doesUserExist = doesUserExist;
     if (doesUserExist) {
-      res.json("This email is already linked to an account");
+      res.json({ message: "This email is already linked to an account", debugInfo });
     } else {
       const newUser = await User.create(req.body);
-      await Session.deleteMany({});
-
-      await Session.create({
-        cookie: req.session.cookie,
-        isLoggedIn: true,
-        currentUser: newUser,
-      });
-      res.json(newUser);
+      debugInfo.newUser = newUser;
+      // rest of the code...
+      res.json({ newUser, debugInfo });
     }
   } catch (err) {
-    res.status(500).json(err);
+    debugInfo.error = err;
+    res.status(500).json({ error: err, debugInfo });
   }
 };
+
 
 const getMarkersFromUser = async (req, res) => {
   try {
