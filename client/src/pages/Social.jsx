@@ -189,7 +189,8 @@ function Social({ userState, setUserState, fetchRequest }) {
           "GET",
           `${API_BASE_URL}/api/session`
         );
-        if (sessionData[0]) {
+        console.log(sessionData.length)
+        if (sessionData.length !== 0) {
           console.log("user is logged in");
           setIsloggedIn(true);
           //This gets the logged in user
@@ -204,7 +205,7 @@ function Social({ userState, setUserState, fetchRequest }) {
       }
     };
     getSession();
-  });
+  }, []);
 
   const mapFly = (camera) => {
     const map = mapRef.current;
