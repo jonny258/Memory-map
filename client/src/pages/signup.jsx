@@ -40,7 +40,7 @@ function Signup({ fetchRequest, setUserState }) {
           pfp: pictureState,
           markers: namedMarkers,
         };
-        const signUpUrl = `${API_BASE_URL}/api/user/signup`;
+        const signUpUrl = `http://localhost:5500/api/user/signup`;
 
         const userData = await fetchRequest("POST", signUpUrl, body);
         console.log(userData);

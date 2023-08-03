@@ -20,25 +20,28 @@ app.use(
   })
 );
 
-const allowedOrigins = [
-  "http://localhost:3000", // Adjust to your local front-end server's port
-  "https://memory-map-1fd827e00c4d.herokuapp.com",
-];
+//Chat GPT cors 
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true,
-  optionsSuccessStatus: 204,
-};
+// const allowedOrigins = [
+//   "http://localhost:3000", // Adjust to your local front-end server's port
+//   "https://memory-map-1fd827e00c4d.herokuapp.com",
+// ];
 
-app.use(cors(corsOptions));
+// const corsOptions = {
+//   origin: function (origin, callback) {
+//     if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error("Not allowed by CORS"));
+//     }
+//   },
+//   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//   credentials: true,
+//   optionsSuccessStatus: 204,
+// };
+
+// app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 

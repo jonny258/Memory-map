@@ -442,9 +442,9 @@ function Social({ userState, setUserState, fetchRequest }) {
                             <div className="view-mem-button">
                               <div className="view-mem-button">
                                 <button
-                                  className={`btn view-mem-button ${
-                                    isDarkColor(user.color) ? "white-text" : ""
-                                  }`}
+                                  // className={`btn view-mem-button ${
+                                  //   isDarkColor(user.color) ? "white-text" : ""
+                                  // }`}
                                   style={{ backgroundColor: user.color }}
                                   onClick={() => userButtonHandler(user, index)}
                                 >
@@ -597,11 +597,11 @@ function Social({ userState, setUserState, fetchRequest }) {
 
                                 <div className="view-mem-button">
                                   <button
-                                    className={`btn view-mem-button ${
-                                      isDarkColor(displayUser.color)
-                                        ? "white-text"
-                                        : ""
-                                    }`}
+                                    // className={`btn view-mem-button ${
+                                    //   isDarkColor(displayUser.color)
+                                    //     ? "white-text"
+                                    //     : ""
+                                    // }`}
                                     onClick={() =>
                                       viewMemoryButtonHandler(point)
                                     }
