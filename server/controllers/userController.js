@@ -41,7 +41,7 @@ const userLogin = async (req, res) => {
       await Session.deleteMany({});
 
       await Session.create({
-        cookie: req.session.cookie,
+        // cookie: req.session.cookie,
         isLoggedIn: true,
         currentUser: selectedUser,
       });
@@ -62,7 +62,7 @@ const userSignUp = async (req, res) => {
       await Session.deleteMany({});
 
       await Session.create({
-        cookie: req.session.cookie,
+        // cookie: req.session.cookie,
         isLoggedIn: true,
         currentUser: newUser,
       });

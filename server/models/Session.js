@@ -1,7 +1,7 @@
 const { model, Schema } = require("mongoose");
 
 const sessionSchema = new Schema({
-    cookie: {type: Object, required: true},
+    // cookie: {type: Object, required: true},
     isLoggedIn: {type: Boolean, required: true},
     currentUser: {type: Object, required: true}
 });
