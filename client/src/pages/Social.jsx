@@ -193,8 +193,9 @@ function Social({ userState, setUserState, fetchRequest }) {
           console.log("user is logged in");
           setIsloggedIn(true);
           //This gets the logged in user
-          // const userUrl = `http://localhost:5500/api/user/${sessionData[0].currentUser._id}`;
-          // const userData = await fetchRequest("GET", userUrl);
+          const userUrl = `${API_BASE_URL}/api/user/${sessionData[0].currentUser._id}`;
+          const userData = await fetchRequest("GET", userUrl);
+          console.log(userData)
         } else {
           setIsloggedIn(false);
         }
