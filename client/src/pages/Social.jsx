@@ -193,7 +193,7 @@ function Social({ userState, setUserState, fetchRequest }) {
         // if(sessionData){
         //   console.log(sessionData[0])
         // }
-        if (sessionData[0]) {
+        if (sessionData) {
           console.log("user is logged in");
           setIsloggedIn(true);
           //This gets the logged in user
@@ -342,7 +342,7 @@ function Social({ userState, setUserState, fetchRequest }) {
 
   return (
     <>
-      {isLoading && <Loading />}
+      {/* {isLoading && <Loading />} */}
       <div
         className="map-container"
         id="map-container-custom"
