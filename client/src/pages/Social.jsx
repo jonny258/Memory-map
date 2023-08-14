@@ -129,6 +129,7 @@ function Social({ userState, setUserState, fetchRequest }) {
     // console.log(map);
     // console.log(allUserData);
 
+    console.log(API_BASE_URL)
     console.log(allUserData)
     allUserData.forEach((user, parIndex) => {
       user.markers.forEach((point, index) => {

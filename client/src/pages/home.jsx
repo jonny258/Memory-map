@@ -56,6 +56,7 @@ function Home({ userState, setUserState, fetchRequest }) {
   //FUNCTIONS CALLED BY USEEFFECT
   const getSession = async () => {
     try {
+      console.log(API_BASE_URL)
       const sessionData = await fetchRequest(
         "GET",
         `${API_BASE_URL}/api/session`
