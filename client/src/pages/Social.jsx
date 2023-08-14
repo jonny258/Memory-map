@@ -185,12 +185,15 @@ function Social({ userState, setUserState, fetchRequest }) {
   useEffect(() => {
     const getSession = async () => {
       try {
+        console.log('This ran')
         const sessionData = await fetchRequest(
           "GET",
           `${API_BASE_URL}/api/session`
         );
-        console.log(sessionData.length)
-        if (sessionData.length !== 0) {
+        // if(sessionData){
+        //   console.log(sessionData[0])
+        // }
+        if (sessionData[0]) {
           console.log("user is logged in");
           setIsloggedIn(true);
           //This gets the logged in user
