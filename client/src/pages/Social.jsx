@@ -129,6 +129,7 @@ function Social({ userState, setUserState, fetchRequest }) {
     // console.log(map);
     // console.log(allUserData);
 
+    console.log(allUserData)
     allUserData.forEach((user, parIndex) => {
       user.markers.forEach((point, index) => {
         addOneMarker(user, parIndex, point, index);
@@ -144,7 +145,7 @@ function Social({ userState, setUserState, fetchRequest }) {
     try {
       console.log(userState);
       mapRef.current = event.target;
-      const allUsersUrl = `${API_BASE_URL}/api/user/`;
+      const allUsersUrl = `${API_BASE_URL}/api/user`;
       const allUserData = await fetchRequest("GET", allUsersUrl);
       allUserDataRef.current = allUserData;
       addMarkersToMap(allUserData);
