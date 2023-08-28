@@ -1,12 +1,13 @@
 import React, { useState, useRef } from "react";
-import "../assets/css/login-signup.css";
+// import "../assets/css/login-signup.css";
 import { ChromePicker } from "react-color";
 import { useNavigate } from "react-router-dom";
 import LocationInput from "../components/LocationInput";
 import PictureUploader from "../components/PictureUploader";
 
 function Signup({ fetchRequest, setUserState }) {
-  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500';
+  const API_BASE_URL =
+    import.meta.env.VITE_APP_API_BASE_URL || "http://localhost:5500";
 
   const MAX_LOCATIONS = 5;
   const navigate = useNavigate();
@@ -89,6 +90,7 @@ function Signup({ fetchRequest, setUserState }) {
                   >
                     <h2 htmlFor="userEmail">Social</h2>
                   </button>
+                  <h1 className="text-3xl font-bold underline">Hello world!</h1>
 
                   <small id="emailHelp" className="form-text text-muted">
                     Skip the sign up and check out the social page
