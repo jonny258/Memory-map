@@ -7,6 +7,7 @@ import Signup from "./pages/signup";
 import OldHome from "./pages/oldHomeFile";
 import Home from "./pages/home";
 import Social from "./pages/Social";
+import User from "./pages/userterminal";
 
 function App() {
   const fetchRequest = async (method, url, body) => {
@@ -39,7 +40,7 @@ function App() {
           <Route
             index
             element={
-              <Signup
+              <User
                 userState={userState}
                 setUserState={setUserState}
                 fetchRequest={fetchRequest}

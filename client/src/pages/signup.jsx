@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 // import "../assets/css/login-signup.css";
 import { ChromePicker } from "react-color";
 import { useNavigate } from "react-router-dom";
-import LocationInput from "../components/LocationInput";
+import LocationInput from "../components/UserTerminal/LocationInput";
 import PictureUploader from "../components/PictureUploader";
 
 function Signup({ fetchRequest, setUserState }) {
@@ -78,59 +78,101 @@ function Signup({ fetchRequest, setUserState }) {
 
   return (
     <>
-      <div className="wrapper">
-        <section>
-          <form className="d-flex">
+      <div className="flex items-center justify-center h-screen w-screen bg-gray-300">
+        <section className="p-5 rounded-xl bg-gray-500 max-h-screen">
+          <form className="flex flex-col">
             {pageState ? (
-              <div className="email-password">
-                <div className="form-group">
+              <div>
+                <div className="bg-gray-600 p-4 m-4 rounded-md">
                   <button
-                    className="btn btn-primary"
+                    className="w-full btn btn-accent"
                     onClick={() => navigate("/social")}
                   >
-                    <h2 htmlFor="userEmail">Social</h2>
+                    <h2 className="text-xl">Go to Social page</h2>
                   </button>
-                  <h1 className="text-3xl font-bold underline">Hello world!</h1>
-
-                  <small id="emailHelp" className="form-text text-muted">
+                  <p className="text-lg w-full text-gray-400">
                     Skip the sign up and check out the social page
-                  </small>
+                  </p>
                 </div>
-                <div className="form-group">
-                  <label htmlFor="userEmail">Email address</label>
+
+                {/* <div className="bg-gray-600 p-4 m-4 rounded-md">
+                  <label className="block mb-2 text-white" htmlFor="userEmail">
+                    Email address
+                  </label>
                   <input
-                    //   type="email"
-                    className="form-control"
+                    className="form-input w-full p-2 rounded mb-2"
                     id="userEmail"
                     placeholder="Enter email"
                     defaultValue={email && email}
                     onChange={(event) => setEmail(event.target.value)}
                   />
-                  <small id="emailHelp" className="form-text text-muted">
+                  <small className="block text-sm text-gray-400">
                     We'll never share your email with anyone else.
                   </small>
+                </div> */}
+
+                <div className="bg-gray-600 rounded-md border-none m-4 p-3">
+                  <label className="label">
+                    <span className="label-text text-lg">Email address</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter email"
+                    className="input input-bordered input-accent w-full text-white"
+                    onChange={(event) => setEmail(event.target.value)}
+                  />
+                  <label className="label">
+                    <span className="label-text-alt">
+                      We'll never share your email with anyone else.
+                    </span>
+                  </label>
                 </div>
-                <div className="form-group">
-                  <label htmlFor="userPassword">Password</label>
+
+                {/* <div className="bg-gray-600 p-4 m-4 rounded-md">
+                  <label
+                    className="block mb-2 text-white"
+                    htmlFor="userPassword"
+                  >
+                    Password
+                  </label>
                   <input
                     type="password"
-                    className="form-control"
+                    className="form-input w-full p-2 rounded mb-2"
                     id="userPassword"
                     placeholder="Password"
                     defaultValue={password && password}
                     onChange={(event) => setPassword(event.target.value)}
                   />
                   <button
-                    className="btn btn-primary"
+                    className="w-full py-2 mt-2 bg-blue-500 text-white rounded"
+                    onClick={emailPasswordHandler}
+                  >
+                    Continue
+                  </button>
+                </div> */}
+
+                <div className="bg-gray-600 rounded-md border-none m-4 p-3">
+                  <label className="label">
+                    <span className="label-text text-lg">Password</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter Password"
+                    className="input input-bordered input-accent w-full text-white mb-3"
+                    onChange={(event) => setPassword(event.target.value)}
+                  />
+                  <button
+                    className="w-full btn btn-primary"
                     onClick={emailPasswordHandler}
                   >
                     Continue
                   </button>
                 </div>
-                <div className="other-option">
-                  <h6>Already have an account? Login here</h6>
+
+                <div className="flex flex-col items-center mt-4">
+                  <h6 className="mb-2">Already have an account? Login here</h6>
                   <button
-                    className="btn btn-primary"
+                    className="w-full btn btn-primary"
                     onClick={() => navigate("/login")}
                   >
                     Go To Login
@@ -138,43 +180,44 @@ function Signup({ fetchRequest, setUserState }) {
                 </div>
               </div>
             ) : (
-              <div className="about-you">
+              <div className="flex space-x-5">
                 <div>
-                  <h2>About you</h2>
-                  <div className="form-group">
-                    <label htmlFor="userName">Name</label>
-                    <input
-                      className="form-control"
-                      id="userName"
-                      placeholder="Enter your name"
-                      defaultValue={name && name}
-                      onChange={(event) => setName(event.target.value)}
-                    />
-                  </div>
-                  <div className="form-group">
+                <h2 className="mt-0 text-center text-xl font-semibold">About you</h2>
+
+                  <div className="bg-gray-600 rounded-md border-none m-4 p-3">
+                  <label className="label">
+                    <span className="label-text text-lg">Name</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter your name"
+                    className="input input-bordered input-accent w-full text-white"
+                    onChange={(event) => setName(event.target.value)}
+                  />
+                </div>
+                  <div className="bg-gray-600 p-4 m-4 rounded-md">
                     <PictureUploader
                       uploadText={"Pick a profile picture"}
                       pictureState={pictureState}
                       setPictureState={setPictureState}
                     />
                   </div>
-                  <div className="form-group color-picker">
+                  <div className="flex items-center justify-center bg-gray-600 p-4 m-4 rounded-md">
                     <ChromePicker
                       color={color}
                       onChange={(event) => setColor(event.hex)}
-                      className="myChromePicker"
                     />
                   </div>
-                  <div className="form-group d-flex">
+                  <div className="flex space-x-4 m-4">
                     <button
-                      className="btn btn-primary"
+                      className="btn btn-outline btn-primary"
                       onClick={() => setPageState(true)}
                     >
                       Back to email and password
                     </button>
                     <button
                       type="submit"
-                      className="btn btn-success"
+                      className="btn btn-primary"
                       onClick={submitButtonHandler}
                     >
                       Sign up
@@ -182,8 +225,10 @@ function Signup({ fetchRequest, setUserState }) {
                   </div>
                 </div>
                 <div>
-                  <h2>Add some locations</h2>
-                  <div className="location-wrapper">
+                  <h2 className="mt-0 text-center text-xl font-semibold">
+                    Add some locations
+                  </h2>
+                  <div className="mt-5 flex flex-col space-y-4">
                     {Array.from({ length: locationCount }).map((_, index) => (
                       <LocationInput
                         key={index}

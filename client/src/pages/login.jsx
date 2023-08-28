@@ -1,8 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-function Login({ fetchRequest, setUserState }) {
-  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500';
+function Login({ fetchRequest, setUserState, setShowLogin, setShowSignup }) {
+  const API_BASE_URL =
+    import.meta.env.VITE_APP_API_BASE_URL || "http://localhost:5500";
   const navigate = useNavigate();
 
   const submitButtonHandler = async (event) => {
@@ -10,23 +11,23 @@ function Login({ fetchRequest, setUserState }) {
       event.preventDefault();
       const email = event.target.form[0].value;
       const password = event.target.form[1].value;
-      if(email && password){
+      if (email && password) {
         const body = {
           email: email,
           password: password,
         };
-  
+
         const loginUrl = `${API_BASE_URL}/api/user/login`;
         const userData = await fetchRequest("POST", loginUrl, body);
         console.log(userData);
-        if(userData._id){
+        if (userData._id) {
           setUserState(userData);
           navigate("/home");
-        }else{
-          alert(userData)
+        } else {
+          alert(userData);
         }
-      }else{
-        alert('Please fillout both feilds')
+      } else {
+        alert("Please fillout both feilds");
       }
     } catch (err) {
       console.error(err);
@@ -35,44 +36,53 @@ function Login({ fetchRequest, setUserState }) {
 
   return (
     <>
-      <div className="wrapper">
-        <section>
-          <form>
-            <div className="form-group">
-              <label htmlFor="userEmail">Email address</label>
+      <div className="flex items-center justify-center h-screen w-screen bg-gray-300">
+        <section className="p-5 rounded-xl bg-gray-500 max-h-screen">
+          <form className="flex flex-col space-y-4">
+            <div className="bg-gray-600 rounded-md border-none m-4 p-3">
+              <label className="label">
+                <span className="label-text text-lg">Email address</span>
+              </label>
               <input
-                className="form-control"
-                id="userEmail"
+                type="text"
                 placeholder="Enter email"
+                className="input input-bordered input-accent w-full text-white"
               />
-              <small id="emailHelp" className="form-text text-muted">
-                We'll never share your email with anyone else.
-              </small>
+              <label className="label">
+                <span className="label-text-alt">
+                  We'll never share your email with anyone else.
+                </span>
+              </label>
             </div>
-            <div className="form-group">
-              <label htmlFor="userPassword">Password</label>
+
+            <div className="bg-gray-600 rounded-md border-none m-4 p-3">
+              <label className="label">
+                <span className="label-text text-lg">Password</span>
+              </label>
               <input
-                type="password"
-                className="form-control"
-                id="userPassword"
-                placeholder="Password"
+                type="text"
+                placeholder="Enter Password"
+                className="input input-bordered input-accent w-full text-white mb-3"
               />
               <button
-                type="submit"
-                className="btn btn-primary"
+                className="w-full btn btn-primary"
                 onClick={submitButtonHandler}
               >
-                Log In
+                Continue
               </button>
             </div>
           </form>
-          <div className="other-option">
-            <h6>Don't have an account yet? Sign up here</h6>
+
+          <div className="flex flex-col items-center mt-4">
+            <h6 className="mb-2">Already have an account? Login here</h6>
             <button
-              className="btn btn-primary"
-              onClick={() => navigate("/signup")}
+              className="w-full btn btn-primary"
+              onClick={() => {
+                setShowLogin(false)
+                setShowSignup(true)
+              }}
             >
-              Go To Sign up
+              Go To Sign Up
             </button>
           </div>
         </section>
