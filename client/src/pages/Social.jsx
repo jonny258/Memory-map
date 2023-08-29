@@ -3,7 +3,7 @@ import { Splide, SplideTrack, SplideSlide } from "@splidejs/react-splide";
 import { useNavigate } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import Map from "../components/Map";
+import Map from "../components/Home/Map";
 import "../assets/css/social.css";
 //I can change the styles
 import "@splidejs/react-splide/css";
@@ -400,9 +400,6 @@ function Social({ userState, setUserState, fetchRequest }) {
               >
                 <button
                   id="custom-btn"
-                  //   className={
-                  //     displayUser.markers.length < 2 ? "display-none" : ""
-                  //   }
                   onClick={() => goPrev(splideUsersRef.current)}
                 >
                   <p>Prev</p>
@@ -464,22 +461,6 @@ function Social({ userState, setUserState, fetchRequest }) {
                       );
                     })}
                   </SplideTrack>
-                  {/* <div className="splide__arrows">
-                    <button
-                      //   className="splide__arrow splide__arrow--prev"
-                      className="splide__arrow splide__arrow--prev"
-                      id="custom-btn"
-                      onClick={() => goPrev(splideUsersRef.current)}
-                    >
-                      Prev
-                    </button>
-                    <button
-                      className="splide__arrow splide__arrow--next"
-                      onClick={() => goNext(splideUsersRef.currnet)}
-                    >
-                      Next
-                    </button>
-                  </div> */}
                 </Splide>
                 <button
                   id="custom-btn"

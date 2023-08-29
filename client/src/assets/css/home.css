@@ -1,9 +1,9 @@
-/* .marker {
-    background-color: blue;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-  } */
+/* #map {
+  width: 100%;
+  height: 100%;
+} */
+
+/* 
 
 .hidden {
   display: none;
@@ -20,14 +20,18 @@
   height: 70vh;
 }
 
-#map {
-  /* width: 100vw;
-    height: 70vh;
-    position: absolute;
-    top: 0; */
-  width: 100%;
-  height: 100%;
-}
+
+
+
+
+
+
+
+
+
+
+
+
 
 .memory-controlls {
   position: absolute;
@@ -59,12 +63,6 @@
   width: 400px;
 }
 
-/* .marker {
-    background-color: blue;
-    width: 20px;
-    height: 20px;
-} */
-
 .popup-non-visable {
   background-color: blue;
   display: none;
@@ -85,8 +83,6 @@
   height: fit-content;
 }
 
-/* Modal inputs */
-
 .input-group-lg {
   display: flex;
   align-items: center;
@@ -104,9 +100,6 @@
   display: flex;
   align-items: center;
 }
-/* Modal Inputs */
-
-/* New Styled stuff */
 
 #home-textArea {
   height: 120px;
@@ -158,8 +151,6 @@
   color: white;
   background-color: rgb(33, 37, 41);
   border-bottom-left-radius: 8px;
-  /* padding-bottom: 10px;
-  padding-left: 10px; */
   z-index: 100;
 }
 
@@ -172,7 +163,6 @@
   padding: 15px;
 }
 
-/* Cards */
 
 .memory-card {
   border-radius: 10px;
@@ -196,7 +186,8 @@
   border-bottom-right-radius: 10px;
 }
 
-/* This is for the profile modal */
+
+
 .edit-profile-title {
   padding: 10px;
 }
@@ -226,17 +217,8 @@
 }
 
 
-/* chrome picker test */
-
-/* Dig in the dom */
-
-/* This is how I would edit it */
-.myChromePicker div{
-  /* width: 400px; */
-}
-
 
 .display-picture img{
   width: 100%;
   margin-bottom: 20px;
-}
+} */
