@@ -15,7 +15,11 @@ const userSchema = new Schema({
   password: { type: String, required: true },
   name: { type: String, required: true },
   color: { type: String },
-  pfp: {type: String, default: 'https://upcdn.io/FW25bUs/image/uploads/2023/07/21/5856-5UKp.jpg.crop?w=600&h=600&fit=max&q=70'},
+  pfp: {
+    type: String,
+    default:
+      "https://upcdn.io/FW25bUs/image/uploads/2023/07/21/5856-5UKp.jpg.crop?w=600&h=600&fit=max&q=70",
+  },
   markers: [markerSchema],
 });
 
