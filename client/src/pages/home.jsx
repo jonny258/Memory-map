@@ -13,6 +13,8 @@ import SplideWrapper from "../components/SplideWrapper";
 import MarkerCard from "../components/MarkerCard";
 import SearchLocation from "../components/Home/SearchLocation";
 import CreateMemoryModal from "../components/Home/CreateMemoryModal";
+import DisplayModal from "../components/DisplayModal";
+import EditModal from "../components/EditModal";
 
 function Home({ userState, setUserState, fetchRequest }) {
   const API_BASE_URL =
@@ -89,6 +91,8 @@ function Home({ userState, setUserState, fetchRequest }) {
 
       const markerClickHandler = () => {
         if (memoryButtonRef.current.innerText === "CURRENTLY VIEW MODE") {
+          console.log("AAAAAAAAAAAAAAAAAAA");
+          console.log(index);
           setIsEdit(false);
           setActiveModal(index);
         }
@@ -229,7 +233,7 @@ function Home({ userState, setUserState, fetchRequest }) {
           <SplideWrapper>
             {markerArr.map((point, index) => (
               <MarkerCard
-              key={index}
+                key={index}
                 point={point}
                 index={index}
                 deleteButtonHandler={deleteButtonHandler}
@@ -240,7 +244,6 @@ function Home({ userState, setUserState, fetchRequest }) {
           <div className="rounded-lg overflow-hidden shadow-md"></div>
         </div>
       </div>
-
       {markerArr.map((point, index) => {
         const modalProps = {
           fetchRequest,
@@ -261,10 +264,18 @@ function Home({ userState, setUserState, fetchRequest }) {
           name: point.name,
           imageSrc: point.image ? point.image : null,
         };
-
-        return index === activeModal && <ParentModal {...modalProps} />;
+        return (
+          index === activeModal && (
+            <DisplayModal
+              handleClose={() => {
+                setActiveModal(-1);
+              }}
+              {...modalProps}
+            />
+          )
+        );
+        //return index === activeModal && <ParentModal {...modalProps} />;
       })}
-
       {profileModalOpen && (
         <ProfileModal
           getSession={getSession}
@@ -277,10 +288,10 @@ function Home({ userState, setUserState, fetchRequest }) {
       {isLoading && <Loading />}
       {modalOpen && (
         <CreateMemoryModal
-        fetchRequest={fetchRequest}
-        setMarkersArr={setMarkersArr}
-        userState={userState}
-        coordinatesRef={coordinatesRef}
+          fetchRequest={fetchRequest}
+          setMarkersArr={setMarkersArr}
+          userState={userState}
+          coordinatesRef={coordinatesRef}
           handleClose={() => {
             setModalOpen(false);
           }}

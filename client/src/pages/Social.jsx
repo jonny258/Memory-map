@@ -3,16 +3,24 @@ import { Splide, SplideTrack, SplideSlide } from "@splidejs/react-splide";
 import { useNavigate } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import Map from "../components/Home/Map";
+import Map from "../components/Social/Map";
 import "../assets/css/social.css";
 //I can change the styles
 import "@splidejs/react-splide/css";
-import SocialDiaplayModal from "../components/SocialDiaplayModal";
+//import SocialDiaplayModal from "../components/SocialDiaplayModal";
 import Loading from "./loading";
+import SplideWrapper from "../components/SplideWrapper";
+import UserCard from "../components/Social/UserCard";
+import MarkerCard from "../components/MarkerCard";
+import MarkersInViewCard from "../components/Social/MarkersInViewCard";
+import Nav from "../components/Social/Nav";
+import DisplayModal from "../components/DisplayModal";
+import User from "./UserTerminal";
 
 function Social({ userState, setUserState, fetchRequest }) {
   const navigate = useNavigate();
-  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500';
+  const API_BASE_URL =
+    import.meta.env.VITE_APP_API_BASE_URL || "http://localhost:5500";
 
   const [activeMarker, setActiveMarker] = useState(null);
   const [showUsers, setShowUsers] = useState(false);
@@ -22,9 +30,8 @@ function Social({ userState, setUserState, fetchRequest }) {
   const [markersInView, setMarkersInView] = useState(null);
   const [isloggedIn, setIsloggedIn] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [showLogin, setShowLogin] = useState(true);
 
-  const splideMemoryRef = useRef();
-  const splideUsersRef = useRef();
   const allUserDataRef = useRef("");
   const mapRef = useRef("");
   const parIndexRef = useRef(null);
@@ -129,8 +136,8 @@ function Social({ userState, setUserState, fetchRequest }) {
     // console.log(map);
     // console.log(allUserData);
 
-    console.log(API_BASE_URL)
-    console.log(allUserData)
+    console.log(API_BASE_URL);
+    console.log(allUserData);
     allUserData.forEach((user, parIndex) => {
       user.markers.forEach((point, index) => {
         addOneMarker(user, parIndex, point, index);
@@ -187,7 +194,7 @@ function Social({ userState, setUserState, fetchRequest }) {
   useEffect(() => {
     const getSession = async () => {
       try {
-        console.log('This ran')
+        console.log("This ran");
         const sessionData = await fetchRequest(
           "GET",
           `${API_BASE_URL}/api/session`
@@ -201,7 +208,7 @@ function Social({ userState, setUserState, fetchRequest }) {
           //This gets the logged in user
           const userUrl = `${API_BASE_URL}/api/user/${sessionData[0].currentUser._id}`;
           const userData = await fetchRequest("GET", userUrl);
-          console.log(userData)
+          console.log(userData);
         } else {
           setIsloggedIn(false);
         }
@@ -331,337 +338,25 @@ function Social({ userState, setUserState, fetchRequest }) {
     return adjustedSize;
   };
 
-  const logoutButtonHandler = async () => {
-    try {
-      navigate("/");
-      const sessionUrl = `${API_BASE_URL}/api/session`;
-      const deleteSession = await fetchRequest("DELETE", sessionUrl);
-      console.log(deleteSession);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   return (
     <>
-      {/* {isLoading && <Loading />} */}
-      <div
-        className="map-container"
-        id="map-container-custom"
-        style={{
-          width: 'calc(80vw - 17px)',
-          height: "70vh",
-          boxSizing: "border-box",
-        }}
-      >
-        <div className="page-nav">
-          <button
-            className="btn btn-outline-warning"
-            id="left-button"
-            onClick={logoutButtonHandler}
-          >
-            {isloggedIn ? "Log Out" : "Sign up"}
-          </button>
-          {isloggedIn && (
-            <button
-              className="btn btn-outline-info"
-              onClick={() => navigate("/home")}
-            >
-              Home
-            </button>
-          )}
-
-          {/* <button
-            className="btn btn-outline-success"
-            onClick={() => setProfileModalOpen(true)}
-          >
-            Profile
-          </button> */}
-        </div>
-        <Map
-          center={[-111.88, 40.67]}
-          mapClickHandler={mapClickHandler}
-          mapLoadHandler={mapLoadHandler}
-        />
-      </div>
-      <div
-        className="section-container"
-        style={{ width: "100vw", marginTop: "70vh" }}
-      >
-        <section>
-          {showUsers ? (
-            <>
-              <h2>View users memories</h2>
-              <div
-                className="splide-wrapper-profile"
-                style={{
-                  border: `5px solid black`,
-                }}
-              >
-                <button
-                  id="custom-btn"
-                  onClick={() => goPrev(splideUsersRef.current)}
-                >
-                  <p>Prev</p>
-                </button>
-                <Splide
-                  ref={splideUsersRef}
-                  hasTrack={false}
-                  options={{
-                    rewind: true,
-                    gap: "1rem",
-                    perPage: 4,
-                    perMove: 1,
-                    arrows: false,
-                  }}
-                  aria-label="My Favorite Images"
-                >
-                  <SplideTrack>
-                    {allUserDataRef.current.map((user, index) => {
-                      return (
-                        <SplideSlide key={index}>
-                          <div className="card users-card">
-                            <img src={user.pfp} className="card-img-top" />
-                            <div className="card-body d-flex">
-                              <div className="col-6 d-flex justify-content-center align-items-center border-right border-bottom light-border">
-                                <h1
-                                  className="card-title text-center"
-                                  style={{
-                                    fontSize: `${calculateFontSize(
-                                      user.name,
-                                      30
-                                    )}px`,
-                                  }}
-                                >
-                                  {user.name}
-                                </h1>
-                              </div>
-                              <div className="col-6 d-flex justify-content-center align-items-center border-bottom light-border">
-                                <h5 className="card-text text-center">
-                                  Memories: {user.markers.length}
-                                </h5>
-                              </div>
-                            </div>
-
-                            <div className="view-mem-button">
-                              <div className="view-mem-button">
-                                <button
-                                  // className={`btn view-mem-button ${
-                                  //   isDarkColor(user.color) ? "white-text" : ""
-                                  // }`}
-                                  style={{ backgroundColor: user.color }}
-                                  onClick={() => userButtonHandler(user, index)}
-                                >
-                                  <h5>View memories</h5>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </SplideSlide>
-                      );
-                    })}
-                  </SplideTrack>
-                </Splide>
-                <button
-                  id="custom-btn"
-                  onClick={() => goNext(splideUsersRef.current)}
-                >
-                  <p>Next</p>
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              {displayUser && (
-                <section className="d-flex">
-                  <div
-                    className="card profile-card"
-                    style={{ border: `5px solid ${displayUser.color}` }}
-                  >
-                    <img src={displayUser.pfp} className="card-img-top" />
-                    <div className="card-body">
-                      <h1
-                        className="card-title"
-                        style={{
-                          fontSize: `${calculateFontSize(
-                            displayUser.name,
-                            50
-                          )}px`,
-                        }}
-                      >
-                        {displayUser.name}
-                      </h1>
-                      <h5 className="card-text">
-                        Memories: {displayUser.markers.length}
-                      </h5>
-                    </div>
-                  </div>
-                  <div
-                    className="splide-wrapper-mem"
-                    style={{
-                      border: `5px solid ${displayUser.color}`,
-                    }}
-                  >
-                    {displayUser.markers.length > 2 && (
-                      <button
-                        id="custom-btn"
-                        //   className={
-                        //     displayUser.markers.length < 2 ? "display-none" : ""
-                        //   }
-                        onClick={() => goPrev(splideMemoryRef.current)}
-                      >
-                        <p>Prev</p>
-                      </button>
-                    )}
-
-                    <Splide
-                      ref={splideMemoryRef}
-                      hasTrack={false}
-                      options={{
-                        rewind: true,
-                        gap: "1rem",
-                        perPage: 2,
-                        perMove: 1,
-                        arrows: false,
-                      }}
-                      aria-label="My Favorite Images"
-                      // style={{
-                      //   // height: "90%",
-                      //   // flex: 1, // Let it grow to take available space
-                      //   // width: displayUser ? "10vw" : '50px', // Minus the combined width of both buttons
-                      // }}
-                    >
-                      <SplideTrack
-                      // style={{
-                      //   height: "100%",
-                      // }}
-                      >
-                        {displayUser.markers.map((point, index) => {
-                          return (
-                            <SplideSlide
-                              key={index}
-                              //   style={{
-                              //     width: "0vw",
-                              //     height: '100%',
-                              //     margin: "5px",
-                              //   }}
-                            >
-                              <div
-                                className="card splide-card"
-                                style={{
-                                  height: "100%",
-                                }}
-                              >
-                                {point.image && (
-                                  <img
-                                    src={point.image}
-                                    className="card-img-top"
-                                  />
-                                )}
-                                <div className="card-body d-flex">
-                                  <div className="col-6 d-flex justify-content-center align-items-center border-right border-bottom">
-                                    <h2
-                                      className={
-                                        point.image
-                                          ? "card-title text-center "
-                                          : "card-title text-center big-font"
-                                      }
-                                    >
-                                      {point.title}
-                                    </h2>
-                                  </div>
-                                  <div className="col-6 d-flex justify-content-center align-items-center border-bottom">
-                                    <p
-                                      className={
-                                        point.image
-                                          ? "card-text text-center"
-                                          : "card-text text-center medium-font"
-                                      }
-                                    >
-                                      {point.description}
-                                    </p>
-                                  </div>
-                                </div>
-
-                                <div className="view-mem-button">
-                                  <button
-                                    // className={`btn view-mem-button ${
-                                    //   isDarkColor(displayUser.color)
-                                    //     ? "white-text"
-                                    //     : ""
-                                    // }`}
-                                    onClick={() =>
-                                      viewMemoryButtonHandler(point)
-                                    }
-                                    style={{
-                                      backgroundColor: displayUser.color,
-                                    }}
-                                  >
-                                    <h5>View Memory</h5>
-                                  </button>
-                                </div>
-                              </div>
-                            </SplideSlide>
-                          );
-                        })}
-                      </SplideTrack>
-                    </Splide>
-                    {/* This logic doesn't really work */}
-                    {displayUser.markers.length > 2 && (
-                      <button
-                        id="custom-btn"
-                        onClick={() => goNext(splideMemoryRef.current)}
-                      >
-                        <p>Next</p>
-                      </button>
-                    )}
-                  </div>
-                  <div className="view-all-btn">
-                    <button
-                      className="btn "
-                      style={{
-                        border: `5px solid ${displayUser.color}`,
-                      }}
-                      onClick={() => viewAllButtonHandler()}
-                    >
-                      <h2>View All</h2>
-                    </button>
-                  </div>
-                </section>
-              )}
-            </>
-          )}
-        </section>
-      </div>
-      {activeMarker && (
-        <SocialDiaplayModal
-          setActiveMarker={setActiveMarker}
-          activeMarker={activeMarker}
-        />
-      )}
-      <div className="sidebar">
+      <Nav />
+      <Map
+        center={[-111.88, 40.67]}
+        mapClickHandler={mapClickHandler}
+        mapLoadHandler={mapLoadHandler}
+      />
+      <div className="absolute top-0 right-0 w-1/5 h-[70vh] box-border overflow-y-auto bg-gray-500">
         {markersInView && (
           <>
-            <ul className="list-group markers-in-map">
+            <ul>
               {markersInView.map((point, index) => {
                 return (
-                  <li
+                  <MarkersInViewCard
                     key={index}
-                    className="list-group-item d-flex justify-content-between align-items-center"
-                    style={{
-                      border: `3px solid ${displayUser.color}`,
-                    }}
-                  >
-                    <h6>{point.title}</h6>
-                    <div className="btn-div">
-                      <button
-                        className="btn btn-info"
-                        onClick={() => viewPointInMapHandler(point)}
-                      >
-                        View
-                      </button>
-                    </div>
-                  </li>
+                    point={point}
+                    viewPointInMapHandler={viewPointInMapHandler}
+                  />
                 );
               })}
             </ul>
@@ -669,29 +364,17 @@ function Social({ userState, setUserState, fetchRequest }) {
         )}
         {markersInViewUsers && (
           <>
-            <ul className="list-group markers-in-map">
+            <ul className="list-group">
               {markersInViewUsers.map((userMarkers, parIndex) => {
                 return (
                   <div key={parIndex}>
                     {userMarkers.map((point, index) => {
                       return (
-                        <li
-                          key={`${parIndex}-${index}`}
-                          className="list-group-item d-flex justify-content-between align-items-center"
-                          style={{
-                            border: `3px solid ${allUserDataRef.current[parIndex].color}`,
-                          }}
-                        >
-                          <h6>{point.title}</h6>
-                          <div className="btn-div">
-                            <button
-                              className="btn btn-info"
-                              onClick={() => viewPointInMapHandler(point)}
-                            >
-                              View
-                            </button>
-                          </div>
-                        </li>
+                        <MarkersInViewCard
+                          key={index}
+                          point={point}
+                          viewPointInMapHandler={viewPointInMapHandler}
+                        />
                       );
                     })}
                   </div>
@@ -701,79 +384,68 @@ function Social({ userState, setUserState, fetchRequest }) {
           </>
         )}
       </div>
+      <section>
+        {showUsers ? (
+          <div className="w-[calc(80vw-60px)] items-center justify-center mx-5">
+            <h2 className="text-2xl font-bold">View users memories</h2>
+
+            <SplideWrapper>
+              {allUserDataRef.current.map((user, index) => {
+                return (
+                  <UserCard
+                    key={index}
+                    user={user}
+                    index={index}
+                    userButtonHandler={userButtonHandler}
+                  />
+                );
+              })}
+            </SplideWrapper>
+          </div>
+        ) : (
+          <>
+            {displayUser && (
+              <section className="flex">
+                <div className="w-[20vw]">
+                  <UserCard
+                    user={displayUser}
+                    userButtonHandler={userButtonHandler}
+                  />
+                </div>
+
+                <div className="w-[60vw]">
+                  <SplideWrapper>
+                    {displayUser.markers.map((point, index) => {
+                      return <MarkerCard key={index} point={point} />;
+                    })}
+                  </SplideWrapper>
+                </div>
+                <button
+                  className="btn w-[20vw] h-[400px]"
+                  onClick={() => viewAllButtonHandler()}
+                >
+                  <h2>View All</h2>
+                </button>
+              </section>
+            )}
+          </>
+        )}
+      </section>
+      {showLogin && (
+        <User
+          userState={userState}
+          setUserState={setUserState}
+          handleClose={() => {
+            setShowLogin(false);
+          }}
+        />
+      )}
+
+      {activeMarker && (
+        <DisplayModal setActiveModal={setActiveMarker} props={activeMarker} />
+      )}
     </>
-
-    // <>
-    // <div className="map-container" id="map-container-custom">
-    //   <Map
-    //     style={{
-    //       width: "80vw",
-    //     }}
-    //     center={[-111.88, 40.67]}
-    //     mapClickHandler={mapClickHandler}
-    //     mapLoadHandler={mapLoadHandler}
-    //   />
-    //   <section>
-    //     <h2>View users memories</h2>
-    //     {showUsers && (
-    //       <Splide
-    //         options={{
-    //           rewind: true,
-    //           gap: "1rem",
-    //           perPage: 4, // Adjust the number of items per page as desired
-    //           perMove: 1, // Adjust the number of items to move per slide as desired
-    //         }}
-    //         aria-label="My Favorite Images"
-    //       >
-    //         {allUserDataRef.current.map((user, index) => {
-    //           return (
-    //             <SplideSlide key={index}>
-    //               <div className="card">
-    //                 <img
-    //                   src="https://upcdn.io/FW25bUs/image/uploads/2023/07/10/529233723_05b1348453_b-5NE5.jpg.crop?w=600&h=600&fit=max&q=70"
-    //                   className="card-img-top"
-    //                 />
-    //                 <div className="card-body">
-    //                   <h5 className="card-title">{user.name}</h5>
-    //                   <p className="card-text">
-    //                     Memories: {user.markers.length}
-    //                   </p>
-    //                   <button
-    //                     className="btn"
-    //                     style={{ backgroundColor: user.color }}
-    //                     onClick={() => {
-    //                       console.log(user);
-    //                     }}
-    //                   >
-    //                     View memories
-    //                   </button>
-    //                 </div>
-    //               </div>
-    //             </SplideSlide>
-    //           );
-    //         })}
-    //       </Splide>
-    //     )}
-    //   </section>
-
-    //   {activeMarker && (
-    //     <SocialDiaplayModal
-    //       setActiveMarker={setActiveMarker}
-    //       activeMarker={activeMarker}
-    //     />
-    //   )}
-    // </div>
-    //       <div className="sidebar">
-    //       <h2>Sidebar</h2>
-    //       <p>This is the sidebar content.</p>
-    //     </div>
-    //     </>
   );
 }
 
 export default Social;
-
-//Add in loading
-//The background in the sidebar is weird
-//It would be cool to randomize the sidebar cards
-//Get the map to be true 80vw

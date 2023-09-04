@@ -15,28 +15,15 @@ function ParentModal(props) {
 
   return (
     <>
-      <div className="modal-backdrop-custom fade show"></div>
-      <div
-        className="modal fade show"
-        tabIndex="-1"
-        role="dialog"
-        style={{ display: "block" }}
-        onClick={(event) => event.target.className === "modal fade show" && props.setActiveModal(-1)}
-      >
-        <div className="modal-dialog" role="document">
-          <div className="modal-content modal-sizing">
-            {props.isEdit ? (
-              <EditModal
-                {...props}
-                tempDescription={tempDescription}
-                handler={editButtonHandler}
-              />
-            ) : (
-              <DisplayModal {...props} tempDescription={tempDescription} />
-            )}
-          </div>
-        </div>
-      </div>
+      {props.isEdit ? (
+        <EditModal
+          {...props}
+          tempDescription={tempDescription}
+          handler={editButtonHandler}
+        />
+      ) : (
+        <DisplayModal {...props} tempDescription={tempDescription} />
+      )}
     </>
   );
 }

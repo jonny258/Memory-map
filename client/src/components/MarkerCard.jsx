@@ -1,5 +1,5 @@
 import React from "react";
-import { Splide, SplideTrack, SplideSlide } from "@splidejs/react-splide";
+import { SplideSlide } from "@splidejs/react-splide";
 
 function MarkerCard({
   point,

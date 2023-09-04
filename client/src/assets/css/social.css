@@ -1,8 +1,8 @@
-#map-container-custom {
+/* #map-container-custom {
   width: 80vw;
   box-sizing: border-box;
-}
-
+} */
+/* 
 .sidebar {
   position: absolute;
   top: 0;
@@ -11,15 +11,13 @@
   height: 70vh;
   box-sizing: border-box;
   overflow: scroll;
-  /* Use a linear gradient for the background */
-  background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.5));
-}
 
-/* .below-map {
-  width: 100vw;
+  background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.5));
 } */
 
-.display-none {
+
+
+/* .display-none {
   display: none;
 }
 
@@ -37,33 +35,20 @@
 #custom-btn p {
   font-size: 40px;
   transform: rotate(90deg);
-}
+} */
 
-/* change this */
-.profile-card {
+/* .profile-card {
   width: 20vw;
   height: 400px;
   box-sizing: border-box;
 }
 
-/* change these */
-/* .splide-card {
-  max-height: 400px;
-
-  box-sizing: border-box;
-} */
-
-/* .card img{
-  width: 50px;
-} */
-
-/* PROFILE SPLIDE */
 
 .splide-wrapper-profile {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Align items at the start of the flex container */
-  width: calc(100vw); /* Adjust the width to account for the sidebar width */
+  justify-content: space-between;
+  width: calc(100vw); 
   height: 400px;
   overflow: hidden;
   box-sizing: border-box;
@@ -88,7 +73,7 @@
   width: calc(50% - 10px);
   height: 90%;
   margin: 10px;
-  /* width: 50px; */
+
 }
 
 .splide__slide .users-card {
@@ -102,15 +87,11 @@
   object-position: center top;
 }
 
-/* PROFILE SPLIDE */
-
-/* MEMORY SPLIDE */
-
 .splide-wrapper-mem {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Align items at the start of the flex container */
-  width: calc(60vw); /* Adjust the width to account for the sidebar width */
+  justify-content: space-between; 
+  width: calc(60vw);
   height: 400px;
   overflow: hidden;
   box-sizing: border-box;
@@ -135,7 +116,7 @@
   width: calc(50% - 10px);
   height: 90%;
   margin: 10px;
-  /* width: 50px; */
+
 }
 
 .splide-wrapper-mem .card-img-top {
@@ -143,7 +124,7 @@
   height: 60%;
   object-fit: cover;
   object-position: center top;
-}
+} */
 
 .view-mem-button {
   width: 100%;
@@ -154,7 +135,6 @@
   border-top-right-radius: 0;
 }
 
-/* MEMORY SPLIDE */
 
 .view-all-btn {
   width: 20vw;
@@ -166,48 +146,48 @@
   height: 100%;
 }
 
-.big-font {
-  font-size: 50px; /* Adjust the font size as needed */
+/* .big-font {
+  font-size: 50px;
 }
 
 .medium-font {
-  font-size: 30px; /* Adjust the font size as needed */
+  font-size: 30px;
 }
 
 .white-text {
   color: white !important;
-}
+} */
 
-.light-border {
-  border-color: #eeeeee; /* Or whatever light color you prefer */
-}
+/* .light-border {
+  border-color: #eeeeee;
+} */
 
-.markers-in-map h6 {
+/* .markers-in-map h6 {
   width: fit-content;
   padding: 1px;
   padding-right: 4px;
   margin-left: 10px;
   padding-left: 4px;
   border-bottom: 2px gray solid;
-}
+} */
 
-.markers-in-map li {
+/* .markers-in-map li {
   box-sizing: border-box;
   margin-top: 5px;
   padding: 0;
   height: 50px;
   border-radius:0;
-}
+} */
 
-.markers-in-map button {
+/* .markers-in-map button {
   height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
 border-radius: 0;
-}
+} */
 
-.btn-div {
+/* .btn-div {
   width: 30%;
   height: 100%;
-}
+} */

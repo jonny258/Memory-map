@@ -19,32 +19,34 @@
 
 
 .splide-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* Align items at the start of the flex container */
-    width: calc(80vw); /* Adjust the width to account for the sidebar width */
-    height: 400px;
-    overflow: hidden;
-    box-sizing: border-box;
-  }
-  
-  .splide-wrapper .splide {
-    height: 100%;
-  }
-  
-  .splide-wrapper .splide__track {
-    height: 100%;
-  }
-  
-  .splide-wrapper .splide__list {
-    width: calc(80vw - 120px);
-    height: 100%;
-    align-items: center;
-    display: flex;
-  }
-  
-  .splide__slide {
-    width: calc(50% - 10px);
-    height: 90%;
-    margin: 10px;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 400px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.splide-wrapper .splide {
+  height: 100%;
+}
+
+.splide-wrapper .splide__track {
+  height: 100%;
+
+}
+
+.splide-wrapper .splide__list {
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  display: flex;
+  max-width: 100vw;
+  min-width: 60vw;
+}
+
+.splide-wrapper .splide__slide {
+  height: 90%;
+  margin: 10px;
+  background-color: aquamarine;
+}

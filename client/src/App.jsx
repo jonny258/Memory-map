@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 //pages
-import Login from "./pages/login";
-import Signup from "./pages/signup";
-import OldHome from "./pages/oldHomeFile";
+// import Login from "./pages/login";
+// import Signup from "./pages/signup";
+// import OldHome from "./pages/oldHomeFile";
 import Home from "./pages/home";
 import Social from "./pages/Social";
-import User from "./pages/userterminal";
+//import User from "./pages/userterminal";
 
 function App() {
   const fetchRequest = async (method, url, body) => {
@@ -37,7 +37,7 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route
+          {/* <Route
             index
             element={
               <User
@@ -46,8 +46,18 @@ function App() {
                 fetchRequest={fetchRequest}
               />
             }
-          />
+          /> */}
           <Route
+            index
+            element={
+              <Social
+                userState={userState}
+                setUserState={setUserState}
+                fetchRequest={fetchRequest}
+              />
+            }
+          />
+          {/* <Route
             path="/login"
             element={
               <Login
@@ -56,8 +66,8 @@ function App() {
                 fetchRequest={fetchRequest}
               />
             }
-          />
-          <Route
+          /> */}
+          {/* <Route
             path="/signup"
             element={
               <Signup
@@ -66,7 +76,7 @@ function App() {
                 fetchRequest={fetchRequest}
               />
             }
-          />
+          /> */}
           <Route
             path="/home"
             element={
@@ -77,7 +87,7 @@ function App() {
               />
             }
           />
-          <Route
+          {/* <Route
             path="/social"
             element={
               <Social
@@ -87,7 +97,7 @@ function App() {
               />
             }
           />
-          <Route path="/oldhome" element={<OldHome />} />
+          <Route path="/oldhome" element={<OldHome />} /> */}
         </Routes>
       </Router>
     </>

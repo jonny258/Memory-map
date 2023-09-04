@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import PictureUploader from "../PictureUploader";
 
 function CreateMemoryModal({
@@ -13,6 +13,7 @@ function CreateMemoryModal({
 
   const [pictureState, setPictureState] = useState("");
   //Make the closing of the modal better
+  const modalContentRef = useRef(null);
 
   class MakeMarker {
     constructor(lat, lng, title, description, date, name, image) {
@@ -64,18 +65,6 @@ function CreateMemoryModal({
       console.error(err);
     }
   };
-  //   return (
-
-  //       <form method="dialog" className="modal-box">
-  //         <h3 className="font-bold text-lg">Hello!</h3>
-  //         <p className="py-4">Press ESC key or click the button below to close</p>
-  //         <div className="modal-action">
-  //           {/* if there is a button in form, it will close the modal */}
-  //           <button className="btn">Close</button>
-  //         </div>
-  //       </form>
-
-  //   );
 
   return (
     <>
@@ -85,16 +74,23 @@ function CreateMemoryModal({
         tabIndex="-1"
         role="dialog"
         onClick={(event) => {
-          event.target.className.includes("flex items-center justify-center") &&
+          if (
+            modalContentRef.current &&
+            !modalContentRef.current.contains(event.target)
+          ) {
             handleClose();
+          }
         }}
       >
         <div className="modal modal-open">
-          <div className="modal-box">
+          <div className="modal-box" ref={modalContentRef}>
             <form>
               <div className="mb-4">
                 <label className="label text-white">Memory</label>
-                <input type="text" className="input input-bordered w-full text-white" />
+                <input
+                  type="text"
+                  className="input input-bordered w-full text-white"
+                />
               </div>
 
               <div className="mb-4">
