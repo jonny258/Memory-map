@@ -1,6 +1,6 @@
 import { Uploader } from "uploader";
 import { UploadButton } from "react-uploader";
-import "../assets/css/fileUploader.css";
+// import "../assets/css/fileUploader.css";
 import { useState } from "react";
 
 function PictureUploader({ pictureState, setPictureState, uploadText }) {
@@ -31,8 +31,8 @@ function PictureUploader({ pictureState, setPictureState, uploadText }) {
         <button
           className={
             isUploaded
-              ? "form-control upload-button btn btn-success"
-              : "form-control upload-button btn btn-secondary"
+              ? "btn btn-success w-full"
+              : "btn btn-primary w-full"
           }
           onClick={onClick}
         >

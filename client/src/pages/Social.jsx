@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Map from "../components/Social/Map";
-import "../assets/css/social.css";
+// import "../assets/css/social.css";
 //I can change the styles
 import "@splidejs/react-splide/css";
 //import SocialDiaplayModal from "../components/SocialDiaplayModal";

@@ -27,7 +27,7 @@ function Nav() {
         </button>
         <button
           className="btn btn-primary rounded-none"
-          onClick={() => navigate("/social")}
+          onClick={() => navigate("/")}
         >
           Social
         </button>
