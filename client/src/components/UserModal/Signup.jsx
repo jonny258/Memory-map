@@ -1,24 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { gql, useMutation } from "@apollo/client";
+import { GET_ALL_USERS } from "../../GraphQL/Queries";
+import { useQuery } from "@apollo/client";
+import { userInputVar } from "../../pages/UserModal";
+import { useReactiveVar } from "@apollo/client";
 
-function Signup({
-  setShowLogin,
-  setShowSignup,
-  setShowSignupPlus,
-  email,
-  password,
-  setEmail,
-  setPassword,
-}) {
+function Signup({ setShowLogin, setShowSignup, setShowSignupPlus }) {
+  const emailRef = useRef();
+  const passwordRef = useRef();
+
   const emailPasswordHandler = (event) => {
     event.preventDefault();
-    if (email && password) {
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (emailRef.current.value && passwordRef.current.value) {
+      if (!emailPattern.test(emailRef.current.value)) {
+        alert("Please enter a valid email address");
+        return;
+      }
+
+      const userInput = userInputVar();
+      userInput.email = emailRef.current.value;
+      userInput.password = passwordRef.current.value;
+      userInputVar(userInput);
       setShowSignup(false);
       setShowSignupPlus(true);
+      console.log(userInputVar());
     } else {
       alert("Please fill out both fields");
     }
   };
+  // useEffect(() => {
+  //   console.log(data);
+  //   console.log(error);
+  //   console.log(loading)
+  // }, [data, error, loading]);
 
+  //ADD VALIDATION FOR IF THE EMAIL IS CORRECT HERE
   return (
     <div>
       <div className="bg-gray-600 p-4 m-4 rounded-md">
@@ -40,8 +59,8 @@ function Signup({
           type="text"
           placeholder="Enter email"
           className="input input-bordered input-accent w-full text-white"
-          defaultValue={email && email}
-          onChange={(event) => setEmail(event.target.value)}
+          ref={emailRef}
+          defaultValue={userInputVar().email}
         />
         <label className="label">
           <span className="label-text-alt">
@@ -57,8 +76,8 @@ function Signup({
           type="password"
           placeholder="Enter Password"
           className="input input-bordered input-accent w-full text-white mb-3"
-          defaultValue={password && password}
-          onChange={(event) => setPassword(event.target.value)}
+          ref={passwordRef}
+          defaultValue={userInputVar().password}
         />
         <button
           className="w-full btn btn-primary"

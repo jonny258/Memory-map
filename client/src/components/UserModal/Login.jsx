@@ -1,36 +1,37 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { LOGIN_USER } from "../../GraphQL/Mutations";
+import { useMutation } from "@apollo/client";
+import Auth from "../../utils/auth"
 
-function Login({ fetchRequest, setUserState, setShowLogin, setShowSignup }) {
-  const API_BASE_URL =
-    import.meta.env.VITE_APP_API_BASE_URL || "http://localhost:5500";
-  const navigate = useNavigate();
+function Login({ setShowLogin, setShowSignup }) {
+  // const API_BASE_URL =
+  //   import.meta.env.VITE_APP_API_BASE_URL || "http://localhost:5500";
+  // const navigate = useNavigate();
+  const [loginUser, { data, loading, error }] = useMutation(LOGIN_USER);
+  const emailRef = useRef();
+  const passwordRef = useRef();
 
   const submitButtonHandler = async (event) => {
     try {
       event.preventDefault();
-      const email = event.target.form[0].value;
-      const password = event.target.form[1].value;
-      if (email && password) {
+      if (emailRef.current.value && passwordRef.current.value) {
         const body = {
-          email: email,
-          password: password,
+          email: emailRef.current.value,
+          password: passwordRef.current.value,
         };
 
-        const loginUrl = `${API_BASE_URL}/api/user/login`;
-        const userData = await fetchRequest("POST", loginUrl, body);
-        console.log(userData);
-        if (userData._id) {
-          setUserState(userData);
-          navigate("/home");
-        } else {
-          alert(userData);
-        }
+        //const loginUrl = `${API_BASE_URL}/api/user/login`;
+        const response = await loginUser({
+          variables: body,
+        });
+        Auth.login(response.data.loginUser.token)
       } else {
         alert("Please fillout both feilds");
       }
     } catch (err) {
       console.error(err);
+      alert(err);
     }
   };
 
@@ -41,6 +42,7 @@ function Login({ fetchRequest, setUserState, setShowLogin, setShowSignup }) {
           <span className="label-text text-lg">Email address</span>
         </label>
         <input
+          ref={emailRef}
           type="text"
           placeholder="Enter email"
           className="input input-bordered input-accent w-full text-white"
@@ -57,6 +59,7 @@ function Login({ fetchRequest, setUserState, setShowLogin, setShowSignup }) {
           <span className="label-text text-lg">Password</span>
         </label>
         <input
+          ref={passwordRef}
           type="text"
           placeholder="Enter Password"
           className="input input-bordered input-accent w-full text-white mb-3"

@@ -5,9 +5,10 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 // import Login from "./pages/login";
 // import Signup from "./pages/signup";
 // import OldHome from "./pages/oldHomeFile";
+import Test from "./pages/test";
 import Home from "./pages/home";
 import Social from "./pages/Social";
-//import User from "./pages/userterminal";
+import User from "./pages/UserModal";
 
 function App() {
   const fetchRequest = async (method, url, body) => {
@@ -32,12 +33,11 @@ function App() {
   };
 
   const [userState, setUserState] = useState(null);
-
   return (
     <>
       <Router>
         <Routes>
-          {/* <Route
+          <Route
             index
             element={
               <User
@@ -46,8 +46,8 @@ function App() {
                 fetchRequest={fetchRequest}
               />
             }
-          /> */}
-          <Route
+          />
+          {/* <Route
             index
             element={
               <Social
@@ -56,17 +56,8 @@ function App() {
                 fetchRequest={fetchRequest}
               />
             }
-          />
-          {/* <Route
-            path="/login"
-            element={
-              <Login
-                userState={userState}
-                setUserState={setUserState}
-                fetchRequest={fetchRequest}
-              />
-            }
           /> */}
+          <Route path="/login" element={<Test />} />
           {/* <Route
             path="/signup"
             element={

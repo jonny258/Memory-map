@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function Nav() {
+function Nav({ setShowLogin }) {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const logoutButtonHandler = async () => {
     try {
-      navigate("/");
-      const sessionUrl = `${API_BASE_URL}/api/session`;
-      const deleteSession = await fetchRequest("DELETE", sessionUrl);
-      console.log(deleteSession);
+      setShowLogin(true)
+      // navigate("/");
+      // const sessionUrl = `${API_BASE_URL}/api/session`;
+      // const deleteSession = await fetchRequest("DELETE", sessionUrl);
+      // console.log(deleteSession);
     } catch (err) {
       console.error(err);
     }
@@ -27,7 +28,7 @@ function Nav() {
     </button>
     <button
       className="btn btn-primary rounded-none"
-      onClick={() => navigate("/home")}
+      onClick={()=> {console.log("AAAA")}}
     >
       Home
     </button>

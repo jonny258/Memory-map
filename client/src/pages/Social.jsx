@@ -15,7 +15,7 @@ import MarkerCard from "../components/MarkerCard";
 import MarkersInViewCard from "../components/Social/MarkersInViewCard";
 import Nav from "../components/Social/Nav";
 import DisplayModal from "../components/DisplayModal";
-import User from "./UserTerminal";
+import User from "./UserModal";
 
 function Social({ userState, setUserState, fetchRequest }) {
   const navigate = useNavigate();
@@ -54,44 +54,44 @@ function Social({ userState, setUserState, fetchRequest }) {
     return array;
   };
 
-  const mapMoveHandler = () => {
-    if (parIndexRef.current || parIndexRef.current === 0) {
-      console.log("Map move action has ended -- SINGLE");
-      console.log(parIndexRef.current);
+  // const mapMoveHandler = () => {
+  //   if (parIndexRef.current || parIndexRef.current === 0) {
+  //     console.log("Map move action has ended -- SINGLE");
+  //     console.log(parIndexRef.current);
 
-      const bounds = mapRef.current.getBounds();
+  //     const bounds = mapRef.current.getBounds();
 
-      const markersInViewCurrent = allUserDataRef.current[
-        parIndexRef.current
-      ].markers.filter((marker) => bounds.contains([marker.lng, marker.lat]));
-      console.log(markersInViewCurrent);
-      console.log(markersInViewCurrent.length);
-      setMarkersInView(markersInViewCurrent);
-      setMarkersInViewUsers(null);
-    } else {
-      console.log("Map move action has ended -- MANY");
-      console.log(allUserDataRef.current);
-      console.log(parIndexRef.current);
-      const arrOfArrMarkers = [];
+  //     const markersInViewCurrent = allUserDataRef.current[
+  //       parIndexRef.current
+  //     ].markers.filter((marker) => bounds.contains([marker.lng, marker.lat]));
+  //     console.log(markersInViewCurrent);
+  //     console.log(markersInViewCurrent.length);
+  //     setMarkersInView(markersInViewCurrent);
+  //     setMarkersInViewUsers(null);
+  //   } else {
+  //     console.log("Map move action has ended -- MANY");
+  //     console.log(allUserDataRef.current);
+  //     console.log(parIndexRef.current);
+  //     const arrOfArrMarkers = [];
 
-      const bounds = mapRef.current.getBounds();
+  //     const bounds = mapRef.current.getBounds();
 
-      allUserDataRef.current.forEach((user) => {
-        const markersInViewCurrent = user.markers.filter((marker) =>
-          bounds.contains([marker.lng, marker.lat])
-        );
-        arrOfArrMarkers.push(markersInViewCurrent);
-        // console.log(markersInViewCurrent);
-        // console.log(markersInViewCurrent.length)
-        // setMarkersInView(markersInViewCurrent);
-      });
-      // console.log(arrOfArrMarkers);
-      // console.log(arrOfArrMarkers.length);
+  //     allUserDataRef.current.forEach((user) => {
+  //       const markersInViewCurrent = user.markers.filter((marker) =>
+  //         bounds.contains([marker.lng, marker.lat])
+  //       );
+  //       arrOfArrMarkers.push(markersInViewCurrent);
+  //       // console.log(markersInViewCurrent);
+  //       // console.log(markersInViewCurrent.length)
+  //       // setMarkersInView(markersInViewCurrent);
+  //     });
+  //     // console.log(arrOfArrMarkers);
+  //     // console.log(arrOfArrMarkers.length);
 
-      setMarkersInViewUsers(arrOfArrMarkers);
-      setMarkersInView(null);
-    }
-  };
+  //     setMarkersInViewUsers(arrOfArrMarkers);
+  //     setMarkersInView(null);
+  //   }
+  // };
 
   const removeAllMarkers = () => {
     // Remove all markers from the map
@@ -154,9 +154,9 @@ function Social({ userState, setUserState, fetchRequest }) {
       console.log(userState);
       mapRef.current = event.target;
       const allUsersUrl = `${API_BASE_URL}/api/user`;
-      const allUserData = await fetchRequest("GET", allUsersUrl);
-      allUserDataRef.current = allUserData;
-      addMarkersToMap(allUserData);
+      // const allUserData = await fetchRequest("GET", allUsersUrl);
+      // allUserDataRef.current = allUserData;
+      // addMarkersToMap(allUserData);
       setShowUsers(true);
       setIsLoading(false);
 
@@ -191,33 +191,33 @@ function Social({ userState, setUserState, fetchRequest }) {
     }
   };
 
-  useEffect(() => {
-    const getSession = async () => {
-      try {
-        console.log("This ran");
-        const sessionData = await fetchRequest(
-          "GET",
-          `${API_BASE_URL}/api/session`
-        );
-        // if(sessionData){
-        //   console.log(sessionData[0])
-        // }
-        if (sessionData) {
-          console.log("user is logged in");
-          setIsloggedIn(true);
-          //This gets the logged in user
-          const userUrl = `${API_BASE_URL}/api/user/${sessionData[0].currentUser._id}`;
-          const userData = await fetchRequest("GET", userUrl);
-          console.log(userData);
-        } else {
-          setIsloggedIn(false);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    getSession();
-  }, []);
+  // useEffect(() => {
+  //   const getSession = async () => {
+  //     try {
+  //       console.log("This ran");
+  //       const sessionData = await fetchRequest(
+  //         "GET",
+  //         `${API_BASE_URL}/api/session`
+  //       );
+  //       // if(sessionData){
+  //       //   console.log(sessionData[0])
+  //       // }
+  //       if (sessionData) {
+  //         console.log("user is logged in");
+  //         setIsloggedIn(true);
+  //         //This gets the logged in user
+  //         const userUrl = `${API_BASE_URL}/api/user/${sessionData[0].currentUser._id}`;
+  //         const userData = await fetchRequest("GET", userUrl);
+  //         console.log(userData);
+  //       } else {
+  //         setIsloggedIn(false);
+  //       }
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+  //   getSession();
+  // }, []);
 
   const mapFly = (camera) => {
     const map = mapRef.current;
@@ -340,7 +340,7 @@ function Social({ userState, setUserState, fetchRequest }) {
 
   return (
     <>
-      <Nav />
+      <Nav setShowLogin={setShowLogin}/>
       <Map
         center={[-111.88, 40.67]}
         mapClickHandler={mapClickHandler}

@@ -3,6 +3,7 @@ const { ApolloServer } = require("apollo-server-express");
 const { typeDefs, resolvers } = require("./schemas");
 const db = require("./config/connection");
 const { makeExecutableSchema } = require('@graphql-tools/schema');
+const cors = require('cors'); // Import cors
 
 const PORT = process.env.PORT || 5500;
 
@@ -15,6 +16,15 @@ const server = new ApolloServer({
 });
 
 const app = express();
+
+// CORS setup
+// You can restrict the origin for security in production
+const corsOptions = {
+  origin: '*', // Allow all domains. In production, you might want to list specific domains.
+  credentials: true, // Allow cookies
+};
+
+app.use(cors(corsOptions));
 
 const startServer = async () => {
   // Ensure MongoDB connection is established

@@ -5,8 +5,7 @@ import { useState } from "react";
 
 function PictureUploader({ pictureState, setPictureState, uploadText }) {
   const uploader = Uploader({ apiKey: "public_FW25bUsEgLaLmifCsyAEZMAxaX9j" });
-
-  const [isUploaded, setIsUploaded] = useState(false);
+  const [isUploaded, setIsUploaded] = useState(pictureState ? true : false);
   return (
     <UploadButton
       uploader={uploader}
