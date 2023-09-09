@@ -3,6 +3,7 @@ import PictureUploader from "../PictureUploader";
 import { CREATE_MARKER } from "../../GraphQL/Mutations";
 import { useMutation } from "@apollo/client";
 import Auth from "../../utils/auth";
+import { markersInMapVar } from "../../App";
 
 function CreateMemoryModal({
   handleClose,
@@ -22,17 +23,17 @@ function CreateMemoryModal({
   const titleRef = useRef();
   const descriptionRef = useRef();
 
-  class MakeMarker {
-    constructor(lat, lng, title, description, date, name, image) {
-      (this.lat = lat),
-        (this.lng = lng),
-        (this.title = title),
-        (this.description = description),
-        (this.date = date),
-        (this.name = name),
-        (this.image = image);
-    }
-  }
+  // class MakeMarker {
+  //   constructor(lat, lng, title, description, date, name, image) {
+  //     (this.lat = lat),
+  //       (this.lng = lng),
+  //       (this.title = title),
+  //       (this.description = description),
+  //       (this.date = date),
+  //       (this.name = name),
+  //       (this.image = image);
+  //   }
+  // }
 
   const saveMemoryHandler = async (event) => {
     event.preventDefault();
@@ -57,7 +58,10 @@ function CreateMemoryModal({
         console.log({ userId, input });
 
         const response = await createMarker({ variables: { userId, input } });
-        console.log(response.data);
+        console.log(response.data.createMarker);
+        console.log(markersInMapVar())
+        const tempMarkersArr = [...markersInMapVar(), response.data.createMarker]
+        markersInMapVar(tempMarkersArr)
 
         // const newMarker = new MakeMarker(
         //   coordinatesRef.current[0],

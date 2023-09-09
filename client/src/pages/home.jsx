@@ -15,6 +15,7 @@ import SearchLocation from "../components/Home/SearchLocation";
 import CreateMemoryModal from "../components/Home/CreateMemoryModal";
 import DisplayModal from "../components/DisplayModal";
 import EditModal from "../components/EditModal";
+import MapFooter from "../components/MapFooter";
 
 function Home({ userState, setUserState, fetchRequest }) {
   const API_BASE_URL =
@@ -208,7 +209,7 @@ function Home({ userState, setUserState, fetchRequest }) {
           />
         </div>
 
-        <nav className="bg-gray-900 flex items-center justify-between px-48">
+        {/* <nav className="bg-gray-900 flex items-center justify-between px-48">
           <a className="font-bold text-white">Memory Map</a>
           <button
             ref={memoryButtonRef}
@@ -225,7 +226,8 @@ function Home({ userState, setUserState, fetchRequest }) {
             CURRENTLY VIEW MODE
           </button>
           <SearchLocation fetchRequest={fetchRequest} mapFly={mapFly} />
-        </nav>
+        </nav> */}
+        <MapFooter mapFly={mapFly}/>
         <div className="items-center justify-between px-48">
           <h1 className="text-3xl font-bold mb-4">
             {userState ? userState.name : "Defaultname"}'s memories

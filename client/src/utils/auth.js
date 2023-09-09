@@ -53,7 +53,7 @@ login(idToken) {
 logout() {
   if (this.isClientSide()) {
     localStorage.removeItem('id_token');
-    window.location.assign('/');
+    // window.location.assign('/');
   }
 }
 }

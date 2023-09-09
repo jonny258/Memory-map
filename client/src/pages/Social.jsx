@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Splide, SplideTrack, SplideSlide } from "@splidejs/react-splide";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Map from "../components/Social/Map";
@@ -16,11 +16,35 @@ import MarkersInViewCard from "../components/Social/MarkersInViewCard";
 import Nav from "../components/Social/Nav";
 import DisplayModal from "../components/DisplayModal";
 import User from "./UserModal";
+import MapFooter from "../components/MapFooter";
+import CreateMemoryModal from "../components/Home/CreateMemoryModal";
+import UserSection from "../components/UserSection";
+import MemorySection from "../components/MemorySection";
+import {
+  GET_ALL_MARKERS,
+  GET_ALL_USERS,
+  GET_USER_BY_ID,
+} from "../GraphQL/Queries";
+import { useQuery, useLazyQuery } from "@apollo/client";
+import { markersInMapVar } from "../App";
+import { useReactiveVar } from "@apollo/client";
 
 function Social({ userState, setUserState, fetchRequest }) {
-  const navigate = useNavigate();
-  const API_BASE_URL =
-    import.meta.env.VITE_APP_API_BASE_URL || "http://localhost:5500";
+  const markersArr = useReactiveVar(markersInMapVar);
+
+  const {
+    loading: markerLoading,
+    error: markerError,
+    data: markerData,
+  } = useQuery(GET_ALL_MARKERS);
+
+  const [loadUser, { called, loading, data }] = useLazyQuery(GET_USER_BY_ID);
+
+  useEffect(() => {
+    console.log(markerData);
+    console.log(markerError);
+    // console.log(userData);
+  }, [markerData]);
 
   const [activeMarker, setActiveMarker] = useState(null);
   const [showUsers, setShowUsers] = useState(false);
@@ -30,19 +54,41 @@ function Social({ userState, setUserState, fetchRequest }) {
   const [markersInView, setMarkersInView] = useState(null);
   const [isloggedIn, setIsloggedIn] = useState();
   const [isLoading, setIsLoading] = useState(true);
-  const [showLogin, setShowLogin] = useState(true);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showDisplayModal, setShowDisplayModal] = useState(false);
+  const [displayMarkerId, setDisplayMarkerId] = useState("");
 
-  const allUserDataRef = useRef("");
+  const [memorySectionId, setMemorySectionId] = useState("");
+
+  //BUTTON STATE STUFF
+
+  const [buttonState, setButtonState] = useState(false);
+  const buttonStateRef = useRef(buttonState);
+
+  useEffect(() => {
+    buttonStateRef.current = buttonState;
+  }, [buttonState]);
+
+  const mapClickHandler = async (event) => {
+    if (buttonStateRef.current) {
+      coordinatesRef.current = [event.lngLat.lat, event.lngLat.lng];
+      setShowCreateModal(true);
+    }
+  };
+
+  //BUTTON STATE STUFF
+
+  const coordinatesRef = useRef();
+  // const allUserDataRef = useRef("");
   const mapRef = useRef("");
   const parIndexRef = useRef(null);
   //const [allUserMarkerData, setAllUserMarkerData] = useState([])
 
-  const markerClickHandler = (parIndex, index) => {
-    console.log(index);
-    console.log(parIndex);
-    //setActiveUserMarkerIndex([parIndex, index]);
-    console.log(allUserDataRef.current[parIndex].markers[index]);
-    setActiveMarker(allUserDataRef.current[parIndex].markers[index]);
+  const markerClickHandler = (markerId) => {
+    //console.log(markerId);
+    setShowDisplayModal(true);
+    setDisplayMarkerId(markerId);
   };
 
   //This could be used to shuffle the arrays, but I cant dig down
@@ -95,68 +141,81 @@ function Social({ userState, setUserState, fetchRequest }) {
 
   const removeAllMarkers = () => {
     // Remove all markers from the map
+    console.log(markers);
     markers.forEach((marker) => marker.remove());
 
     // Clear the markers state
     setMarkers([]);
   };
 
-  const addOneMarker = (user, parIndex, point, index) => {
+  const addOneMarker = (marker, index) => {
+    console.log(marker, index);
     const map = mapRef.current;
     const popup = new mapboxgl.Popup({ closeButton: false });
 
     popup.on("open", (event) => {
-      if (point.image) {
-        popup.setHTML(
-          `<img src='${point.image}' style="width:200px;height:auto;"/>`
-        ); // adjust style as needed
-      } else {
-        popup.setHTML(`<h1 style="color:black;">${point.title}</h1>`); // adjust style as needed
-      }
+      popup.setHTML(
+        `<img src='${marker.media}' style="width:200px;height:auto;"/>`
+      );
     });
 
-    const marker = new mapboxgl.Marker({
-      color: user.color,
+    const newMarker = new mapboxgl.Marker({
+      color: marker.user.color,
     })
-      .setLngLat([point.lng, point.lat])
+      .setLngLat([marker.lng, marker.lat])
       .setPopup(popup)
       .addTo(map);
     // Add the hover functionality here:
-    marker.getElement().addEventListener("mouseenter", () => popup.addTo(map));
-    marker.getElement().addEventListener("mouseleave", () => popup.remove());
-    marker
+    newMarker
       .getElement()
-      .addEventListener("click", () => markerClickHandler(parIndex, index));
+      .addEventListener("mouseenter", () => popup.addTo(map));
+    newMarker.getElement().addEventListener("mouseleave", () => popup.remove());
+    newMarker
+      .getElement()
+      .addEventListener("click", () => markerClickHandler(marker._id));
 
-    setMarkers((prev) => [...prev, marker]);
+    setMarkers((prev) => [...prev, newMarker]);
   };
 
-  const addMarkersToMap = (allUserData) => {
-    // const markers = [];
-    // console.log(map);
-    // console.log(allUserData);
+  // const addMarkersToMap = (allUserData) => {
+  //   // const markers = [];
+  //   // console.log(map);
+  //   // console.log(allUserData);
 
-    console.log(API_BASE_URL);
-    console.log(allUserData);
-    allUserData.forEach((user, parIndex) => {
-      user.markers.forEach((point, index) => {
-        addOneMarker(user, parIndex, point, index);
+  //   console.log(API_BASE_URL);
+  //   console.log(allUserData);
+  //   allUserData.forEach((user, parIndex) => {
+  //     user.markers.forEach((point, index) => {
+  //       addOneMarker(user, parIndex, point, index);
+  //     });
+  //   });
+  // };
+  useEffect(() => {
+    if (mapRef.current && markerData && markersInMapVar()) {
+      markersInMapVar().forEach((marker, index) => {
+        addOneMarker(marker, index);
       });
-    });
-  };
+    } else {
+      console.log("one or more are not loaded");
+    }
+  }, [markersInMapVar()]);
 
-  const mapClickHandler = async (event) => {
-    console.log(event);
-  };
+  useEffect(() => {
+    if (mapRef.current && markerData) {
+      console.log("Setting markersInMapVar with:", markerData.getAllMarkers);
+      markersInMapVar(markerData.getAllMarkers);
+    }
+  }, [mapRef.current, markerData]);
 
   const mapLoadHandler = async (event) => {
     try {
-      console.log(userState);
+      console.log("test test");
       mapRef.current = event.target;
-      const allUsersUrl = `${API_BASE_URL}/api/user`;
+      // const allUsersUrl = `${API_BASE_URL}/api/user`;
       // const allUserData = await fetchRequest("GET", allUsersUrl);
       // allUserDataRef.current = allUserData;
-      // addMarkersToMap(allUserData);
+      //addMarkersToMap();
+
       setShowUsers(true);
       setIsLoading(false);
 
@@ -231,37 +290,45 @@ function Social({ userState, setUserState, fetchRequest }) {
     });
   };
 
-  const userButtonHandler = (user, parIndex) => {
-    if (user.markers[0]) {
-      const camera = {
-        center: [user.markers[0].lng, user.markers[0].lat],
-        zoom: 7,
-      };
-      parIndexRef.current = parIndex;
-      mapFly(camera);
-      removeAllMarkers();
-      user.markers.forEach((point, index) => {
-        console.log(point);
-        addOneMarker(user, parIndex, point, index);
-      });
-      setDisplayUser(user);
-      setShowUsers(false);
-    } else {
-      alert("User has 0 memories");
-    }
+  const userButtonHandler = async (userId) => {
+    const response = await loadUser({ variables: { userId: userId } });
+    console.log(response.data.getUserById);
+
+    // if (user.markers[0]) {
+    const camera = {
+      center: [
+        response.data.getUserById.markers[0].lng,
+        response.data.getUserById.markers[0].lat,
+      ],
+      zoom: 7,
+    };
+    console.log(camera);
+    //   parIndexRef.current = parIndex;
+    mapFly(camera);
+
+    console.log(markersInMapVar());
+    removeAllMarkers();
+    markersInMapVar(response.data.getUserById.markers);
+    setDisplayUser(true);
+    console.log(userId);
+    setMemorySectionId(userId);
+    setShowUsers(false);
+    // } else {
+    //   alert("User has 0 memories");
+    // }
   };
 
-  const goNext = (splideRef) => {
-    if (splideRef) {
-      splideRef.splide.go(">");
-    }
-  };
+  // const goNext = (splideRef) => {
+  //   if (splideRef) {
+  //     splideRef.splide.go(">");
+  //   }
+  // };
 
-  const goPrev = (splideRef) => {
-    if (splideRef) {
-      splideRef.splide.go("<");
-    }
-  };
+  // const goPrev = (splideRef) => {
+  //   if (splideRef) {
+  //     splideRef.splide.go("<");
+  //   }
+  // };
 
   const viewPointInMapHandler = (point) => {
     console.log(point);
@@ -285,7 +352,7 @@ function Social({ userState, setUserState, fetchRequest }) {
     parIndexRef.current = null;
     setShowUsers(true);
     removeAllMarkers();
-    addMarkersToMap(allUserDataRef.current);
+    // addMarkersToMap(allUserDataRef.current);
     const camera = {
       center: [-111.88, 40.67],
       zoom: 9,
@@ -310,37 +377,37 @@ function Social({ userState, setUserState, fetchRequest }) {
     mapFly(camera);
   };
 
-  const isDarkColor = (hexColor) => {
-    // Remove the # symbol from the hex color code
-    const hex = hexColor.replace("#", "");
+  // const isDarkColor = (hexColor) => {
+  //   // Remove the # symbol from the hex color code
+  //   const hex = hexColor.replace("#", "");
 
-    // Convert the hex color code to RGB values
-    const red = parseInt(hex.substr(0, 2), 16);
-    const green = parseInt(hex.substr(2, 2), 16);
-    const blue = parseInt(hex.substr(4, 2), 16);
+  //   // Convert the hex color code to RGB values
+  //   const red = parseInt(hex.substr(0, 2), 16);
+  //   const green = parseInt(hex.substr(2, 2), 16);
+  //   const blue = parseInt(hex.substr(4, 2), 16);
 
-    // Calculate the relative luminance using the sRGB color space formula
-    const luminance = (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255;
+  //   // Calculate the relative luminance using the sRGB color space formula
+  //   const luminance = (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255;
 
-    // Return true if the luminance is below a certain threshold, indicating a dark color
-    return luminance < 0.5;
-  };
+  //   // Return true if the luminance is below a certain threshold, indicating a dark color
+  //   return luminance < 0.5;
+  // };
 
-  const calculateFontSize = (name, baseSize) => {
-    let minSize = 12; // Do not go below 12px for readability
+  // const calculateFontSize = (name, baseSize) => {
+  //   let minSize = 12; // Do not go below 12px for readability
 
-    // Decrease font size by 1px for each additional character over 10
-    let adjustedSize = baseSize - Math.max(0, name.length - 10);
+  //   // Decrease font size by 1px for each additional character over 10
+  //   let adjustedSize = baseSize - Math.max(0, name.length - 10);
 
-    // Do not go below the minimum size
-    adjustedSize = Math.max(minSize, adjustedSize);
+  //   // Do not go below the minimum size
+  //   adjustedSize = Math.max(minSize, adjustedSize);
 
-    return adjustedSize;
-  };
+  //   return adjustedSize;
+  // };
 
   return (
     <>
-      <Nav setShowLogin={setShowLogin}/>
+      <Nav initialState={true} />
       <Map
         center={[-111.88, 40.67]}
         mapClickHandler={mapClickHandler}
@@ -384,65 +451,86 @@ function Social({ userState, setUserState, fetchRequest }) {
           </>
         )}
       </div>
+      <MapFooter
+        mapFly={mapFly}
+        buttonState={buttonState}
+        setButtonState={setButtonState}
+      />
       <section>
         {showUsers ? (
-          <div className="w-[calc(80vw-60px)] items-center justify-center mx-5">
-            <h2 className="text-2xl font-bold">View users memories</h2>
-
-            <SplideWrapper>
-              {allUserDataRef.current.map((user, index) => {
-                return (
-                  <UserCard
-                    key={index}
-                    user={user}
-                    index={index}
-                    userButtonHandler={userButtonHandler}
-                  />
-                );
-              })}
-            </SplideWrapper>
-          </div>
+          <>
+            <UserSection userButtonHandler={userButtonHandler} />
+            {/* // <div className="w-[calc(80vw-60px)] items-center justify-center mx-5">
+              //   <h2 className="text-2xl font-bold">View users memories</h2>
+              //   <SplideWrapper>
+              //     {userData.getAllUsers.map((user, index) => {
+              //       return (
+              //         <UserCard
+              //           key={index}
+              //           user={user}
+              //           userButtonHandler={userButtonHandler}
+              //         />
+              //       );
+              //     })}
+              //   </SplideWrapper>
+              // </div> */}
+          </>
         ) : (
           <>
             {displayUser && (
-              <section className="flex">
-                <div className="w-[20vw]">
-                  <UserCard
-                    user={displayUser}
-                    userButtonHandler={userButtonHandler}
-                  />
-                </div>
+              <MemorySection
+                userId={memorySectionId}
+                viewAllButtonHandler={viewAllButtonHandler}
+              />
+              // <section className="flex">
+              //   <div className="w-[20vw]">
+              //     <UserCard
+              //       user={displayUser}
+              //       userButtonHandler={userButtonHandler}
+              //     />
+              //   </div>
 
-                <div className="w-[60vw]">
-                  <SplideWrapper>
-                    {displayUser.markers.map((point, index) => {
-                      return <MarkerCard key={index} point={point} />;
-                    })}
-                  </SplideWrapper>
-                </div>
-                <button
-                  className="btn w-[20vw] h-[400px]"
-                  onClick={() => viewAllButtonHandler()}
-                >
-                  <h2>View All</h2>
-                </button>
-              </section>
+              //   <div className="w-[60vw]">
+              //     <SplideWrapper>
+              //       {displayUser.markers.map((point, index) => {
+              //         return <MarkerCard key={index} point={point} />;
+              //       })}
+              //     </SplideWrapper>
+              //   </div>
+              //   <button
+              //     className="btn w-[20vw] h-[400px]"
+              //     onClick={() => viewAllButtonHandler()}
+              //   >
+              //     <h2>View All</h2>
+              //   </button>
+              // </section>
             )}
           </>
         )}
       </section>
-      {showLogin && (
-        <User
-          userState={userState}
-          setUserState={setUserState}
+      {/* {showLogin && (
+        // <User
+        //   userState={userState}
+        //   setUserState={setUserState}
+        //   handleClose={() => {
+        //     setShowLogin(false);
+        //   }}
+        // />
+      )} */}
+      {showCreateModal && (
+        <CreateMemoryModal
+          coordinatesRef={coordinatesRef}
           handleClose={() => {
-            setShowLogin(false);
+            setShowCreateModal(false);
           }}
         />
       )}
 
-      {activeMarker && (
-        <DisplayModal setActiveModal={setActiveMarker} props={activeMarker} />
+      {showDisplayModal && (
+        <DisplayModal
+          markerId={displayMarkerId}
+          handleClose={() => setShowDisplayModal(false)}
+        />
       )}
     </>
   );

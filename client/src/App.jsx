@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { makeVar } from "@apollo/client";
 
 //pages
 // import Login from "./pages/login";
@@ -9,6 +10,8 @@ import Test from "./pages/test";
 import Home from "./pages/home";
 import Social from "./pages/Social";
 import User from "./pages/UserModal";
+
+export const markersInMapVar = makeVar([])
 
 function App() {
   const fetchRequest = async (method, url, body) => {
@@ -37,7 +40,7 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route
+          {/* <Route
             index
             element={
               <User
@@ -46,8 +49,8 @@ function App() {
                 fetchRequest={fetchRequest}
               />
             }
-          />
-          {/* <Route
+          /> */}
+          <Route
             index
             element={
               <Social
@@ -56,7 +59,7 @@ function App() {
                 fetchRequest={fetchRequest}
               />
             }
-          /> */}
+          />
           <Route path="/login" element={<Test />} />
           {/* <Route
             path="/signup"

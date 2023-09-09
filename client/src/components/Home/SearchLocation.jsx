@@ -1,6 +1,29 @@
 import React from 'react'
 
-function SearchLocation({fetchRequest, mapFly}) {
+function SearchLocation({ mapFly}) {
+
+  async function fetchData(url) {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      return data;
+  
+    } catch (error) {
+      console.error("There was a problem with the fetch operation:", error.message);
+    }
+  }
+
+
     const searchButtonHandler = async (event) => {
         try {
           event.preventDefault();
@@ -11,7 +34,7 @@ function SearchLocation({fetchRequest, mapFly}) {
           const searchUrl = `${baseEndpoint}/${encodeURIComponent(
             query
           )}.json?access_token=${accessToken}&limit=1`;
-          const searchData = await fetchRequest("Get", searchUrl);
+          const searchData = await fetchData(searchUrl);
           if (searchData.features[0]) {
             let zoomAmount;
             const placeType = searchData.features[0].place_type[0];

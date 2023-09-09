@@ -24,8 +24,6 @@ function Map({ center, mapClickHandler, mapLoadHandler }) {
     mapRef.current = map;
 
     map.on("click", (event) => {
-      console.log(event);
-      console.log(mapClickHandler);
       mapClickHandler(event);
     });
 

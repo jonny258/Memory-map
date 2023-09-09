@@ -12,8 +12,7 @@ function MarkerCard({
       <div className="card card-compact w-72 bg-base-100 shadow-xl">
         <figure>
           <img
-            src="https://upcdn.io/FW25bUs/image/uploads/2023/08/05/Doyle_Brunson_high_res_feature-512x275-5rrX.jpg.crop?w=600&h=600&fit=max&q=70"
-            alt="Shoes"
+            src={point.media}
           />
         </figure>
         <div className="card-body">
