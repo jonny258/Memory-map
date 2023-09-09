@@ -1,19 +1,26 @@
 import React, { useState, useRef } from "react";
 import PictureUploader from "../PictureUploader";
+import { CREATE_MARKER } from "../../GraphQL/Mutations";
+import { useMutation } from "@apollo/client";
+import Auth from "../../utils/auth";
 
 function CreateMemoryModal({
   handleClose,
   coordinatesRef,
-  userState,
-  fetchRequest,
+  //userState,
+  //fetchRequest,
   setMarkersArr,
 }) {
-  const API_BASE_URL =
-    import.meta.env.VITE_APP_API_BASE_URL || "http://localhost:5500";
+  console.log(Auth.getProfile().data._id);
+  // const API_BASE_URL =
+  //   import.meta.env.VITE_APP_API_BASE_URL || "http://localhost:5500";
+
+  const [createMarker, { data, loading, error }] = useMutation(CREATE_MARKER);
 
   const [pictureState, setPictureState] = useState("");
-  //Make the closing of the modal better
   const modalContentRef = useRef(null);
+  const titleRef = useRef();
+  const descriptionRef = useRef();
 
   class MakeMarker {
     constructor(lat, lng, title, description, date, name, image) {
@@ -30,33 +37,47 @@ function CreateMemoryModal({
   const saveMemoryHandler = async (event) => {
     event.preventDefault();
     try {
-      const title = event.target.form[0].value;
-      const description = event.target.form[2].value;
-      if (title && description) {
+      // const title = event.target.form[0].value;
+      // const description = event.target.form[2].value;
+      if (titleRef.current.value && descriptionRef.current.value) {
         const currentDate = new Date();
         const formattedDate = `${
           currentDate.getMonth() + 1
         }/${currentDate.getDate()}`;
 
-        const newMarker = new MakeMarker(
-          coordinatesRef.current[0],
-          coordinatesRef.current[1],
-          title,
-          description,
-          formattedDate,
-          userState.name,
-          pictureState
-        );
+        const userId = Auth.getProfile().data._id;
+        const input = {
+          lat: coordinatesRef.current[0],
+          lng: coordinatesRef.current[1],
+          media: pictureState,
+          title: titleRef.current.value,
+          description: descriptionRef.current.value,
+        };
 
-        const markerURL = `${API_BASE_URL}/api/user/marker/${userState._id}`;
-        const postedNewMarker = await fetchRequest(
-          "POST",
-          markerURL,
-          newMarker
-        );
-        console.log(postedNewMarker);
+        console.log({ userId, input });
 
-        setMarkersArr((prev) => [...prev, newMarker]);
+        const response = await createMarker({ variables: { userId, input } });
+        console.log(response.data);
+
+        // const newMarker = new MakeMarker(
+        //   coordinatesRef.current[0],
+        //   coordinatesRef.current[1],
+        //   title,
+        //   description,
+        //   formattedDate,
+        //   userState.name,
+        //   pictureState
+        // );
+
+        // const markerURL = `${API_BASE_URL}/api/user/marker/${userState._id}`;
+        // const postedNewMarker = await fetchRequest(
+        //   "POST",
+        //   markerURL,
+        //   newMarker
+        // );
+        // console.log(postedNewMarker);
+
+        // setMarkersArr((prev) => [...prev, newMarker]);
         handleClose(false);
       } else {
         alert("Please fillout both fields");
@@ -90,6 +111,7 @@ function CreateMemoryModal({
                 <input
                   type="text"
                   className="input input-bordered w-full text-white"
+                  ref={titleRef}
                 />
               </div>
 
@@ -106,6 +128,7 @@ function CreateMemoryModal({
                 <textarea
                   id="home-textArea"
                   className="textarea textarea-bordered w-full h-32 text-white"
+                  ref={descriptionRef}
                 />
               </div>
 

@@ -25,3 +25,21 @@ export const LOGIN_USER = gql`
     }
   }
 `;
+
+export const CREATE_MARKER = gql`
+  mutation CreateMarker($userId: String!, $input: MakeMarkerInput!) {
+    createMarker(userId: $userId, input: $input) {
+      _id
+      media
+      title
+      createdAt
+      lat
+      lng
+      user {
+        _id
+        username
+        email
+      }
+    }
+  }
+`;

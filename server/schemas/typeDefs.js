@@ -2,7 +2,7 @@ const { gql } = require("apollo-server-express");
 
 const typeDefs = gql`
     type User {
-        _id: ID!
+        _id: String!
         email: String!
         password: String!
         username: String!
@@ -13,7 +13,7 @@ const typeDefs = gql`
     }
 
     type Marker {
-        _id: ID!
+        _id: String!
         lat: Float!
         lng: Float!
         title: String!
@@ -24,7 +24,7 @@ const typeDefs = gql`
         likes: [Like]
     }
     type Like {
-        _id: ID!
+        _id: String!
         user: User!
         marker: Marker!
     }
@@ -36,19 +36,19 @@ const typeDefs = gql`
 
     type Query {
         getAllUsers: [User]
-        getUserById(userId: ID!): User
+        getUserById(userId: String!): User
         getAllMarkers: [Marker]
-        getMarkerById(markerId: ID!): Marker
+        getMarkerById(markerId: String!): Marker
     }
 
     type Mutation {
         createUser(input: MakeUserInput!): AuthPayload
         loginUser(email: String!, password: String!): AuthPayload
-        editUser(input: EditUserInput!, userId: ID!): AuthPayload
-        deleteUser(userId: ID!): User
-        createMarker(input: MakeMarkerInput!, userId: ID!): Marker
-        editMarker(markerId: ID!, input: EditMarkerInput!): Marker
-        deleteMarker(markerId: ID!): Marker
+        editUser(input: EditUserInput!, userId: String!): AuthPayload
+        deleteUser(userId: String!): User
+        createMarker(input: MakeMarkerInput!, userId: String!): Marker
+        editMarker(markerId: String!, input: EditMarkerInput!): Marker
+        deleteMarker(markerId: String!): Marker
         likeMarker(markerId: String!, userId: String!): Like
         unlikeMarker(markerId: String!, userId: String!): Like
     }
