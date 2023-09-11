@@ -41,10 +41,10 @@ function CreateMemoryModal({
       // const title = event.target.form[0].value;
       // const description = event.target.form[2].value;
       if (titleRef.current.value && descriptionRef.current.value) {
-        const currentDate = new Date();
-        const formattedDate = `${
-          currentDate.getMonth() + 1
-        }/${currentDate.getDate()}`;
+        // const currentDate = new Date();
+        // const formattedDate = `${
+        //   currentDate.getMonth() + 1
+        // }/${currentDate.getDate()}`;
 
         const userId = Auth.getProfile().data._id;
         const input = {

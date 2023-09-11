@@ -43,3 +43,41 @@ export const CREATE_MARKER = gql`
     }
   }
 `;
+
+export const EDIT_MARKER = gql`
+mutation EditMarker($markerId: String!, $input: EditMarkerInput!) {
+  editMarker(markerId: $markerId, input: $input) {
+    _id
+    title
+    media
+    user {
+      _id
+      username
+      email
+    }
+  }
+}
+`;
+
+
+export const DELETE_MARKER = gql`
+  mutation DeleteMarker($markerId: String!) {
+    deleteMarker(markerId: $markerId) {
+      _id
+      title
+    }
+  }
+`;
+
+export const EDIT_USER = gql`
+  mutation EditUser($input: EditUserInput!, $userId: String!) {
+    editUser(input: $input, userId: $userId) {
+      user {
+        _id
+        username
+        email
+      }
+      token
+    }
+  }
+`;

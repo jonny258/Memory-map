@@ -1,21 +1,22 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import User from "../../pages/UserModal";
-import Auth from '../../utils/auth'
+import ProfileModal from "../ProfileModal";
+import Auth from "../../utils/auth";
 
-function Nav({initialState}) {
-  const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const navigate = useNavigate();
+function Nav({ initialState }) {
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [showUserModal, setShowUserModal] = useState(initialState);
 
   const logoutButtonHandler = async () => {
     try {
-      Auth.logout()
+      Auth.logout();
       setShowUserModal(true);
     } catch (err) {
       console.error(err);
     }
   };
+  //console.log(Auth.getProfile().data._id)
 
   return (
     <>
@@ -27,25 +28,37 @@ function Nav({initialState}) {
           >
             Log Out
           </button>
-          <button
+          {/* <button
             className="btn btn-primary rounded-none"
             onClick={() => {
               console.log("AAAA");
             }}
           >
             Home
-          </button>
+          </button> */}
           <button
             className="btn btn-accent rounded-none"
-            onClick={() => setProfileModalOpen(true)}
+            onClick={() => setShowProfileModal(true)}
           >
             Profile
           </button>
         </div>
       </div>
-      {showUserModal && <User handleClose={() => {
+      {showUserModal && (
+        <User
+          handleClose={() => {
             setShowUserModal(false);
-          }}/>}
+          }}
+        />
+      )}
+      {showProfileModal && (
+        <ProfileModal
+          userId={Auth.getProfile().data._id}
+          handleClose={() => {
+            setShowProfileModal(false);
+          }}
+        />
+      )}
     </>
   );
 }

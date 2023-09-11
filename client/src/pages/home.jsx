@@ -13,8 +13,8 @@ import SplideWrapper from "../components/SplideWrapper";
 import MarkerCard from "../components/MarkerCard";
 import SearchLocation from "../components/Home/SearchLocation";
 import CreateMemoryModal from "../components/Home/CreateMemoryModal";
-import DisplayModal from "../components/DisplayModal";
-import EditModal from "../components/EditModal";
+import DisplayModal from "../components/MarkerModal";
+import EditModal from "../components/EditBody";
 import MapFooter from "../components/MapFooter";
 
 function Home({ userState, setUserState, fetchRequest }) {

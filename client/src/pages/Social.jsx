@@ -14,7 +14,7 @@ import UserCard from "../components/Social/UserCard";
 import MarkerCard from "../components/MarkerCard";
 import MarkersInViewCard from "../components/Social/MarkersInViewCard";
 import Nav from "../components/Social/Nav";
-import DisplayModal from "../components/DisplayModal";
+import DisplayModal from "../components/MarkerModal";
 import User from "./UserModal";
 import MapFooter from "../components/MapFooter";
 import CreateMemoryModal from "../components/Home/CreateMemoryModal";
@@ -28,6 +28,7 @@ import {
 import { useQuery, useLazyQuery } from "@apollo/client";
 import { markersInMapVar } from "../App";
 import { useReactiveVar } from "@apollo/client";
+import Auth from "../utils/auth";
 
 function Social({ userState, setUserState, fetchRequest }) {
   const markersArr = useReactiveVar(markersInMapVar);
@@ -100,44 +101,45 @@ function Social({ userState, setUserState, fetchRequest }) {
     return array;
   };
 
-  // const mapMoveHandler = () => {
-  //   if (parIndexRef.current || parIndexRef.current === 0) {
-  //     console.log("Map move action has ended -- SINGLE");
-  //     console.log(parIndexRef.current);
+  const mapMoveHandler = () => {
+    console.log(markersInMapVar());
 
-  //     const bounds = mapRef.current.getBounds();
+    const bounds = mapRef.current.getBounds();
 
-  //     const markersInViewCurrent = allUserDataRef.current[
-  //       parIndexRef.current
-  //     ].markers.filter((marker) => bounds.contains([marker.lng, marker.lat]));
-  //     console.log(markersInViewCurrent);
-  //     console.log(markersInViewCurrent.length);
-  //     setMarkersInView(markersInViewCurrent);
-  //     setMarkersInViewUsers(null);
-  //   } else {
-  //     console.log("Map move action has ended -- MANY");
-  //     console.log(allUserDataRef.current);
-  //     console.log(parIndexRef.current);
-  //     const arrOfArrMarkers = [];
+    const markersInViewCurrent = markersInMapVar().filter((marker) =>
+      bounds.contains([marker.lng, marker.lat])
+    );
+    setMarkersInView(markersInViewCurrent);
 
-  //     const bounds = mapRef.current.getBounds();
+    // if (parIndexRef.current || parIndexRef.current === 0) {
+    //   console.log("Map move action has ended -- SINGLE");
+    //   console.log(parIndexRef.current);
 
-  //     allUserDataRef.current.forEach((user) => {
-  //       const markersInViewCurrent = user.markers.filter((marker) =>
-  //         bounds.contains([marker.lng, marker.lat])
-  //       );
-  //       arrOfArrMarkers.push(markersInViewCurrent);
-  //       // console.log(markersInViewCurrent);
-  //       // console.log(markersInViewCurrent.length)
-  //       // setMarkersInView(markersInViewCurrent);
-  //     });
-  //     // console.log(arrOfArrMarkers);
-  //     // console.log(arrOfArrMarkers.length);
+    //   const bounds = mapRef.current.getBounds();
 
-  //     setMarkersInViewUsers(arrOfArrMarkers);
-  //     setMarkersInView(null);
-  //   }
-  // };
+    //   const markersInViewCurrent = allUserDataRef.current[
+    //     parIndexRef.current
+    //   ].markers.filter((marker) => bounds.contains([marker.lng, marker.lat]));
+    //   console.log(markersInViewCurrent);
+    //   console.log(markersInViewCurrent.length);
+    //   setMarkersInView(markersInViewCurrent);
+    //   setMarkersInViewUsers(null);
+    // } else {
+    //   console.log("Map move action has ended -- MANY");
+    //   console.log(allUserDataRef.current);
+    //   console.log(parIndexRef.current);
+    //   const arrOfArrMarkers = [];
+
+    //   allUserDataRef.current.forEach((user) => {
+    //     const markersInViewCurrent = user.markers.filter((marker) =>
+    //       bounds.contains([marker.lng, marker.lat])
+    //     );
+    //     arrOfArrMarkers.push(markersInViewCurrent);
+    //   });
+    //   setMarkersInViewUsers(arrOfArrMarkers);
+    //   setMarkersInView(null);
+    // }
+  };
 
   const removeAllMarkers = () => {
     // Remove all markers from the map
@@ -244,6 +246,7 @@ function Social({ userState, setUserState, fetchRequest }) {
       mapRef.current.on("moveend", (event) => {
         mapMoveHandler();
       });
+
       mapMoveHandler();
     } catch (err) {
       console.error(err);
@@ -317,18 +320,6 @@ function Social({ userState, setUserState, fetchRequest }) {
     //   alert("User has 0 memories");
     // }
   };
-
-  // const goNext = (splideRef) => {
-  //   if (splideRef) {
-  //     splideRef.splide.go(">");
-  //   }
-  // };
-
-  // const goPrev = (splideRef) => {
-  //   if (splideRef) {
-  //     splideRef.splide.go("<");
-  //   }
-  // };
 
   const viewPointInMapHandler = (point) => {
     console.log(point);
@@ -407,7 +398,7 @@ function Social({ userState, setUserState, fetchRequest }) {
 
   return (
     <>
-      <Nav initialState={true} />
+      <Nav initialState={Auth.loggedIn() ? false : true} />
       <Map
         center={[-111.88, 40.67]}
         mapClickHandler={mapClickHandler}
@@ -415,40 +406,17 @@ function Social({ userState, setUserState, fetchRequest }) {
       />
       <div className="absolute top-0 right-0 w-1/5 h-[70vh] box-border overflow-y-auto bg-gray-500">
         {markersInView && (
-          <>
-            <ul>
-              {markersInView.map((point, index) => {
-                return (
-                  <MarkersInViewCard
-                    key={index}
-                    point={point}
-                    viewPointInMapHandler={viewPointInMapHandler}
-                  />
-                );
-              })}
-            </ul>
-          </>
-        )}
-        {markersInViewUsers && (
-          <>
-            <ul className="list-group">
-              {markersInViewUsers.map((userMarkers, parIndex) => {
-                return (
-                  <div key={parIndex}>
-                    {userMarkers.map((point, index) => {
-                      return (
-                        <MarkersInViewCard
-                          key={index}
-                          point={point}
-                          viewPointInMapHandler={viewPointInMapHandler}
-                        />
-                      );
-                    })}
-                  </div>
-                );
-              })}
-            </ul>
-          </>
+          <ul>
+            {markersInView.map((point, index) => {
+              return (
+                <MarkersInViewCard
+                  key={index}
+                  point={point}
+                  viewPointInMapHandler={viewPointInMapHandler}
+                />
+              );
+            })}
+          </ul>
         )}
       </div>
       <MapFooter
@@ -458,23 +426,7 @@ function Social({ userState, setUserState, fetchRequest }) {
       />
       <section>
         {showUsers ? (
-          <>
-            <UserSection userButtonHandler={userButtonHandler} />
-            {/* // <div className="w-[calc(80vw-60px)] items-center justify-center mx-5">
-              //   <h2 className="text-2xl font-bold">View users memories</h2>
-              //   <SplideWrapper>
-              //     {userData.getAllUsers.map((user, index) => {
-              //       return (
-              //         <UserCard
-              //           key={index}
-              //           user={user}
-              //           userButtonHandler={userButtonHandler}
-              //         />
-              //       );
-              //     })}
-              //   </SplideWrapper>
-              // </div> */}
-          </>
+          <UserSection userButtonHandler={userButtonHandler} />
         ) : (
           <>
             {displayUser && (
@@ -482,41 +434,10 @@ function Social({ userState, setUserState, fetchRequest }) {
                 userId={memorySectionId}
                 viewAllButtonHandler={viewAllButtonHandler}
               />
-              // <section className="flex">
-              //   <div className="w-[20vw]">
-              //     <UserCard
-              //       user={displayUser}
-              //       userButtonHandler={userButtonHandler}
-              //     />
-              //   </div>
-
-              //   <div className="w-[60vw]">
-              //     <SplideWrapper>
-              //       {displayUser.markers.map((point, index) => {
-              //         return <MarkerCard key={index} point={point} />;
-              //       })}
-              //     </SplideWrapper>
-              //   </div>
-              //   <button
-              //     className="btn w-[20vw] h-[400px]"
-              //     onClick={() => viewAllButtonHandler()}
-              //   >
-              //     <h2>View All</h2>
-              //   </button>
-              // </section>
             )}
           </>
         )}
       </section>
-      {/* {showLogin && (
-        // <User
-        //   userState={userState}
-        //   setUserState={setUserState}
-        //   handleClose={() => {
-        //     setShowLogin(false);
-        //   }}
-        // />
-      )} */}
       {showCreateModal && (
         <CreateMemoryModal
           coordinatesRef={coordinatesRef}

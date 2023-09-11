@@ -11,7 +11,7 @@ function MapFooter({ mapFly, buttonState, setButtonState }) {
           setButtonState((prev) => !prev);
         }}
       >
-        {buttonState ? "CURRENTLY VIEW MODE" : "CURRENTLY CREATE MODE"}
+        {buttonState ? "CURRENTLY CREATE MODE" : "CURRENTLY VIEW MODE"}
       </button>
       <SearchLocation mapFly={mapFly} />
     </nav>

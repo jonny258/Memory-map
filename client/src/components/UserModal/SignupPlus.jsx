@@ -109,8 +109,6 @@ function SignupPlus({ setShowSignup, setShowSignupPlus }) {
           />
         </div>
         <div className="bg-gray-600 p-4 m-4 rounded-md">
-          {/* Make this conditional so that it can tell if you have already uploaded a pfp */}
-          {/* Actually just fuck with the whole thing */}
           <PictureUploader
             uploadText={"Pick a profile picture"}
             pictureState={userInputVar().pfp}
@@ -139,28 +137,6 @@ function SignupPlus({ setShowSignup, setShowSignupPlus }) {
           </button>
         </div>
       </div>
-      {/* <div>
-        <h2 className="mt-0 text-center text-xl font-semibold">
-          Add some locations
-        </h2>
-        <div className="mt-5 flex flex-col space-y-4">
-          {Array.from({ length: locationCount }).map((_, index) => (
-            <LocationInput
-              key={index}
-              fetchRequest={fetchRequest}
-              getLocationMarkers={getLocationMarkers}
-              inputLocations={inputLocations}
-              index={index}
-              name={name}
-            />
-          ))}
-          {locationCount < MAX_LOCATIONS && (
-            <button className="btn btn-primary" onClick={addALocationHandler}>
-              Add a location
-            </button>
-          )}
-        </div>
-      </div> */}
     </div>
   );
 }

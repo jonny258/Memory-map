@@ -51,6 +51,7 @@ export const GET_USER_BY_ID = gql`
       username
       email
       pfp
+      color
       markers {
         _id
         media
@@ -77,6 +78,7 @@ export const GET_MARKER_BY_ID = gql`
       description
       lat
       lng
+      createdAt
       user {
         _id
         username
