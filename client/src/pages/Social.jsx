@@ -73,8 +73,13 @@ function Social({ userState, setUserState, fetchRequest }) {
 
   const mapClickHandler = async (event) => {
     if (buttonStateRef.current) {
-      coordinatesRef.current = [event.lngLat.lat, event.lngLat.lng];
-      setShowCreateModal(true);
+      if(Auth.loggedIn()){
+
+        coordinatesRef.current = [event.lngLat.lat, event.lngLat.lng];
+        setShowCreateModal(true);
+      }else{
+        alert("Sign into make a memory")
+      }
     }
   };
 
@@ -88,8 +93,10 @@ function Social({ userState, setUserState, fetchRequest }) {
 
   const markerClickHandler = (markerId) => {
     //console.log(markerId);
-    setShowDisplayModal(true);
-    setDisplayMarkerId(markerId);
+    if(!buttonStateRef.current){
+      setShowDisplayModal(true);
+      setDisplayMarkerId(markerId);
+    }
   };
 
   //This could be used to shuffle the arrays, but I cant dig down

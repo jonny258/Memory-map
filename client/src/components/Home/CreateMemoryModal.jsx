@@ -5,46 +5,25 @@ import { useMutation } from "@apollo/client";
 import Auth from "../../utils/auth";
 import { markersInMapVar } from "../../App";
 
+//I need to get the users color from this 
 function CreateMemoryModal({
   handleClose,
   coordinatesRef,
-  //userState,
-  //fetchRequest,
-  setMarkersArr,
 }) {
-  console.log(Auth.getProfile().data._id);
-  // const API_BASE_URL =
-  //   import.meta.env.VITE_APP_API_BASE_URL || "http://localhost:5500";
+  console.log(Auth.getProfile().data);
 
   const [createMarker, { data, loading, error }] = useMutation(CREATE_MARKER);
-
   const [pictureState, setPictureState] = useState("");
   const modalContentRef = useRef(null);
   const titleRef = useRef();
   const descriptionRef = useRef();
 
-  // class MakeMarker {
-  //   constructor(lat, lng, title, description, date, name, image) {
-  //     (this.lat = lat),
-  //       (this.lng = lng),
-  //       (this.title = title),
-  //       (this.description = description),
-  //       (this.date = date),
-  //       (this.name = name),
-  //       (this.image = image);
-  //   }
-  // }
-
   const saveMemoryHandler = async (event) => {
     event.preventDefault();
     try {
-      // const title = event.target.form[0].value;
-      // const description = event.target.form[2].value;
+
       if (titleRef.current.value && descriptionRef.current.value) {
-        // const currentDate = new Date();
-        // const formattedDate = `${
-        //   currentDate.getMonth() + 1
-        // }/${currentDate.getDate()}`;
+
 
         const userId = Auth.getProfile().data._id;
         const input = {
@@ -57,32 +36,17 @@ function CreateMemoryModal({
 
         console.log({ userId, input });
 
-        const response = await createMarker({ variables: { userId, input } });
-        console.log(response.data.createMarker);
-        console.log(markersInMapVar())
-        const tempMarkersArr = [...markersInMapVar(), response.data.createMarker]
-        markersInMapVar(tempMarkersArr)
+        if(input.lat && input.lng && input.media && input.title && input.description){
 
-        // const newMarker = new MakeMarker(
-        //   coordinatesRef.current[0],
-        //   coordinatesRef.current[1],
-        //   title,
-        //   description,
-        //   formattedDate,
-        //   userState.name,
-        //   pictureState
-        // );
-
-        // const markerURL = `${API_BASE_URL}/api/user/marker/${userState._id}`;
-        // const postedNewMarker = await fetchRequest(
-        //   "POST",
-        //   markerURL,
-        //   newMarker
-        // );
-        // console.log(postedNewMarker);
-
-        // setMarkersArr((prev) => [...prev, newMarker]);
-        handleClose(false);
+          const response = await createMarker({ variables: { userId, input } });
+          console.log(response.data.createMarker);
+          console.log(markersInMapVar())
+          const tempMarkersArr = [...markersInMapVar(), response.data.createMarker]
+          markersInMapVar(tempMarkersArr)
+          handleClose(false);
+        }else{
+          alert("Please fill out all fields")
+        }
       } else {
         alert("Please fillout both fields");
       }
@@ -93,9 +57,9 @@ function CreateMemoryModal({
 
   return (
     <>
-      <div className="fixed top-0 left-0 w-full h-full bg-black opacity-50"></div>
+      <div className="fixed top-0 left-0 w-full h-full bg-black opacity-50 z-40"></div>
       <div
-        className="fixed top-0 left-0 w-full h-full flex items-center justify-center"
+        className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50"
         tabIndex="-1"
         role="dialog"
         onClick={(event) => {

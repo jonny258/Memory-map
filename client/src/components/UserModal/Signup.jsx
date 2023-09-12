@@ -40,7 +40,7 @@ function Signup({ setShowLogin, setShowSignup, setShowSignupPlus }) {
   //ADD VALIDATION FOR IF THE EMAIL IS CORRECT HERE
   return (
     <div>
-      <div className="bg-gray-600 p-4 m-4 rounded-md">
+      {/* <div className="bg-gray-600 p-4 m-4 rounded-md">
         <button
           className="w-full btn btn-accent"
           onClick={() => navigate("/social")}
@@ -50,7 +50,7 @@ function Signup({ setShowLogin, setShowSignup, setShowSignupPlus }) {
         <p className="text-lg w-full text-gray-400">
           Skip the sign up and check out the social page
         </p>
-      </div>
+      </div> */}
       <div className="bg-gray-600 rounded-md border-none m-4 p-3">
         <label className="label">
           <span className="label-text text-lg">Email address</span>

@@ -26,22 +26,16 @@ function Nav({ initialState }) {
             className="btn btn-warning rounded-none"
             onClick={logoutButtonHandler}
           >
-            Log Out
+            {Auth.loggedIn() ? "Log Out" : "Sign Up"}
           </button>
-          {/* <button
-            className="btn btn-primary rounded-none"
-            onClick={() => {
-              console.log("AAAA");
-            }}
-          >
-            Home
-          </button> */}
-          <button
-            className="btn btn-accent rounded-none"
-            onClick={() => setShowProfileModal(true)}
-          >
-            Profile
-          </button>
+          {Auth.loggedIn() && (
+            <button
+              className="btn btn-accent rounded-none"
+              onClick={() => setShowProfileModal(true)}
+            >
+              Profile
+            </button>
+          )}
         </div>
       </div>
       {showUserModal && (

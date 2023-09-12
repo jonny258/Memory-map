@@ -6,7 +6,7 @@ import PictureUploader from "../PictureUploader";
 import { gql, useMutation } from "@apollo/client";
 import { CREATE_USER } from "../../GraphQL/Mutations";
 import { userInputVar } from "../../pages/UserModal";
-import Auth from "../../utils/auth"
+import Auth from "../../utils/auth";
 
 function SignupPlus({ setShowSignup, setShowSignupPlus }) {
   const [createUser, { data, loading, error }] = useMutation(CREATE_USER);
@@ -42,12 +42,19 @@ function SignupPlus({ setShowSignup, setShowSignupPlus }) {
           color: color,
           pfp: pictureState || userInputVar().pfp,
         };
-        //const signUpUrl = `${API_BASE_URL}/api/user/signup`;
 
-        //const userData = await fetchRequest("POST", signUpUrl, body);
-        const response = await createUser({ variables: { input: body } });
-        Auth.login(response.data.createUser.token)
-
+        if (
+          body.email &&
+          body.password &&
+          body.username &&
+          body.color &&
+          body.pfp
+        ) {
+          const response = await createUser({ variables: { input: body } });
+          Auth.login(response.data.createUser.token);
+        }else{
+          alert("Please fill out all fields")
+        }
 
         //I need something to close this
         // userInputVar({
@@ -64,7 +71,7 @@ function SignupPlus({ setShowSignup, setShowSignupPlus }) {
       }
     } catch (err) {
       console.error(err);
-      alert(err)
+      alert(err);
     }
   };
 
