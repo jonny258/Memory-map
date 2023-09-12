@@ -1,32 +1,48 @@
-const express = require("express");
-const app = express();
-const path = require("path");
-
-const session = require("express-session");
-const cors = require("cors");
-
+const express = require('express');
+const { ApolloServer } = require("apollo-server-express");
+const { typeDefs, resolvers } = require("./schemas");
 const db = require("./config/connection");
-const routes = require("./routes");
+const { makeExecutableSchema } = require('@graphql-tools/schema');
+const cors = require('cors'); // Import cors
 
 const PORT = process.env.PORT || 5500;
 
-app.use(cors());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+const schema = makeExecutableSchema({ typeDefs, resolvers });
 
-app.use(routes);
-
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../client/dist")));
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
-  });
-}
-
-
-db.once("open", () => {
-  console.log("MongoDB connected");
-  app.listen(PORT, () => {
-    console.log(`API server running on port ${PORT}!`);
-  });
+const server = new ApolloServer({
+  schema,
+  context: ({ req }) => ({ req }),
+  // playground: true, // Enable playground always or you can set based on your condition
 });
+
+const app = express();
+
+// CORS setup
+// You can restrict the origin for security in production
+const corsOptions = {
+  origin: '*', // Allow all domains. In production, you might want to list specific domains.
+  credentials: true, // Allow cookies
+};
+
+app.use(cors(corsOptions));
+
+const startServer = async () => {
+  // Ensure MongoDB connection is established
+  db.once("open", async () => {
+    console.log("Connected to MongoDB");
+
+    // Start Apollo Server before applying middleware
+    await server.start();
+
+    // Apply ApolloServer middleware to the Express server
+    server.applyMiddleware({ app });
+
+    // Listen on the port
+    app.listen(PORT, () => {
+      console.log(`Server is live at http://localhost:${PORT}`);
+      console.log(`GraphQL server is live at http://localhost:${PORT}${server.graphqlPath}`);
+    });
+  });
+};
+
+startServer();

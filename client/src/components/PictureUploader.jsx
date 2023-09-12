@@ -1,12 +1,11 @@
 import { Uploader } from "uploader";
 import { UploadButton } from "react-uploader";
-import "../assets/css/fileUploader.css";
+// import "../assets/css/fileUploader.css";
 import { useState } from "react";
 
 function PictureUploader({ pictureState, setPictureState, uploadText }) {
   const uploader = Uploader({ apiKey: "public_FW25bUsEgLaLmifCsyAEZMAxaX9j" });
-
-  const [isUploaded, setIsUploaded] = useState(false);
+  const [isUploaded, setIsUploaded] = useState(pictureState ? true : false);
   return (
     <UploadButton
       uploader={uploader}
@@ -31,8 +30,8 @@ function PictureUploader({ pictureState, setPictureState, uploadText }) {
         <button
           className={
             isUploaded
-              ? "form-control upload-button btn btn-success"
-              : "form-control upload-button btn btn-secondary"
+              ? "btn btn-success w-full"
+              : "btn btn-primary w-full"
           }
           onClick={onClick}
         >

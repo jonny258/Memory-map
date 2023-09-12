@@ -1,18 +1,51 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Splide, SplideTrack, SplideSlide } from "@splidejs/react-splide";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import Map from "../components/Map";
-import "../assets/css/social.css";
+import Map from "../components/Social/Map";
+// import "../assets/css/social.css";
 //I can change the styles
 import "@splidejs/react-splide/css";
-import SocialDiaplayModal from "../components/SocialDiaplayModal";
+//import SocialDiaplayModal from "../components/SocialDiaplayModal";
 import Loading from "./loading";
+import SplideWrapper from "../components/SplideWrapper";
+import UserCard from "../components/Social/UserCard";
+import MarkerCard from "../components/MarkerCard";
+import MarkersInViewCard from "../components/Social/MarkersInViewCard";
+import Nav from "../components/Social/Nav";
+import DisplayModal from "../components/MarkerModal";
+import User from "./UserModal";
+import MapFooter from "../components/MapFooter";
+import CreateMemoryModal from "../components/Home/CreateMemoryModal";
+import UserSection from "../components/UserSection";
+import MemorySection from "../components/MemorySection";
+import {
+  GET_ALL_MARKERS,
+  GET_ALL_USERS,
+  GET_USER_BY_ID,
+} from "../GraphQL/Queries";
+import { useQuery, useLazyQuery } from "@apollo/client";
+import { markersInMapVar } from "../App";
+import { useReactiveVar } from "@apollo/client";
+import Auth from "../utils/auth";
 
 function Social({ userState, setUserState, fetchRequest }) {
-  const navigate = useNavigate();
-  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5500';
+  const markersArr = useReactiveVar(markersInMapVar);
+
+  const {
+    loading: markerLoading,
+    error: markerError,
+    data: markerData,
+  } = useQuery(GET_ALL_MARKERS);
+
+  const [loadUser, { called, loading, data }] = useLazyQuery(GET_USER_BY_ID);
+
+  useEffect(() => {
+    console.log(markerData);
+    console.log(markerError);
+    // console.log(userData);
+  }, [markerData]);
 
   const [activeMarker, setActiveMarker] = useState(null);
   const [showUsers, setShowUsers] = useState(false);
@@ -22,20 +55,48 @@ function Social({ userState, setUserState, fetchRequest }) {
   const [markersInView, setMarkersInView] = useState(null);
   const [isloggedIn, setIsloggedIn] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showDisplayModal, setShowDisplayModal] = useState(false);
+  const [displayMarkerId, setDisplayMarkerId] = useState("");
 
-  const splideMemoryRef = useRef();
-  const splideUsersRef = useRef();
-  const allUserDataRef = useRef("");
+  const [memorySectionId, setMemorySectionId] = useState("");
+
+  //BUTTON STATE STUFF
+
+  const [buttonState, setButtonState] = useState(false);
+  const buttonStateRef = useRef(buttonState);
+
+  useEffect(() => {
+    buttonStateRef.current = buttonState;
+  }, [buttonState]);
+
+  const mapClickHandler = async (event) => {
+    if (buttonStateRef.current) {
+      if(Auth.loggedIn()){
+
+        coordinatesRef.current = [event.lngLat.lat, event.lngLat.lng];
+        setShowCreateModal(true);
+      }else{
+        alert("Sign into make a memory")
+      }
+    }
+  };
+
+  //BUTTON STATE STUFF
+
+  const coordinatesRef = useRef();
+  // const allUserDataRef = useRef("");
   const mapRef = useRef("");
   const parIndexRef = useRef(null);
   //const [allUserMarkerData, setAllUserMarkerData] = useState([])
 
-  const markerClickHandler = (parIndex, index) => {
-    console.log(index);
-    console.log(parIndex);
-    //setActiveUserMarkerIndex([parIndex, index]);
-    console.log(allUserDataRef.current[parIndex].markers[index]);
-    setActiveMarker(allUserDataRef.current[parIndex].markers[index]);
+  const markerClickHandler = (markerId) => {
+    //console.log(markerId);
+    if(!buttonStateRef.current){
+      setShowDisplayModal(true);
+      setDisplayMarkerId(markerId);
+    }
   };
 
   //This could be used to shuffle the arrays, but I cant dig down
@@ -48,108 +109,122 @@ function Social({ userState, setUserState, fetchRequest }) {
   };
 
   const mapMoveHandler = () => {
-    if (parIndexRef.current || parIndexRef.current === 0) {
-      console.log("Map move action has ended -- SINGLE");
-      console.log(parIndexRef.current);
+    console.log(markersInMapVar());
 
-      const bounds = mapRef.current.getBounds();
+    const bounds = mapRef.current.getBounds();
 
-      const markersInViewCurrent = allUserDataRef.current[
-        parIndexRef.current
-      ].markers.filter((marker) => bounds.contains([marker.lng, marker.lat]));
-      console.log(markersInViewCurrent);
-      console.log(markersInViewCurrent.length);
-      setMarkersInView(markersInViewCurrent);
-      setMarkersInViewUsers(null);
-    } else {
-      console.log("Map move action has ended -- MANY");
-      console.log(allUserDataRef.current);
-      console.log(parIndexRef.current);
-      const arrOfArrMarkers = [];
+    const markersInViewCurrent = markersInMapVar().filter((marker) =>
+      bounds.contains([marker.lng, marker.lat])
+    );
+    setMarkersInView(markersInViewCurrent);
 
-      const bounds = mapRef.current.getBounds();
+    // if (parIndexRef.current || parIndexRef.current === 0) {
+    //   console.log("Map move action has ended -- SINGLE");
+    //   console.log(parIndexRef.current);
 
-      allUserDataRef.current.forEach((user) => {
-        const markersInViewCurrent = user.markers.filter((marker) =>
-          bounds.contains([marker.lng, marker.lat])
-        );
-        arrOfArrMarkers.push(markersInViewCurrent);
-        // console.log(markersInViewCurrent);
-        // console.log(markersInViewCurrent.length)
-        // setMarkersInView(markersInViewCurrent);
-      });
-      // console.log(arrOfArrMarkers);
-      // console.log(arrOfArrMarkers.length);
+    //   const bounds = mapRef.current.getBounds();
 
-      setMarkersInViewUsers(arrOfArrMarkers);
-      setMarkersInView(null);
-    }
+    //   const markersInViewCurrent = allUserDataRef.current[
+    //     parIndexRef.current
+    //   ].markers.filter((marker) => bounds.contains([marker.lng, marker.lat]));
+    //   console.log(markersInViewCurrent);
+    //   console.log(markersInViewCurrent.length);
+    //   setMarkersInView(markersInViewCurrent);
+    //   setMarkersInViewUsers(null);
+    // } else {
+    //   console.log("Map move action has ended -- MANY");
+    //   console.log(allUserDataRef.current);
+    //   console.log(parIndexRef.current);
+    //   const arrOfArrMarkers = [];
+
+    //   allUserDataRef.current.forEach((user) => {
+    //     const markersInViewCurrent = user.markers.filter((marker) =>
+    //       bounds.contains([marker.lng, marker.lat])
+    //     );
+    //     arrOfArrMarkers.push(markersInViewCurrent);
+    //   });
+    //   setMarkersInViewUsers(arrOfArrMarkers);
+    //   setMarkersInView(null);
+    // }
   };
 
   const removeAllMarkers = () => {
     // Remove all markers from the map
+    console.log(markers);
     markers.forEach((marker) => marker.remove());
 
     // Clear the markers state
     setMarkers([]);
   };
 
-  const addOneMarker = (user, parIndex, point, index) => {
+  const addOneMarker = (marker, index) => {
+    console.log(marker, index);
     const map = mapRef.current;
     const popup = new mapboxgl.Popup({ closeButton: false });
 
     popup.on("open", (event) => {
-      if (point.image) {
-        popup.setHTML(
-          `<img src='${point.image}' style="width:200px;height:auto;"/>`
-        ); // adjust style as needed
-      } else {
-        popup.setHTML(`<h1 style="color:black;">${point.title}</h1>`); // adjust style as needed
-      }
+      popup.setHTML(
+        `<img src='${marker.media}' style="width:200px;height:auto;"/>`
+      );
     });
 
-    const marker = new mapboxgl.Marker({
-      color: user.color,
+    const newMarker = new mapboxgl.Marker({
+      color: marker.user.color,
     })
-      .setLngLat([point.lng, point.lat])
+      .setLngLat([marker.lng, marker.lat])
       .setPopup(popup)
       .addTo(map);
     // Add the hover functionality here:
-    marker.getElement().addEventListener("mouseenter", () => popup.addTo(map));
-    marker.getElement().addEventListener("mouseleave", () => popup.remove());
-    marker
+    newMarker
       .getElement()
-      .addEventListener("click", () => markerClickHandler(parIndex, index));
+      .addEventListener("mouseenter", () => popup.addTo(map));
+    newMarker.getElement().addEventListener("mouseleave", () => popup.remove());
+    newMarker
+      .getElement()
+      .addEventListener("click", () => markerClickHandler(marker._id));
 
-    setMarkers((prev) => [...prev, marker]);
+    setMarkers((prev) => [...prev, newMarker]);
   };
 
-  const addMarkersToMap = (allUserData) => {
-    // const markers = [];
-    // console.log(map);
-    // console.log(allUserData);
+  // const addMarkersToMap = (allUserData) => {
+  //   // const markers = [];
+  //   // console.log(map);
+  //   // console.log(allUserData);
 
-    console.log(API_BASE_URL)
-    console.log(allUserData)
-    allUserData.forEach((user, parIndex) => {
-      user.markers.forEach((point, index) => {
-        addOneMarker(user, parIndex, point, index);
+  //   console.log(API_BASE_URL);
+  //   console.log(allUserData);
+  //   allUserData.forEach((user, parIndex) => {
+  //     user.markers.forEach((point, index) => {
+  //       addOneMarker(user, parIndex, point, index);
+  //     });
+  //   });
+  // };
+  useEffect(() => {
+    if (mapRef.current && markerData && markersInMapVar()) {
+      markersInMapVar().forEach((marker, index) => {
+        addOneMarker(marker, index);
       });
-    });
-  };
+    } else {
+      console.log("one or more are not loaded");
+    }
+  }, [markersInMapVar()]);
 
-  const mapClickHandler = async (event) => {
-    console.log(event);
-  };
+  useEffect(() => {
+    if (mapRef.current && markerData) {
+      console.log("Setting markersInMapVar with:", markerData.getAllMarkers);
+      markersInMapVar(markerData.getAllMarkers);
+    }
+  }, [mapRef.current, markerData]);
 
   const mapLoadHandler = async (event) => {
     try {
-      console.log(userState);
+      console.log("test test");
       mapRef.current = event.target;
-      const allUsersUrl = `${API_BASE_URL}/api/user`;
-      const allUserData = await fetchRequest("GET", allUsersUrl);
-      allUserDataRef.current = allUserData;
-      addMarkersToMap(allUserData);
+      // const allUsersUrl = `${API_BASE_URL}/api/user`;
+      // const allUserData = await fetchRequest("GET", allUsersUrl);
+      // allUserDataRef.current = allUserData;
+      //addMarkersToMap();
+
       setShowUsers(true);
       setIsLoading(false);
 
@@ -178,39 +253,40 @@ function Social({ userState, setUserState, fetchRequest }) {
       mapRef.current.on("moveend", (event) => {
         mapMoveHandler();
       });
+
       mapMoveHandler();
     } catch (err) {
       console.error(err);
     }
   };
 
-  useEffect(() => {
-    const getSession = async () => {
-      try {
-        console.log('This ran')
-        const sessionData = await fetchRequest(
-          "GET",
-          `${API_BASE_URL}/api/session`
-        );
-        // if(sessionData){
-        //   console.log(sessionData[0])
-        // }
-        if (sessionData) {
-          console.log("user is logged in");
-          setIsloggedIn(true);
-          //This gets the logged in user
-          const userUrl = `${API_BASE_URL}/api/user/${sessionData[0].currentUser._id}`;
-          const userData = await fetchRequest("GET", userUrl);
-          console.log(userData)
-        } else {
-          setIsloggedIn(false);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    getSession();
-  }, []);
+  // useEffect(() => {
+  //   const getSession = async () => {
+  //     try {
+  //       console.log("This ran");
+  //       const sessionData = await fetchRequest(
+  //         "GET",
+  //         `${API_BASE_URL}/api/session`
+  //       );
+  //       // if(sessionData){
+  //       //   console.log(sessionData[0])
+  //       // }
+  //       if (sessionData) {
+  //         console.log("user is logged in");
+  //         setIsloggedIn(true);
+  //         //This gets the logged in user
+  //         const userUrl = `${API_BASE_URL}/api/user/${sessionData[0].currentUser._id}`;
+  //         const userData = await fetchRequest("GET", userUrl);
+  //         console.log(userData);
+  //       } else {
+  //         setIsloggedIn(false);
+  //       }
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+  //   getSession();
+  // }, []);
 
   const mapFly = (camera) => {
     const map = mapRef.current;
@@ -224,36 +300,32 @@ function Social({ userState, setUserState, fetchRequest }) {
     });
   };
 
-  const userButtonHandler = (user, parIndex) => {
-    if (user.markers[0]) {
-      const camera = {
-        center: [user.markers[0].lng, user.markers[0].lat],
-        zoom: 7,
-      };
-      parIndexRef.current = parIndex;
-      mapFly(camera);
-      removeAllMarkers();
-      user.markers.forEach((point, index) => {
-        console.log(point);
-        addOneMarker(user, parIndex, point, index);
-      });
-      setDisplayUser(user);
-      setShowUsers(false);
-    } else {
-      alert("User has 0 memories");
-    }
-  };
+  const userButtonHandler = async (userId) => {
+    const response = await loadUser({ variables: { userId: userId } });
+    console.log(response.data.getUserById);
 
-  const goNext = (splideRef) => {
-    if (splideRef) {
-      splideRef.splide.go(">");
-    }
-  };
+    // if (user.markers[0]) {
+    const camera = {
+      center: [
+        response.data.getUserById.markers[0].lng,
+        response.data.getUserById.markers[0].lat,
+      ],
+      zoom: 7,
+    };
+    console.log(camera);
+    //   parIndexRef.current = parIndex;
+    mapFly(camera);
 
-  const goPrev = (splideRef) => {
-    if (splideRef) {
-      splideRef.splide.go("<");
-    }
+    console.log(markersInMapVar());
+    removeAllMarkers();
+    markersInMapVar(response.data.getUserById.markers);
+    setDisplayUser(true);
+    console.log(userId);
+    setMemorySectionId(userId);
+    setShowUsers(false);
+    // } else {
+    //   alert("User has 0 memories");
+    // }
   };
 
   const viewPointInMapHandler = (point) => {
@@ -278,7 +350,7 @@ function Social({ userState, setUserState, fetchRequest }) {
     parIndexRef.current = null;
     setShowUsers(true);
     removeAllMarkers();
-    addMarkersToMap(allUserDataRef.current);
+    // addMarkersToMap(allUserDataRef.current);
     const camera = {
       center: [-111.88, 40.67],
       zoom: 9,
@@ -303,496 +375,93 @@ function Social({ userState, setUserState, fetchRequest }) {
     mapFly(camera);
   };
 
-  const isDarkColor = (hexColor) => {
-    // Remove the # symbol from the hex color code
-    const hex = hexColor.replace("#", "");
+  // const isDarkColor = (hexColor) => {
+  //   // Remove the # symbol from the hex color code
+  //   const hex = hexColor.replace("#", "");
 
-    // Convert the hex color code to RGB values
-    const red = parseInt(hex.substr(0, 2), 16);
-    const green = parseInt(hex.substr(2, 2), 16);
-    const blue = parseInt(hex.substr(4, 2), 16);
+  //   // Convert the hex color code to RGB values
+  //   const red = parseInt(hex.substr(0, 2), 16);
+  //   const green = parseInt(hex.substr(2, 2), 16);
+  //   const blue = parseInt(hex.substr(4, 2), 16);
 
-    // Calculate the relative luminance using the sRGB color space formula
-    const luminance = (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255;
+  //   // Calculate the relative luminance using the sRGB color space formula
+  //   const luminance = (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255;
 
-    // Return true if the luminance is below a certain threshold, indicating a dark color
-    return luminance < 0.5;
-  };
+  //   // Return true if the luminance is below a certain threshold, indicating a dark color
+  //   return luminance < 0.5;
+  // };
 
-  const calculateFontSize = (name, baseSize) => {
-    let minSize = 12; // Do not go below 12px for readability
+  // const calculateFontSize = (name, baseSize) => {
+  //   let minSize = 12; // Do not go below 12px for readability
 
-    // Decrease font size by 1px for each additional character over 10
-    let adjustedSize = baseSize - Math.max(0, name.length - 10);
+  //   // Decrease font size by 1px for each additional character over 10
+  //   let adjustedSize = baseSize - Math.max(0, name.length - 10);
 
-    // Do not go below the minimum size
-    adjustedSize = Math.max(minSize, adjustedSize);
+  //   // Do not go below the minimum size
+  //   adjustedSize = Math.max(minSize, adjustedSize);
 
-    return adjustedSize;
-  };
-
-  const logoutButtonHandler = async () => {
-    try {
-      navigate("/");
-      const sessionUrl = `${API_BASE_URL}/api/session`;
-      const deleteSession = await fetchRequest("DELETE", sessionUrl);
-      console.log(deleteSession);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  //   return adjustedSize;
+  // };
 
   return (
     <>
-      {/* {isLoading && <Loading />} */}
-      <div
-        className="map-container"
-        id="map-container-custom"
-        style={{
-          width: 'calc(80vw - 17px)',
-          height: "70vh",
-          boxSizing: "border-box",
-        }}
-      >
-        <div className="page-nav">
-          <button
-            className="btn btn-outline-warning"
-            id="left-button"
-            onClick={logoutButtonHandler}
-          >
-            {isloggedIn ? "Log Out" : "Sign up"}
-          </button>
-          {isloggedIn && (
-            <button
-              className="btn btn-outline-info"
-              onClick={() => navigate("/home")}
-            >
-              Home
-            </button>
-          )}
-
-          {/* <button
-            className="btn btn-outline-success"
-            onClick={() => setProfileModalOpen(true)}
-          >
-            Profile
-          </button> */}
-        </div>
-        <Map
-          center={[-111.88, 40.67]}
-          mapClickHandler={mapClickHandler}
-          mapLoadHandler={mapLoadHandler}
-        />
+      <Nav initialState={Auth.loggedIn() ? false : true} />
+      <Map
+        center={[-111.88, 40.67]}
+        mapClickHandler={mapClickHandler}
+        mapLoadHandler={mapLoadHandler}
+      />
+      <div className="absolute top-0 right-0 w-1/5 h-[70vh] box-border overflow-y-auto bg-gray-500">
+        {markersInView && (
+          <ul>
+            {markersInView.map((point, index) => {
+              return (
+                <MarkersInViewCard
+                  key={index}
+                  point={point}
+                  viewPointInMapHandler={viewPointInMapHandler}
+                />
+              );
+            })}
+          </ul>
+        )}
       </div>
-      <div
-        className="section-container"
-        style={{ width: "100vw", marginTop: "70vh" }}
-      >
-        <section>
-          {showUsers ? (
-            <>
-              <h2>View users memories</h2>
-              <div
-                className="splide-wrapper-profile"
-                style={{
-                  border: `5px solid black`,
-                }}
-              >
-                <button
-                  id="custom-btn"
-                  //   className={
-                  //     displayUser.markers.length < 2 ? "display-none" : ""
-                  //   }
-                  onClick={() => goPrev(splideUsersRef.current)}
-                >
-                  <p>Prev</p>
-                </button>
-                <Splide
-                  ref={splideUsersRef}
-                  hasTrack={false}
-                  options={{
-                    rewind: true,
-                    gap: "1rem",
-                    perPage: 4,
-                    perMove: 1,
-                    arrows: false,
-                  }}
-                  aria-label="My Favorite Images"
-                >
-                  <SplideTrack>
-                    {allUserDataRef.current.map((user, index) => {
-                      return (
-                        <SplideSlide key={index}>
-                          <div className="card users-card">
-                            <img src={user.pfp} className="card-img-top" />
-                            <div className="card-body d-flex">
-                              <div className="col-6 d-flex justify-content-center align-items-center border-right border-bottom light-border">
-                                <h1
-                                  className="card-title text-center"
-                                  style={{
-                                    fontSize: `${calculateFontSize(
-                                      user.name,
-                                      30
-                                    )}px`,
-                                  }}
-                                >
-                                  {user.name}
-                                </h1>
-                              </div>
-                              <div className="col-6 d-flex justify-content-center align-items-center border-bottom light-border">
-                                <h5 className="card-text text-center">
-                                  Memories: {user.markers.length}
-                                </h5>
-                              </div>
-                            </div>
-
-                            <div className="view-mem-button">
-                              <div className="view-mem-button">
-                                <button
-                                  // className={`btn view-mem-button ${
-                                  //   isDarkColor(user.color) ? "white-text" : ""
-                                  // }`}
-                                  style={{ backgroundColor: user.color }}
-                                  onClick={() => userButtonHandler(user, index)}
-                                >
-                                  <h5>View memories</h5>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </SplideSlide>
-                      );
-                    })}
-                  </SplideTrack>
-                  {/* <div className="splide__arrows">
-                    <button
-                      //   className="splide__arrow splide__arrow--prev"
-                      className="splide__arrow splide__arrow--prev"
-                      id="custom-btn"
-                      onClick={() => goPrev(splideUsersRef.current)}
-                    >
-                      Prev
-                    </button>
-                    <button
-                      className="splide__arrow splide__arrow--next"
-                      onClick={() => goNext(splideUsersRef.currnet)}
-                    >
-                      Next
-                    </button>
-                  </div> */}
-                </Splide>
-                <button
-                  id="custom-btn"
-                  onClick={() => goNext(splideUsersRef.current)}
-                >
-                  <p>Next</p>
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              {displayUser && (
-                <section className="d-flex">
-                  <div
-                    className="card profile-card"
-                    style={{ border: `5px solid ${displayUser.color}` }}
-                  >
-                    <img src={displayUser.pfp} className="card-img-top" />
-                    <div className="card-body">
-                      <h1
-                        className="card-title"
-                        style={{
-                          fontSize: `${calculateFontSize(
-                            displayUser.name,
-                            50
-                          )}px`,
-                        }}
-                      >
-                        {displayUser.name}
-                      </h1>
-                      <h5 className="card-text">
-                        Memories: {displayUser.markers.length}
-                      </h5>
-                    </div>
-                  </div>
-                  <div
-                    className="splide-wrapper-mem"
-                    style={{
-                      border: `5px solid ${displayUser.color}`,
-                    }}
-                  >
-                    {displayUser.markers.length > 2 && (
-                      <button
-                        id="custom-btn"
-                        //   className={
-                        //     displayUser.markers.length < 2 ? "display-none" : ""
-                        //   }
-                        onClick={() => goPrev(splideMemoryRef.current)}
-                      >
-                        <p>Prev</p>
-                      </button>
-                    )}
-
-                    <Splide
-                      ref={splideMemoryRef}
-                      hasTrack={false}
-                      options={{
-                        rewind: true,
-                        gap: "1rem",
-                        perPage: 2,
-                        perMove: 1,
-                        arrows: false,
-                      }}
-                      aria-label="My Favorite Images"
-                      // style={{
-                      //   // height: "90%",
-                      //   // flex: 1, // Let it grow to take available space
-                      //   // width: displayUser ? "10vw" : '50px', // Minus the combined width of both buttons
-                      // }}
-                    >
-                      <SplideTrack
-                      // style={{
-                      //   height: "100%",
-                      // }}
-                      >
-                        {displayUser.markers.map((point, index) => {
-                          return (
-                            <SplideSlide
-                              key={index}
-                              //   style={{
-                              //     width: "0vw",
-                              //     height: '100%',
-                              //     margin: "5px",
-                              //   }}
-                            >
-                              <div
-                                className="card splide-card"
-                                style={{
-                                  height: "100%",
-                                }}
-                              >
-                                {point.image && (
-                                  <img
-                                    src={point.image}
-                                    className="card-img-top"
-                                  />
-                                )}
-                                <div className="card-body d-flex">
-                                  <div className="col-6 d-flex justify-content-center align-items-center border-right border-bottom">
-                                    <h2
-                                      className={
-                                        point.image
-                                          ? "card-title text-center "
-                                          : "card-title text-center big-font"
-                                      }
-                                    >
-                                      {point.title}
-                                    </h2>
-                                  </div>
-                                  <div className="col-6 d-flex justify-content-center align-items-center border-bottom">
-                                    <p
-                                      className={
-                                        point.image
-                                          ? "card-text text-center"
-                                          : "card-text text-center medium-font"
-                                      }
-                                    >
-                                      {point.description}
-                                    </p>
-                                  </div>
-                                </div>
-
-                                <div className="view-mem-button">
-                                  <button
-                                    // className={`btn view-mem-button ${
-                                    //   isDarkColor(displayUser.color)
-                                    //     ? "white-text"
-                                    //     : ""
-                                    // }`}
-                                    onClick={() =>
-                                      viewMemoryButtonHandler(point)
-                                    }
-                                    style={{
-                                      backgroundColor: displayUser.color,
-                                    }}
-                                  >
-                                    <h5>View Memory</h5>
-                                  </button>
-                                </div>
-                              </div>
-                            </SplideSlide>
-                          );
-                        })}
-                      </SplideTrack>
-                    </Splide>
-                    {/* This logic doesn't really work */}
-                    {displayUser.markers.length > 2 && (
-                      <button
-                        id="custom-btn"
-                        onClick={() => goNext(splideMemoryRef.current)}
-                      >
-                        <p>Next</p>
-                      </button>
-                    )}
-                  </div>
-                  <div className="view-all-btn">
-                    <button
-                      className="btn "
-                      style={{
-                        border: `5px solid ${displayUser.color}`,
-                      }}
-                      onClick={() => viewAllButtonHandler()}
-                    >
-                      <h2>View All</h2>
-                    </button>
-                  </div>
-                </section>
-              )}
-            </>
-          )}
-        </section>
-      </div>
-      {activeMarker && (
-        <SocialDiaplayModal
-          setActiveMarker={setActiveMarker}
-          activeMarker={activeMarker}
+      <MapFooter
+        mapFly={mapFly}
+        buttonState={buttonState}
+        setButtonState={setButtonState}
+      />
+      <section>
+        {showUsers ? (
+          <UserSection userButtonHandler={userButtonHandler} />
+        ) : (
+          <>
+            {displayUser && (
+              <MemorySection
+                userId={memorySectionId}
+                viewAllButtonHandler={viewAllButtonHandler}
+              />
+            )}
+          </>
+        )}
+      </section>
+      {showCreateModal && (
+        <CreateMemoryModal
+          coordinatesRef={coordinatesRef}
+          handleClose={() => {
+            setShowCreateModal(false);
+          }}
         />
       )}
-      <div className="sidebar">
-        {markersInView && (
-          <>
-            <ul className="list-group markers-in-map">
-              {markersInView.map((point, index) => {
-                return (
-                  <li
-                    key={index}
-                    className="list-group-item d-flex justify-content-between align-items-center"
-                    style={{
-                      border: `3px solid ${displayUser.color}`,
-                    }}
-                  >
-                    <h6>{point.title}</h6>
-                    <div className="btn-div">
-                      <button
-                        className="btn btn-info"
-                        onClick={() => viewPointInMapHandler(point)}
-                      >
-                        View
-                      </button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </>
-        )}
-        {markersInViewUsers && (
-          <>
-            <ul className="list-group markers-in-map">
-              {markersInViewUsers.map((userMarkers, parIndex) => {
-                return (
-                  <div key={parIndex}>
-                    {userMarkers.map((point, index) => {
-                      return (
-                        <li
-                          key={`${parIndex}-${index}`}
-                          className="list-group-item d-flex justify-content-between align-items-center"
-                          style={{
-                            border: `3px solid ${allUserDataRef.current[parIndex].color}`,
-                          }}
-                        >
-                          <h6>{point.title}</h6>
-                          <div className="btn-div">
-                            <button
-                              className="btn btn-info"
-                              onClick={() => viewPointInMapHandler(point)}
-                            >
-                              View
-                            </button>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </div>
-                );
-              })}
-            </ul>
-          </>
-        )}
-      </div>
+
+      {showDisplayModal && (
+        <DisplayModal
+          markerId={displayMarkerId}
+          handleClose={() => setShowDisplayModal(false)}
+        />
+      )}
     </>
-
-    // <>
-    // <div className="map-container" id="map-container-custom">
-    //   <Map
-    //     style={{
-    //       width: "80vw",
-    //     }}
-    //     center={[-111.88, 40.67]}
-    //     mapClickHandler={mapClickHandler}
-    //     mapLoadHandler={mapLoadHandler}
-    //   />
-    //   <section>
-    //     <h2>View users memories</h2>
-    //     {showUsers && (
-    //       <Splide
-    //         options={{
-    //           rewind: true,
-    //           gap: "1rem",
-    //           perPage: 4, // Adjust the number of items per page as desired
-    //           perMove: 1, // Adjust the number of items to move per slide as desired
-    //         }}
-    //         aria-label="My Favorite Images"
-    //       >
-    //         {allUserDataRef.current.map((user, index) => {
-    //           return (
-    //             <SplideSlide key={index}>
-    //               <div className="card">
-    //                 <img
-    //                   src="https://upcdn.io/FW25bUs/image/uploads/2023/07/10/529233723_05b1348453_b-5NE5.jpg.crop?w=600&h=600&fit=max&q=70"
-    //                   className="card-img-top"
-    //                 />
-    //                 <div className="card-body">
-    //                   <h5 className="card-title">{user.name}</h5>
-    //                   <p className="card-text">
-    //                     Memories: {user.markers.length}
-    //                   </p>
-    //                   <button
-    //                     className="btn"
-    //                     style={{ backgroundColor: user.color }}
-    //                     onClick={() => {
-    //                       console.log(user);
-    //                     }}
-    //                   >
-    //                     View memories
-    //                   </button>
-    //                 </div>
-    //               </div>
-    //             </SplideSlide>
-    //           );
-    //         })}
-    //       </Splide>
-    //     )}
-    //   </section>
-
-    //   {activeMarker && (
-    //     <SocialDiaplayModal
-    //       setActiveMarker={setActiveMarker}
-    //       activeMarker={activeMarker}
-    //     />
-    //   )}
-    // </div>
-    //       <div className="sidebar">
-    //       <h2>Sidebar</h2>
-    //       <p>This is the sidebar content.</p>
-    //     </div>
-    //     </>
   );
 }
 
 export default Social;
-
-//Add in loading
-//The background in the sidebar is weird
-//It would be cool to randomize the sidebar cards
-//Get the map to be true 80vw

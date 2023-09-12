@@ -1,4 +1,5 @@
 const User = require('./User')
-const Session = require('./Session')
+const Like = require('./like')
+const Marker = require('./Marker')
 
-module.exports = { User, Session }
+module.exports = { User, Like, Marker}

@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { makeVar } from "@apollo/client";
 
 //pages
-import Login from "./pages/login";
-import Signup from "./pages/signup";
-import OldHome from "./pages/oldHomeFile";
+// import Login from "./pages/login";
+// import Signup from "./pages/signup";
+// import OldHome from "./pages/oldHomeFile";
+import Test from "./pages/test";
 import Home from "./pages/home";
 import Social from "./pages/Social";
+import User from "./pages/UserModal";
+
+export const markersInMapVar = makeVar([])
 
 function App() {
   const fetchRequest = async (method, url, body) => {
@@ -31,32 +36,32 @@ function App() {
   };
 
   const [userState, setUserState] = useState(null);
-
   return (
     <>
       <Router>
         <Routes>
+          {/* <Route
+            index
+            element={
+              <User
+                userState={userState}
+                setUserState={setUserState}
+                fetchRequest={fetchRequest}
+              />
+            }
+          /> */}
           <Route
             index
             element={
-              <Signup
+              <Social
                 userState={userState}
                 setUserState={setUserState}
                 fetchRequest={fetchRequest}
               />
             }
           />
-          <Route
-            path="/login"
-            element={
-              <Login
-                userState={userState}
-                setUserState={setUserState}
-                fetchRequest={fetchRequest}
-              />
-            }
-          />
-          <Route
+          <Route path="/login" element={<Test />} />
+          {/* <Route
             path="/signup"
             element={
               <Signup
@@ -65,7 +70,7 @@ function App() {
                 fetchRequest={fetchRequest}
               />
             }
-          />
+          /> */}
           <Route
             path="/home"
             element={
@@ -76,7 +81,7 @@ function App() {
               />
             }
           />
-          <Route
+          {/* <Route
             path="/social"
             element={
               <Social
@@ -86,7 +91,7 @@ function App() {
               />
             }
           />
-          <Route path="/oldhome" element={<OldHome />} />
+          <Route path="/oldhome" element={<OldHome />} /> */}
         </Routes>
       </Router>
     </>
