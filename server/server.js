@@ -4,6 +4,7 @@ const { typeDefs, resolvers } = require("./schemas");
 const db = require("./config/connection");
 const { makeExecutableSchema } = require('@graphql-tools/schema');
 const cors = require('cors'); // Import cors
+const path = require('path')
 
 const PORT = process.env.PORT || 5500;
 
@@ -25,6 +26,11 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../client/dist")));
+}
+
 
 const startServer = async () => {
   // Ensure MongoDB connection is established
