@@ -30,7 +30,7 @@ import { markersInMapVar } from "../App";
 import { useReactiveVar } from "@apollo/client";
 import Auth from "../utils/auth";
 
-function Social({ userState, setUserState, fetchRequest }) {
+function Social() {
   const markersArr = useReactiveVar(markersInMapVar);
 
   const {
