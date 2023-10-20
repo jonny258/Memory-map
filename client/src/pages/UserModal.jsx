@@ -57,6 +57,7 @@ function User({ handleClose }) {
                 <SignupPlus
                   setShowSignup={setShowSignup}
                   setShowSignupPlus={setShowSignupPlus}
+                  handleClose={handleClose}
                 />
               )}
               {showLogin && (

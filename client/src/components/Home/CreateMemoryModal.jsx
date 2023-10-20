@@ -4,13 +4,14 @@ import { CREATE_MARKER } from "../../GraphQL/Mutations";
 import { useMutation } from "@apollo/client";
 import Auth from "../../utils/auth";
 import { markersInMapVar } from "../../App";
+import { userDataVar } from "../../main";
 
 //I need to get the users color from this 
 function CreateMemoryModal({
   handleClose,
   coordinatesRef,
 }) {
-  console.log(Auth.getProfile().data);
+  console.log(markersInMapVar());
 
   const [createMarker, { data, loading, error }] = useMutation(CREATE_MARKER);
   const [pictureState, setPictureState] = useState("");
@@ -39,11 +40,20 @@ function CreateMemoryModal({
         if(input.lat && input.lng && input.media && input.title && input.description){
 
           const response = await createMarker({ variables: { userId, input } });
-          console.log(response.data.createMarker);
-          console.log(markersInMapVar())
-          const tempMarkersArr = [...markersInMapVar(), response.data.createMarker]
-          markersInMapVar(tempMarkersArr)
-          handleClose(false);
+          if(response.data){
+            if(markersInMapVar().getAllMarkers){
+              markersInMapVar(markersInMapVar().getAllMarkers)
+            }
+            console.log(markersInMapVar())
+            const tempMarkersArr = [...markersInMapVar(), response.data.createMarker]
+            markersInMapVar(tempMarkersArr)
+            const tempUserDataVar = { ...userDataVar() };
+            tempUserDataVar.markers = [...tempUserDataVar.markers, response.data.createMarker];
+            userDataVar(tempUserDataVar);
+            handleClose();
+          }else{
+            alert(response.errors)
+          }
         }else{
           alert("Please fill out all fields")
         }

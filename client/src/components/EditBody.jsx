@@ -4,8 +4,11 @@ import { GET_MARKER_BY_ID } from "../GraphQL/Queries";
 import { EDIT_MARKER, DELETE_MARKER } from "../GraphQL/Mutations";
 import { useQuery, useLazyQuery } from "@apollo/client";
 import { useMutation } from "@apollo/client";
+import { markersInMapVar } from "../App";
+import { userDataVar } from "../main";
 
 function EditModal({ markerId, handleClose, setShowEditModal }) {
+  console.log(markersInMapVar());
   const {
     loading: markerLoading,
     error: markerError,
@@ -41,28 +44,73 @@ function EditModal({ markerId, handleClose, setShowEditModal }) {
       };
       console.log(body);
 
-      const responce = await editMarker({
+      const response = await editMarker({
         variables: {
           markerId: markerId,
           input: body,
         },
       });
-      console.log(responce);
+      console.log(response);
       setShowEditModal(false);
+
+      // Update markersInMapVar
+      const currentMarkersInMap = markersInMapVar();
+
+      const updatedMarkersInMap = currentMarkersInMap.map((marker) =>
+        marker._id === response.data.editMarker._id
+          ? response.data.editMarker
+          : marker
+      );
+      markersInMapVar(updatedMarkersInMap);
+
+      // Update userDataVar
+      const currentUserData = userDataVar();
+
+      const updatedUserDataMarkers = currentUserData.markers.map((marker) =>
+        marker._id === response.data.editMarker._id
+          ? response.data.editMarker
+          : marker
+      );
+      // Using spread operator to update the entire user data along with updated markers
+      userDataVar({ ...currentUserData, markers: updatedUserDataMarkers });
     } catch (err) {
       console.error(err);
+      // Handle the error appropriately, such as showing an error message to the user
     }
   };
-  //This needs to delete with the markersInMapVar
+
   const deleteHandler = async () => {
-    const response = await deleteMarker({
-      variables: {
-        markerId: markerId,
-      }
-    });
-    console.log(response)
-    handleClose()
-  };
+    try {
+        const response = await deleteMarker({
+            variables: {
+                markerId: markerId,
+            },
+        });
+        console.log(response.data.deleteMarker._id);
+        
+        // Update markersInMapVar
+        const currentMarkersInMap = markersInMapVar();
+        if (currentMarkersInMap) {
+            const updatedMarkersInMap = currentMarkersInMap.filter(marker => marker._id !== response.data.deleteMarker._id);
+            markersInMapVar(updatedMarkersInMap);
+        }
+        
+        // Update userDataVar
+        const currentUserData = userDataVar();
+        if (currentUserData && currentUserData.markers) {
+            const updatedUserDataMarkers = currentUserData.markers.filter(marker => marker._id !== response.data.deleteMarker._id);
+            // Using spread operator to update the entire user data along with updated markers
+            userDataVar({ ...currentUserData, markers: updatedUserDataMarkers });
+        }
+
+        handleClose();
+    } catch (error) {
+        console.error("Error deleting marker: ", error);
+        // Handle the error appropriately in your application,
+        // such as displaying an error message to the user
+    }
+};
+
 
   const formatDate = (timestamp) => {
     let date = new Date(parseInt(timestamp));

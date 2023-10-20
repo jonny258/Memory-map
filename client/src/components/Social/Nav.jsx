@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import User from "../../pages/UserModal";
 import ProfileModal from "../ProfileModal";
 import Auth from "../../utils/auth";
+import { userDataVar } from "../../main";
 
 function Nav({ initialState }) {
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -12,11 +13,11 @@ function Nav({ initialState }) {
     try {
       Auth.logout();
       setShowUserModal(true);
+      userDataVar('')
     } catch (err) {
       console.error(err);
     }
   };
-  //console.log(Auth.getProfile().data._id)
 
   return (
     <>

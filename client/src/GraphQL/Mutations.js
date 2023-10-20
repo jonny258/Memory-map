@@ -8,6 +8,11 @@ export const CREATE_USER = gql`
         _id
         username
         email
+        pfp
+        color
+        markers {
+          _id
+        }
       }
     }
   }
@@ -21,6 +26,11 @@ export const LOGIN_USER = gql`
         _id
         username
         email
+        pfp
+        color
+        markers {
+          _id
+        }
       }
     }
   }
@@ -38,7 +48,7 @@ export const CREATE_MARKER = gql`
       user {
         _id
         username
-        email
+        color
       }
     }
   }
@@ -48,12 +58,15 @@ export const EDIT_MARKER = gql`
 mutation EditMarker($markerId: String!, $input: EditMarkerInput!) {
   editMarker(markerId: $markerId, input: $input) {
     _id
-    title
     media
+    title
+    createdAt
+    lat
+    lng
     user {
       _id
       username
-      email
+      color
     }
   }
 }
@@ -76,6 +89,11 @@ export const EDIT_USER = gql`
         _id
         username
         email
+        pfp
+        color
+        markers {
+          _id
+        }
       }
       token
     }

@@ -5,28 +5,26 @@ import { GET_USER_BY_ID } from "../GraphQL/Queries";
 import { EDIT_USER } from "../GraphQL/Mutations";
 import { useQuery, useMutation } from "@apollo/client";
 import Auth from '../utils/auth'
+import { userDataVar } from "../main";
 
 function ProfileModal({
-  setProfileModalOpen,
   userId,
-  markerArr,
-  fetchRequest,
-  getSession,
   handleClose,
 }) {
-  const { loading, error, data } = useQuery(GET_USER_BY_ID, {
-    variables: { userId: userId },
-  });
+  console.log(userDataVar())
+  // const { loading, error, data } = useQuery(GET_USER_BY_ID, {
+  //   variables: { userId: userId },
+  // });
   const [editUser, { data: editData, loading: loadingData, error: errorData }] =
     useMutation(EDIT_USER);
 
   useEffect(() => {
-    if (data) {
-      console.log(data);
-      setColor(data.getUserById.color);
+    if (userDataVar()) {
+      console.log(userDataVar());
+      setColor(userDataVar().color);
     }
     //console.log(data);
-  }, [data]);
+  }, [userDataVar()]);
 
   console.log(userId);
   //Set this to the user that  is logged in
@@ -63,39 +61,21 @@ function ProfileModal({
           userId: userId,
         },
       });
-      console.log(response.data.editUser.token);
-      Auth.login(response.data.editUser.token)
-      // if (email && password && name) {
-      //   const updatedNameMarkers = markerArr.map((marker) => {
-      //     marker.name = name;
-      //     return marker;
-      //   });
-
-      //   const body = {
-      //     email: email,
-      //     password: password,
-      //     name: name,
-      //     color: color,
-      //     pfp: pictureState,
-      //     markers: updatedNameMarkers,
-      //   };
-
-      //   const updateUserUrl = `${API_BASE_URL}/api/user/${user._id}`;
-
-      //   const updatedUserData = await fetchRequest("PUT", updateUserUrl, body);
-      //   console.log(updatedUserData);
-      //   setProfileModalOpen(false);
-      //   getSession();
-      // } else {
-      //   alert("Please fill out all fields");
-      // }
+      // console.log(response.data.editUser);
+      if(response.data){
+        Auth.login(response.data.editUser.token)
+        userDataVar(response.data.editUser.user)
+        handleClose()
+      }else{
+        alert(response.error)
+      }
     } catch (err) {
       console.error(err);
     }
   };
   return (
     <>
-      {data && (
+      {userDataVar() && (
         <>
           <div className="fixed top-0 left-0 w-full h-full bg-black opacity-50 z-40"></div>
           <div
@@ -124,7 +104,7 @@ function ProfileModal({
                       type="text"
                       ref={emailRef}
                       className="input input-bordered w-full"
-                      defaultValue={data.getUserById.email}
+                      defaultValue={userDataVar().email}
                     />
                   </div>
 
@@ -154,7 +134,7 @@ function ProfileModal({
                       type="text"
                       ref={usernameRef}
                       className="input input-bordered w-full"
-                      defaultValue={data.getUserById.username}
+                      defaultValue={userDataVar().username}
                     />
                   </div>
 

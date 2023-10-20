@@ -8,7 +8,9 @@ import { CREATE_USER } from "../../GraphQL/Mutations";
 import { userInputVar } from "../../pages/UserModal";
 import Auth from "../../utils/auth";
 
-function SignupPlus({ setShowSignup, setShowSignupPlus }) {
+import { userDataVar } from "../../main";
+
+function SignupPlus({ setShowSignup, setShowSignupPlus, handleClose }) {
   const [createUser, { data, loading, error }] = useMutation(CREATE_USER);
 
   // const MAX_LOCATIONS = 5;
@@ -28,12 +30,6 @@ function SignupPlus({ setShowSignup, setShowSignupPlus }) {
         color &&
         usernameRef.current.value
       ) {
-        // const namedMarkers = inputLocations
-        //   .filter((marker) => marker.name && marker.name.trim() !== "")
-        //   .map((marker) => {
-        //     marker.name = name;
-        //     return marker;
-        //   });
         console.log(pictureState);
         const body = {
           email: userInputVar().email,
@@ -51,21 +47,16 @@ function SignupPlus({ setShowSignup, setShowSignupPlus }) {
           body.pfp
         ) {
           const response = await createUser({ variables: { input: body } });
-          Auth.login(response.data.createUser.token);
+          if(response.data){
+            Auth.login(response.data.createUser.token);
+            userDataVar(response.data.createUser.user);
+            handleClose()
+          }else{
+            alert(response.errors)
+          }
         }else{
           alert("Please fill out all fields")
         }
-
-        //I need something to close this
-        // userInputVar({
-        //   email: "",
-        //   password: "",
-        //   username: "",
-        //   pfp: "",
-        //   color: "",
-        // })
-        // usernameRef.current.value = ""
-        // pictureState = ""
       } else {
         alert("Please fill out all required fields");
       }
