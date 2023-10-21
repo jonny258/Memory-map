@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import PictureUploader from "../PictureUploader";
+import PictureUploader from "../Helpers/PictureUploader";
 import { CREATE_MARKER } from "../../GraphQL/Mutations";
 import { useMutation } from "@apollo/client";
 import Auth from "../../utils/auth";

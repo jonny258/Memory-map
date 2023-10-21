@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { LOGIN_USER } from "../../GraphQL/Mutations";
+import { LOGIN_USER } from "../../../GraphQL/Mutations";
 import { useMutation } from "@apollo/client";
-import Auth from "../../utils/auth"
+import Auth from "../../../utils/auth"
 
 function Login({ setShowLogin, setShowSignup }) {
   // const API_BASE_URL =

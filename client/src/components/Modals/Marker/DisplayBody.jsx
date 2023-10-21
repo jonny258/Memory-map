@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { GET_MARKER_BY_ID } from "../GraphQL/Queries";
+import { GET_MARKER_BY_ID } from "../../../GraphQL/Queries";
 import { useQuery, useLazyQuery } from "@apollo/client";
-import Auth from "../utils/auth";
+import Auth from "../../../utils/auth";
 
 function DisplayBody({ handleClose, markerId, setShowEditModal }) {
   const { loading, error, data } = useQuery(GET_MARKER_BY_ID, {

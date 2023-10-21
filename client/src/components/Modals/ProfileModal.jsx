@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChromePicker } from "react-color";
-import PictureUploader from "./PictureUploader";
-import { GET_USER_BY_ID } from "../GraphQL/Queries";
-import { EDIT_USER } from "../GraphQL/Mutations";
+import PictureUploader from "../Helpers/PictureUploader";
+import { GET_USER_BY_ID } from "../../GraphQL/Queries";
+import { EDIT_USER } from "../../GraphQL/Mutations";
 import { useQuery, useMutation } from "@apollo/client";
-import Auth from '../utils/auth'
-import { userDataVar } from "../main";
+import Auth from '../../utils/auth'
+import { userDataVar } from "../../main";
 
 function ProfileModal({
   userId,

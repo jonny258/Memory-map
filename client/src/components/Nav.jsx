@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import User from "../../pages/UserModal";
-import ProfileModal from "../ProfileModal";
-import Auth from "../../utils/auth";
-import { userDataVar } from "../../main";
+import User from "./Modals/User/UserModal";
+import ProfileModal from "./Modals/ProfileModal";
+import Auth from "../utils/auth";
+import { userDataVar } from "../main";
 
 function Nav({ initialState }) {
   const [showProfileModal, setShowProfileModal] = useState(false);

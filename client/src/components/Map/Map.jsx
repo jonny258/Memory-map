@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import MapStyles from "../MapStyles";
+import MapStyles from "./MapStyles";
 
 function Map({ center, mapClickHandler, mapLoadHandler }) {
   const [mapStyles, setMapStyles] = useState(

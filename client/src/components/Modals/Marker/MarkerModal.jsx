@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { GET_MARKER_BY_ID } from "../GraphQL/Queries";
+import { GET_MARKER_BY_ID } from "../../../GraphQL/Queries";
 import { useQuery, useLazyQuery } from "@apollo/client";
 import EditBody from "./EditBody";
 import DisplayBody from "./DisplayBody";

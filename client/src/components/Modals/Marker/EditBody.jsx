@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
-import PictureUploader from "./PictureUploader";
-import { GET_MARKER_BY_ID } from "../GraphQL/Queries";
-import { EDIT_MARKER, DELETE_MARKER } from "../GraphQL/Mutations";
+import PictureUploader from "../../Helpers/PictureUploader";
+import { GET_MARKER_BY_ID } from "../../../GraphQL/Queries";
+import { EDIT_MARKER, DELETE_MARKER } from "../../../GraphQL/Mutations";
 import { useQuery, useLazyQuery } from "@apollo/client";
 import { useMutation } from "@apollo/client";
-import { markersInMapVar } from "../App";
-import { userDataVar } from "../main";
+import { markersInMapVar } from "../../../App";
+import { userDataVar } from "../../../main";
 
 function EditModal({ markerId, handleClose, setShowEditModal }) {
   console.log(markersInMapVar());

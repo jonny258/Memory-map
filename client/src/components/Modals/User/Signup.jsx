@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { gql, useMutation } from "@apollo/client";
-import { GET_ALL_USERS } from "../../GraphQL/Queries";
+import { GET_ALL_USERS } from "../../../GraphQL/Queries";
 import { useQuery } from "@apollo/client";
-import { userInputVar } from "../../pages/UserModal";
+import { userInputVar } from "./UserModal";
 import { useReactiveVar } from "@apollo/client";
 
 function Signup({ setShowLogin, setShowSignup, setShowSignupPlus }) {

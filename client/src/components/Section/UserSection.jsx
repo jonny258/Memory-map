@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import SplideWrapper from "./SplideWrapper";
-import UserCard from "./Social/UserCard";
-import { GET_ALL_USERS, GET_USER_BY_ID } from "../GraphQL/Queries";
+import SplideWrapper from "../Helpers/SplideWrapper";
+import UserCard from "../Cards/UserCard";
+import { GET_ALL_USERS, GET_USER_BY_ID } from "../../GraphQL/Queries";
 import { useQuery, useLazyQuery } from "@apollo/client";
-import Auth from "../utils/auth";
-import { userDataVar } from "../main";
+import Auth from "../../utils/auth";
+import { userDataVar } from "../../main";
 import { useReactiveVar } from "@apollo/client";
 
 function UserSection({ userButtonHandler }) {

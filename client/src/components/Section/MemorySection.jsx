@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import SplideWrapper from "./SplideWrapper";
-import MarkerCard from "./MarkerCard";
-import UserCard from "./Social/UserCard";
+import SplideWrapper from "../Helpers/SplideWrapper";
+import MarkerCard from "../Cards/MarkerCard";
+import UserCard from "../Cards/UserCard";
 import { useQuery, useLazyQuery } from "@apollo/client";
 import {
   GET_USER_BY_ID,
-} from "../GraphQL/Queries";
-import { userDataVar } from "../main";
+} from "../../GraphQL/Queries";
+import { userDataVar } from "../../main";
 import { useReactiveVar } from "@apollo/client";
 
 function MemorySection({

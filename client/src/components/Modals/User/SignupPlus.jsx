@@ -1,12 +1,12 @@
 import React, { useState, useRef } from "react";
 import { ChromePicker } from "react-color";
-import PictureUploader from "../PictureUploader";
+import PictureUploader from "../../Helpers/PictureUploader";
 import { gql, useMutation } from "@apollo/client";
-import { CREATE_USER } from "../../GraphQL/Mutations";
-import { userInputVar } from "../../pages/UserModal";
-import Auth from "../../utils/auth";
+import { CREATE_USER } from "../../../GraphQL/Mutations";
+import { userInputVar } from "./UserModal";
+import Auth from "../../../utils/auth";
 
-import { userDataVar } from "../../main";
+import { userDataVar } from "../../../main";
 
 function SignupPlus({ setShowSignup, setShowSignupPlus, handleClose }) {
   const [createUser, { data, loading, error }] = useMutation(CREATE_USER);

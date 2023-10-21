@@ -1,9 +1,9 @@
 import React from "react";
 import { SplideSlide } from "@splidejs/react-splide";
-import { EDIT_MARKER, DELETE_MARKER } from "../GraphQL/Mutations";
+import { EDIT_MARKER, DELETE_MARKER } from "../../GraphQL/Mutations";
 import { useMutation } from "@apollo/client";
-import { markersInMapVar } from "../App";
-import { userDataVar } from "../main";
+import { markersInMapVar } from "../../App";
+import { userDataVar } from "../../main";
 
 function MarkerCard({ point, index, isMyProfile, viewPointInMapHandler }) {
   const [

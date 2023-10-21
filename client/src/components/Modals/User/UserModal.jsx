@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
-import Signup from "../components/UserModal/Signup";
-import SignupPlus from "../components/UserModal/SignupPlus";
-import Login from "../components/UserModal/Login";
+import Signup from "./Signup";
+import SignupPlus from "./SignupPlus";
+import Login from "./Login";
 import { makeVar } from "@apollo/client";
 
 export const userInputVar = makeVar({

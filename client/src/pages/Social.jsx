@@ -2,14 +2,14 @@ import React, { useEffect, useState, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-import Map from "../components/Social/Map";
-import MarkersInViewCard from "../components/Social/MarkersInViewCard";
-import Nav from "../components/Social/Nav";
-import DisplayModal from "../components/MarkerModal";
-import MapFooter from "../components/MapFooter";
-import CreateMemoryModal from "../components/Home/CreateMemoryModal";
-import UserSection from "../components/UserSection";
-import MemorySection from "../components/MemorySection";
+import Map from "../components/Map/Map";
+import MarkersInViewCard from "../components/MarkersInViewCard";
+import Nav from "../components/Nav";
+import DisplayModal from "../components/Modals/Marker/MarkerModal";
+import MapFooter from "../components/Map/MapFooter";
+import CreateMemoryModal from "../components/Modals/CreateMemoryModal";
+import UserSection from "../components/Section/UserSection";
+import MemorySection from "../components/Section/MemorySection";
 
 import { GET_ALL_MARKERS, GET_USER_BY_ID } from "../GraphQL/Queries";
 import { useQuery, useLazyQuery } from "@apollo/client";

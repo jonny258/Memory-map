@@ -1,5 +1,5 @@
 import React from "react";
-import SearchLocation from "./Home/SearchLocation";
+import SearchLocation from "./SearchLocation";
 
 function MapFooter({ mapFly, buttonState, setButtonState }) {
   return (
