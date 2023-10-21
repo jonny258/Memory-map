@@ -81,36 +81,39 @@ function EditModal({ markerId, handleClose, setShowEditModal }) {
 
   const deleteHandler = async () => {
     try {
-        const response = await deleteMarker({
-            variables: {
-                markerId: markerId,
-            },
-        });
-        console.log(response.data.deleteMarker._id);
-        
-        // Update markersInMapVar
-        const currentMarkersInMap = markersInMapVar();
-        if (currentMarkersInMap) {
-            const updatedMarkersInMap = currentMarkersInMap.filter(marker => marker._id !== response.data.deleteMarker._id);
-            markersInMapVar(updatedMarkersInMap);
-        }
-        
-        // Update userDataVar
-        const currentUserData = userDataVar();
-        if (currentUserData && currentUserData.markers) {
-            const updatedUserDataMarkers = currentUserData.markers.filter(marker => marker._id !== response.data.deleteMarker._id);
-            // Using spread operator to update the entire user data along with updated markers
-            userDataVar({ ...currentUserData, markers: updatedUserDataMarkers });
-        }
+      const response = await deleteMarker({
+        variables: {
+          markerId: markerId,
+        },
+      });
+      console.log(response.data.deleteMarker._id);
 
-        handleClose();
+      // Update markersInMapVar
+      const currentMarkersInMap = markersInMapVar();
+      if (currentMarkersInMap) {
+        const updatedMarkersInMap = currentMarkersInMap.filter(
+          (marker) => marker._id !== response.data.deleteMarker._id
+        );
+        markersInMapVar(updatedMarkersInMap);
+      }
+
+      // Update userDataVar
+      const currentUserData = userDataVar();
+      if (currentUserData && currentUserData.markers) {
+        const updatedUserDataMarkers = currentUserData.markers.filter(
+          (marker) => marker._id !== response.data.deleteMarker._id
+        );
+        // Using spread operator to update the entire user data along with updated markers
+        userDataVar({ ...currentUserData, markers: updatedUserDataMarkers });
+      }
+
+      handleClose();
     } catch (error) {
-        console.error("Error deleting marker: ", error);
-        // Handle the error appropriately in your application,
-        // such as displaying an error message to the user
+      console.error("Error deleting marker: ", error);
+      // Handle the error appropriately in your application,
+      // such as displaying an error message to the user
     }
-};
-
+  };
 
   const formatDate = (timestamp) => {
     let date = new Date(parseInt(timestamp));

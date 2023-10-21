@@ -11,10 +11,7 @@ import CreateMemoryModal from "../components/Home/CreateMemoryModal";
 import UserSection from "../components/UserSection";
 import MemorySection from "../components/MemorySection";
 
-import {
-  GET_ALL_MARKERS,
-  GET_USER_BY_ID,
-} from "../GraphQL/Queries";
+import { GET_ALL_MARKERS, GET_USER_BY_ID } from "../GraphQL/Queries";
 import { useQuery, useLazyQuery } from "@apollo/client";
 import { markersInMapVar } from "../App";
 import { useReactiveVar } from "@apollo/client";
@@ -32,11 +29,9 @@ function Social() {
 
   const [loadUser, { called, loading, data }] = useLazyQuery(GET_USER_BY_ID);
 
-
-
   const [showUsers, setShowUsers] = useState(false);
   const [markers, setMarkers] = useState([]);
-  const [displayUser, setDisplayUser] = useState("");
+  // const [displayUser, setDisplayUser] = useState("");
   const [markersInView, setMarkersInView] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDisplayModal, setShowDisplayModal] = useState(false);
@@ -47,7 +42,6 @@ function Social() {
   const mapRef = useRef("");
   const coordinatesRef = useRef();
   const buttonStateRef = useRef(buttonState);
-
 
   const mapClickHandler = async (event) => {
     if (buttonStateRef.current) {
@@ -60,8 +54,6 @@ function Social() {
     }
   };
 
-
-
   const markerClickHandler = (markerId) => {
     if (!buttonStateRef.current) {
       setShowDisplayModal(true);
@@ -69,25 +61,21 @@ function Social() {
     }
   };
 
-
   const mapMoveHandler = () => {
-    // Check if markersInMapVar is an object with the getAllMarkers property
     let markers;
     if (markersInMapVar().getAllMarkers) {
       markers = markersInMapVar().getAllMarkers;
     } else {
       markers = markersInMapVar();
     }
-  
+
     const bounds = mapRef.current.getBounds();
-    
+
     const markersInViewCurrent = markers.filter((marker) =>
       bounds.contains([marker.lng, marker.lat])
     );
-  
     setMarkersInView(markersInViewCurrent);
   };
-  
 
   const removeAllMarkers = () => {
     // Remove all markers from the map
@@ -96,7 +84,6 @@ function Social() {
     // Clear the markers state
     setMarkers([]);
   };
-
 
   const addOneMarker = (marker, index) => {
     const map = mapRef.current;
@@ -126,7 +113,6 @@ function Social() {
     setMarkers((prev) => [...prev, newMarker]);
   };
 
-
   useEffect(() => {
     const setUserData = async (userId) => {
       const response = await loadUser({ variables: { userId: userId } });
@@ -143,12 +129,12 @@ function Social() {
 
   useEffect(() => {
     if (mapRef.current && markerData && markersArr) {
-      removeAllMarkers()
-      if(markersArr.getAllMarkers){
+      removeAllMarkers();
+      if (markersArr.getAllMarkers) {
         markersArr.getAllMarkers.forEach((marker, index) => {
           addOneMarker(marker, index);
         });
-      }else{
+      } else {
         markersArr.forEach((marker, index) => {
           addOneMarker(marker, index);
         });
@@ -158,15 +144,13 @@ function Social() {
     }
   }, [markersArr]);
 
-
   useEffect(() => {
     if (mapRef.current && markerData) {
       console.log("Setting markersInMapVar with:", markerData.getAllMarkers);
       markersInMapVar(markerData.getAllMarkers);
+      mapMoveHandler();
     }
   }, [mapRef.current, markerData]);
-
-
 
   const mapLoadHandler = async (event) => {
     try {
@@ -175,8 +159,6 @@ function Social() {
       mapRef.current.on("moveend", (event) => {
         mapMoveHandler();
       });
-
-      mapMoveHandler();
     } catch (err) {
       console.error(err);
     }
@@ -196,26 +178,21 @@ function Social() {
 
   const userButtonHandler = async (userId) => {
     const response = await loadUser({ variables: { userId: userId } });
-    console.log(response.data.getUserById);
 
     if (response.data.getUserById.markers[0]) {
-    const camera = {
-      center: [
-        response.data.getUserById.markers[0].lng,
-        response.data.getUserById.markers[0].lat,
-      ],
-      zoom: 7,
-    };
-    console.log(camera);
-    mapFly(camera);
-    console.log(markersInMapVar());
-    console.log("MARKERS REMOVED")
-    removeAllMarkers();
-    markersInMapVar(response.data.getUserById.markers);
-    setDisplayUser(true);
-    console.log(userId);
-    setMemorySectionId(userId);
-    setShowUsers(false);
+      const camera = {
+        center: [
+          response.data.getUserById.markers[0].lng,
+          response.data.getUserById.markers[0].lat,
+        ],
+        zoom: 7,
+      };
+      mapFly(camera);
+      removeAllMarkers();
+      markersInMapVar(response.data.getUserById.markers);
+      // setDisplayUser(true);
+      setMemorySectionId(userId);
+      setShowUsers(false);
     } else {
       alert("User has 0 memories");
     }
@@ -238,12 +215,11 @@ function Social() {
     mapFly(camera);
   };
 
-
   const viewAllButtonHandler = () => {
     console.log("view button handler");
     setShowUsers(true);
     removeAllMarkers();
-    markersInMapVar(markerData)
+    markersInMapVar(markerData);
     const camera = {
       center: [-111.88, 40.67],
       zoom: 9,
@@ -300,15 +276,11 @@ function Social() {
         {showUsers ? (
           <UserSection userButtonHandler={userButtonHandler} />
         ) : (
-          <>
-            {displayUser && (
-              <MemorySection
-                userId={memorySectionId}
-                viewAllButtonHandler={viewAllButtonHandler}
-                viewPointInMapHandler={viewPointInMapHandler}
-              />
-            )}
-          </>
+          <MemorySection
+            userId={memorySectionId}
+            viewAllButtonHandler={viewAllButtonHandler}
+            viewPointInMapHandler={viewPointInMapHandler}
+          />
         )}
       </section>
       {showCreateModal && (

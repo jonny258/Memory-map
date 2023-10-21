@@ -4,8 +4,6 @@ import MarkerCard from "./MarkerCard";
 import UserCard from "./Social/UserCard";
 import { useQuery, useLazyQuery } from "@apollo/client";
 import {
-  GET_ALL_MARKERS,
-  GET_ALL_USERS,
   GET_USER_BY_ID,
 } from "../GraphQL/Queries";
 import { userDataVar } from "../main";

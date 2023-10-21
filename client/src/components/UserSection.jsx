@@ -8,21 +8,23 @@ import { userDataVar } from "../main";
 import { useReactiveVar } from "@apollo/client";
 
 function UserSection({ userButtonHandler }) {
+
   const loggedInUser = useReactiveVar(userDataVar)
   const {
     loading: userLoading,
     error: userError,
     data: userData,
   } = useQuery(GET_ALL_USERS);
-  const [getUserById, { loading, error, data }] = useLazyQuery(GET_USER_BY_ID);
+  
+  // const [getUserById, { loading, error, data }] = useLazyQuery(GET_USER_BY_ID);
 
-  useEffect(() => {
-    console.log(userDataVar())
-    const userProfile = Auth.getProfile();
-    if (userProfile?.data?._id) {
-      getUserById({ variables: { userId: userProfile.data._id } });
-    }
-  }, []);
+  // useEffect(() => {
+  //   console.log(userDataVar())
+  //   const userProfile = Auth.getProfile();
+  //   if (userProfile?.data?._id) {
+  //     getUserById({ variables: { userId: userProfile.data._id } });
+  //   }
+  // }, []);
 
   return (
     <div className="flex items-center">
