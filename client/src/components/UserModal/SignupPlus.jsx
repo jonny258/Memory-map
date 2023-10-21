@@ -1,7 +1,5 @@
 import React, { useState, useRef } from "react";
 import { ChromePicker } from "react-color";
-import { useNavigate } from "react-router-dom";
-import LocationInput from "./LocationInput";
 import PictureUploader from "../PictureUploader";
 import { gql, useMutation } from "@apollo/client";
 import { CREATE_USER } from "../../GraphQL/Mutations";
