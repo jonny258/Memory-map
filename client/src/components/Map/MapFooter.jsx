@@ -4,7 +4,7 @@ import SearchLocation from "./SearchLocation";
 function MapFooter({ mapFly, buttonState, setButtonState }) {
   return (
     <nav className="bg-gray-900 flex items-center justify-between px-48">
-      <a className="font-bold text-white">Memory Map</a>
+      <a className="text-2xl font-bold">Memory Map</a>
       <button
         className="btn btn-primary w-1/3"
         onClick={() => {

@@ -5,7 +5,6 @@ import { gql, useMutation } from "@apollo/client";
 import { CREATE_USER } from "../../../GraphQL/Mutations";
 import { userInputVar } from "./UserModal";
 import Auth from "../../../utils/auth";
-
 import { userDataVar } from "../../../main";
 
 function SignupPlus({ setShowSignup, setShowSignupPlus, handleClose }) {

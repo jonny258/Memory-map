@@ -83,6 +83,7 @@ export const GET_MARKER_BY_ID = gql`
         _id
         username
         email
+        pfp
       }
       likes {
         _id

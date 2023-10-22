@@ -1,11 +1,18 @@
 import React from "react";
 
 function MarkersInViewCard({ point, viewPointInMapHandler }) {
+  console.log(point);
   return (
-    <div className="join bg-gray-100 border justify-between border-gray-200 rounded-lg w-full">
-      <h2 className="join-item px-4 py-2 text-gray-700">{point.title}</h2>
+    <div className="bg-gray-300 border justify-between my-1 rounded-lg w-full flex items-center">
+      <img
+        src={point.media}
+        class="w-12 h-12 rounded-full border-2 border-gray-300 shadow-lg object-cover"
+      />
+      <h2 className="px-4 py-2 text-gray-700 truncate flex-grow">
+        {point.title}
+      </h2>
       <button
-        className="join-item btn btn-info"
+        className="btn btn-outline btn-primary"
         onClick={() => viewPointInMapHandler(point)}
       >
         View

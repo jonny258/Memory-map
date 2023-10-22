@@ -2,9 +2,10 @@ import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { LOGIN_USER } from "../../../GraphQL/Mutations";
 import { useMutation } from "@apollo/client";
-import Auth from "../../../utils/auth"
+import Auth from "../../../utils/auth";
+import { userDataVar } from "../../../main";
 
-function Login({ setShowLogin, setShowSignup }) {
+function Login({ setShowLogin, setShowSignup, handleClose }) {
   // const API_BASE_URL =
   //   import.meta.env.VITE_APP_API_BASE_URL || "http://localhost:5500";
   // const navigate = useNavigate();
@@ -20,12 +21,14 @@ function Login({ setShowLogin, setShowSignup }) {
           email: emailRef.current.value,
           password: passwordRef.current.value,
         };
-
         //const loginUrl = `${API_BASE_URL}/api/user/login`;
         const response = await loginUser({
           variables: body,
         });
-        Auth.login(response.data.loginUser.token)
+        console.log(response);
+        Auth.login(response.data.loginUser.token);
+        userDataVar(response.data.loginUser.user);
+        handleClose();
       } else {
         alert("Please fillout both feilds");
       }
@@ -60,7 +63,7 @@ function Login({ setShowLogin, setShowSignup }) {
         </label>
         <input
           ref={passwordRef}
-          type="text"
+          type="password"
           placeholder="Enter Password"
           className="input input-bordered input-accent w-full text-white mb-3"
         />

@@ -13,7 +13,7 @@ function Nav({ initialState }) {
     try {
       Auth.logout();
       setShowUserModal(true);
-      userDataVar('')
+      userDataVar("");
     } catch (err) {
       console.error(err);
     }
@@ -22,22 +22,20 @@ function Nav({ initialState }) {
   return (
     <>
       <div className="absolute top-0 right-[20vw] z-10">
-        <div className="btn-group btn-group-vertical lg:btn-group-horizontal">
+        <button
+          className="btn btn-warning rounded-none rounded-bl"
+          onClick={logoutButtonHandler}
+        >
+          {Auth.loggedIn() ? "Log Out" : "Sign Up"}
+        </button>
+        {Auth.loggedIn() && (
           <button
-            className="btn btn-warning rounded-none"
-            onClick={logoutButtonHandler}
+            className="btn btn-accent rounded-none"
+            onClick={() => setShowProfileModal(true)}
           >
-            {Auth.loggedIn() ? "Log Out" : "Sign Up"}
+            Profile
           </button>
-          {Auth.loggedIn() && (
-            <button
-              className="btn btn-accent rounded-none"
-              onClick={() => setShowProfileModal(true)}
-            >
-              Profile
-            </button>
-          )}
-        </div>
+        )}
       </div>
       {showUserModal && (
         <User

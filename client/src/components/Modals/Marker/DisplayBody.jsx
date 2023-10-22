@@ -34,14 +34,20 @@ function DisplayBody({ handleClose, markerId, setShowEditModal }) {
             <h2 className="text-xl font-semibold">
               {data.getMarkerById.title}
             </h2>
-            <div className="text-right">
-              <h6>{data.getMarkerById.user.username}</h6>
-              <p>{formatDate(data.getMarkerById.createdAt)}</p>
+            <div className="flex items-center text-right space-x-4">
+              <img
+                src={data.getMarkerById.user.pfp}
+                class="w-16 h-16 rounded-full border-2 border-gray-300 shadow-lg object-cover"
+              />
+              <div>
+                <h6>{data.getMarkerById.user.username}</h6>
+                <p>{formatDate(data.getMarkerById.createdAt)}</p>
+              </div>
             </div>
           </div>
 
           <div>
-            <div className="mb-4">
+            <div className="mb-4 mt-1">
               <img
                 className="w-full h-auto"
                 src={data.getMarkerById.media}

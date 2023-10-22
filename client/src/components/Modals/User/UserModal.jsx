@@ -64,6 +64,7 @@ function User({ handleClose }) {
                 <Login
                   setShowLogin={setShowLogin}
                   setShowSignup={setShowSignup}
+                  handleClose={handleClose}
                 />
               )}
             </div>

@@ -253,6 +253,9 @@ function Social() {
         mapLoadHandler={mapLoadHandler}
       />
       <div className="absolute top-0 right-0 w-1/5 h-[70vh] box-border overflow-y-auto bg-gray-500">
+        <h1 className="sticky top-0 bg-gray-900 p-4 z-10 text-2xl font-bold rounded-bl">
+          Memories in View
+        </h1>
         {markersInView && (
           <ul>
             {markersInView.map((point, index) => {
@@ -298,6 +301,19 @@ function Social() {
           handleClose={() => setShowDisplayModal(false)}
         />
       )}
+      <div className="mt-5 bottom-0 w-full bg-gray-800 p-4">
+        <div className="text-center text-white">
+          <a
+            href="https://github.com/jonny258"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex justify-center items-center space-x-2"
+          >
+            <i className="fab fa-github text-2xl"></i>
+            <span>Jonny258</span>
+          </a>
+        </div>
+      </div>
     </>
   );
 }
